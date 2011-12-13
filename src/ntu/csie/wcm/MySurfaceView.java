@@ -1,110 +1,103 @@
 package ntu.csie.wcm;
 
-import android.view.Menu;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RectF;
+import android.graphics.Path;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.view.View;
 
-public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback {
-	
+public class MySurfaceView extends View {
 
-	SurfaceHolder holder;
-	
-	MyThread thread;
-	
-	public MySurfaceView(Context context ,AttributeSet attrs) {
-		super(context);
-		
+    private static final float MINP = 0.25f;
+    private static final float MAXP = 0.75f;
+    
+    
+    private Paint   mPaint;
+    private Bitmap  mBitmap;
+    private Canvas  mCanvas;
+    private Path    mPath;
+    private Paint   mBitmapPaint;
 
-		// TODO Auto-generated constructor stub
-        holder = this.getHolder();
-        holder.addCallback(this);
-        Log.e("hello","mysurfaceview create");
-        thread = new MyThread();
-		
-	}
-
-	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void surfaceCreated(SurfaceHolder holder) {
-		// TODO Auto-generated method stub
-		thread.start();
-		
-	}
-
-	@Override
-	public void surfaceDestroyed(SurfaceHolder holder) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		// TODO Auto-generated method stub
-		
-		thread.doTouchEvent(event);
-		return super.onTouchEvent(event);
-		
-	}
-
-	
-	
-    class MyThread extends Thread{  
-    	  
-        @Override  
-        public void run() {  
-        	
-        	
-        	
-            Canvas canvas = holder.lockCanvas(null);
-            doDraw(canvas);
-
-              
-        }
+    public MySurfaceView(Context c ,AttributeSet attrs) {
+        super(c);
+        mPaint = new Paint();
+        mPaint.setAntiAlias(true);
+        mPaint.setDither(true);
+        mPaint.setColor(0xFFFF0000);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeJoin(Paint.Join.ROUND);
+        mPaint.setStrokeCap(Paint.Cap.ROUND);
+        mPaint.setStrokeWidth(12);
         
-        public void doTouchEvent(MotionEvent event)
-        {
-            if (event.getAction() == MotionEvent.ACTION_UP) {
+        mPath = new Path();
+        mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+    }
 
-        
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        mCanvas = new Canvas(mBitmap);
+    }
 
-            } else {
+    @Override
+    protected void onDraw(Canvas canvas) {
+        //canvas.drawColor(0xFFAAAAAA);
+    	canvas.drawColor(Color.BLUE);
+        canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
 
-        	int pc = event.getPointerCount();
-        	 Log.e("hello","pc = " + pc);
-        	if(pc > 1)
-        	{
-        		for(int i = 0; i< pc;i++)
-        		Log.e("hello",event.getX(i) + "," + event.getY(i) + " pointCount: " + event.getPointerCount());
-        	}
-        	else
-          Log.e("hello",event.getX() + "," + event.getY() + " pointCount: " + event.getPointerCount());
-            }
+        canvas.drawPath(mPath, mPaint);
+    }
+
+    private float mX, mY;
+    private static final float TOUCH_TOLERANCE = 200;//4;
+
+    private void touch_start(float x, float y) {
+        mPath.reset();
+        mPath.moveTo(x, y);
+        mX = x;
+        mY = y;
+    }
+    private void touch_move(float x, float y) {
+        float dx = Math.abs(x - mX);
+        float dy = Math.abs(y - mY);
+        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
+            mPath.quadTo(mX, mY, (x + mX)/2, (y + mY)/2);
+            mX = x;
+            mY = y;
         }
-        
-        private void doDraw(Canvas ca)
-        {
-        	
-            Paint mPaint = new Paint();  
-            mPaint.setColor(Color.BLUE);  
-              
-            ca.drawRect(new RectF(40,60,80,80), mPaint);  
-            Log.e("hello","drawing");
-            holder.unlockCanvasAndPost(ca); 
+    }
+    private void touch_up() {
+        mPath.lineTo(mX, mY);
+        // commit the path to our offscreen
+        mCanvas.drawPath(mPath, mPaint);
+        // kill this so we don't double draw
+        mPath.reset();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                touch_start(x, y);
+                invalidate();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                touch_move(x, y);
+                invalidate();
+                break;
+            case MotionEvent.ACTION_UP:
+                touch_up();
+                invalidate();
+                break;
         }
-     
-    } 
+        return true;
+    }
 }
