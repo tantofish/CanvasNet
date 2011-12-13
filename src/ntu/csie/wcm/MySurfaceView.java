@@ -1,9 +1,11 @@
 package ntu.csie.wcm;
 
+import android.view.Menu;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback {
+	
 	
 	public MySurfaceView() {
 		// TODO Auto-generated constructor stub
