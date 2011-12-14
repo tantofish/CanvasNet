@@ -9,6 +9,7 @@ import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 
 public class MySurfaceView extends View {
 
@@ -16,14 +17,25 @@ public class MySurfaceView extends View {
     private static final float MAXP = 0.75f;
     
     
-    private Paint   mPaint;
+	
+
+    
+    public static Paint   mPaint;
     private Bitmap  mBitmap;
     private Canvas  mCanvas;
     private Path    mPath;
     private Paint   mBitmapPaint;
+    private Context mContext;
 
     public MySurfaceView(Context c ,AttributeSet attrs) {
         super(c);
+        mContext = c;
+        
+      
+        
+
+	 
+       // mPaint = MyCanvas.mPaint;
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
@@ -35,6 +47,12 @@ public class MySurfaceView extends View {
         
         mPath = new Path();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+        
+        
+ 
+        
+    
+    
     }
 
     @Override
@@ -47,17 +65,20 @@ public class MySurfaceView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         //canvas.drawColor(0xFFAAAAAA);
-    	canvas.drawColor(Color.BLUE);
-        canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+    	canvas.drawColor(Color.WHITE);
+        
+    	
+    	canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
 
         canvas.drawPath(mPath, mPaint);
     }
 
     private float mX, mY;
-    private static final float TOUCH_TOLERANCE = 200;//4;
+    private static final float TOUCH_TOLERANCE = 4;//4;
 
     private void touch_start(float x, float y) {
-        mPath.reset();
+    	
+        //mPath.reset();
         mPath.moveTo(x, y);
         mX = x;
         mY = y;
@@ -100,4 +121,8 @@ public class MySurfaceView extends View {
         }
         return true;
     }
+    
+    
+    
+
 }
