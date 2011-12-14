@@ -1,27 +1,25 @@
 package ntu.csie.wcm;
 
 
-import java.util.HashMap;
-
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MyCanvas extends Activity{
 
-//	MySurfaceView mView;
+	MyCanvas mSelf;
+	MySurfaceView mView;
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -29,38 +27,66 @@ public class MyCanvas extends Activity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.canvaslayout);
 		
-		//mView = (MySurfaceView)findViewById(R.id.mySurfaceView1);
+		mSelf = this;
+		
+	
+		mView = (MySurfaceView)findViewById(R.id.mySurfaceView1);
+		
 		
 		Button CcBtn;  //change color button
-		Button eraserBtn;
 		CcBtn = (Button) findViewById(R.id.ChangeColorBt);
 		CcBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
 				useColorPicker();
-				
-
 			}
 		});
+		
+		
+
+		
+		Button eraserBtn;
 		eraserBtn = (Button) findViewById(R.id.EraserBt);
 		eraserBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
-				MySurfaceView.mPaint.setColor(Color.WHITE);
-			
-
-
+				mView.getPaint().setColor(Color.WHITE);
 			}
 		});
-        
+		
+		Button undoBtn = (Button) findViewById(R.id.undoBt);
+		undoBtn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				// Perform action on click
+
+				mView.undo();
+			}
+		});
+		
+		Button redoBtn = (Button) findViewById(R.id.redoBt);
+		redoBtn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				// Perform action on click
+				mView.redo();
+			}
+		});
+		
+		Button clearBtn = (Button) findViewById(R.id.clearBt);
+		clearBtn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				// Perform action on click
+				mView.clearCanvas(mSelf);
+			}
+		});
 
 		
 	}
+
 	
 	
 	private void useColorPicker()
 	{
-		new ColorPickDialog(this , MySurfaceView.mPaint , MySurfaceView.mPaint.getColor()).show();
+		new ColorPickDialog(this , mView.getPaint() , mView.getPaint().getColor()).show();
 	}
 	
 	@Override
