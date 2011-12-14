@@ -19,11 +19,14 @@ import android.content.res.AssetManager;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -42,12 +45,11 @@ public class ImgLoaderActivity extends Activity {
 	Context context;
 	ImageView image;
 	
-	
-	
 	Vector<File[]> files;
 	int folderIndex = -1;
 	int imageIndex = -1;
-	//int level = 1;
+	int w, h;	//
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -58,47 +60,52 @@ public class ImgLoaderActivity extends Activity {
 		g_folder = (Gallery)   findViewById(R.id.gallery_folder);
 		g_photo  = (Gallery)   findViewById(R.id.gallery1);
 		image	 = (ImageView) findViewById(R.id.imageView1);
-		
+		image.setImageBitmap(null);
 		readExternalStoragePublicPicture();
 		
+		DisplayMetrics dm = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
+		w = dm.widthPixels;
+		h = dm.heightPixels;
 		
 		g_folder.setAdapter((SpinnerAdapter) new ImageAdapter(context));
 		
 		g_folder.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView parent, View v, int position, long id) {
-				//Toast.makeText(context, String.valueOf(position), Toast.LENGTH_SHORT).show();
-
-				/*if (position == 0) {
-					level = 11;
-				} else if (position == 1) {
-					level = 12;
-				} else if (position == 2) {
-					level = 13;
-				}*/
 				folderIndex = position;
 				imageIndex = 0;
 				g_photo.setAdapter((SpinnerAdapter) new ImageAdapter(context));
-				backgroundType(image);
 			}
 		});
 
 		g_photo.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView parent, View v, int position, long id) {
-				//Toast.makeText(context, String.valueOf(position), Toast.LENGTH_SHORT).show();
-				/*if (level == 11) {
-					image.setImageResource(new ImageAdapter(context).ImageId1[position]);
-				} else if (level == 12) {
-					image.setImageResource(new ImageAdapter(context).ImageId2[position]);
-				} else if (level == 13) {
-					image.setImageResource(new ImageAdapter(context).ImageId3[position]);
-				}*/
 				imageIndex = position;
-				image.setImageBitmap(BitmapFactory.decodeFile(files.get(folderIndex)[imageIndex].getPath()));
+				//image.setImageBitmap(BitmapFactory.decodeFile(files.get(folderIndex)[imageIndex].getPath()));
+				
+				Bitmap bm = BitmapFactory.decodeFile(files.get(folderIndex)[position].getPath());
+				//記憶體會爆 所以要縮圖 
+				int width = bm.getWidth();
+				int height = bm.getHeight();
+	            float scale = (float) w / width;
+                Matrix matrix = new Matrix();
+                matrix.postScale(scale, scale);
+                Bitmap img = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
+                bm.recycle();
+				image.setImageBitmap(img);
 				
 				backgroundType(image);
 			}
 		});
 		
+		
+		image.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				finish();
+			}
+		});
 	}
 
 	public class ImageAdapter extends BaseAdapter {
@@ -114,15 +121,6 @@ public class ImgLoaderActivity extends Activity {
 				return files.size();
 			else
 				return files.get(folderIndex).length;
-			/*if (level == 1) {
-				return folderImageIds.length;
-			} else if (level == 11) {
-				return ImageId1.length;
-			} else if (level == 12) {
-				return ImageId2.length;
-			} else {
-				return ImageId3.length;
-			}*/
 		}
 
 		public Object getItem(int position) {	return position;	}
@@ -131,19 +129,26 @@ public class ImgLoaderActivity extends Activity {
 
 		public View getView(int position, View convertView, ViewGroup parent) {
 			ImageView i = new ImageView(mContext);
-/*			if (level == 1) {
-				i.setImageResource(folderImageIds[position]);
-			} else if (level == 11) {
-				i.setImageResource(ImageId1[position]);
-			} else if (level == 12) {
-				i.setImageResource(ImageId2[position]);
-			} else if (level == 13) {
-				i.setImageResource(ImageId3[position]);
-			}*/
 			if (imageIndex == -1)
 				i.setImageResource(folderImageId);
-			else
-				i.setImageBitmap(BitmapFactory.decodeFile(files.get(folderIndex)[position].getPath()));
+			else{
+				
+				Bitmap bm = BitmapFactory.decodeFile(files.get(folderIndex)[position].getPath());
+				if (bm != null){
+					//記憶體會爆 所以要縮圖 這裡會導致滾動lag
+					int width = bm.getWidth();
+					int height = bm.getHeight();
+		            int newWidth = w/5;
+		            float scale = (float) newWidth / width;
+	                Matrix matrix = new Matrix();
+	                matrix.postScale(scale, scale);
+	                Bitmap img = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
+	                bm.recycle();
+					i.setImageBitmap(img);
+				}else{
+					return i;
+				}
+			}
 			
 			i.setScaleType(ImageView.ScaleType.FIT_XY);
 			i.setLayoutParams(new Gallery.LayoutParams(120, 120));
@@ -165,6 +170,7 @@ public class ImgLoaderActivity extends Activity {
 		a.recycle();
 		image.setBackgroundResource(mGalleryItemBackground);
 	}
+	
 	
 	public void readExternalStoragePublicPicture() {
 		/* Get the folder path: "mnt/sdcard/Pictures" */
@@ -192,6 +198,12 @@ public class ImgLoaderActivity extends Activity {
 			if(f.length>0) files.add(f);
 		}
 		
+		
+		File DCIM = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+		File newpath = new File(DCIM.toString(), "Camera");
+		f = newpath.listFiles(fileFilter);
+		if(f.length>0) files.add(f);
+		
 		/* Debug Message */
 		for(int i = 0 ; i < dirs.length; i++){
 			f = files.get(i);
@@ -199,17 +211,8 @@ public class ImgLoaderActivity extends Activity {
 				Log.d("DEBUG_GET_FILE", "DIR " + f[j].getPath());
 			}
 		}
-		
-		
-		/*//File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-		String extStorage = Environment.getExternalStorageDirectory().toString();
-		
-	       String file = new File(extStorage, "myFile.PNG").toString();
-	       Bitmap bm = BitmapFactory.decodeFile(file);
-	          image.setImageBitmap(bm);*/
-		
 	}
-	public void createExternalStoragePublicPicture() {
+	/*public void createExternalStoragePublicPicture() {
 	    
 	    File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 	    File file = new File(path, "pic_1.png");
@@ -236,5 +239,5 @@ public class ImgLoaderActivity extends Activity {
 	        
 	        Log.w("ExternalStorage", "Error writing " + file, e);
 	    }
-	}
+	}*/
 }
