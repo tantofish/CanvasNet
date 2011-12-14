@@ -1,41 +1,24 @@
 package ntu.csie.wcm;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.Object;
 import java.util.Vector;
 
-import android.net.Uri;
+
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.res.AssetManager;
+import android.content.*;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.MediaScannerConnection;
+import android.graphics.*;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.View;
+import android.util.*;
+import android.view.*;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
+import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.Gallery;
-import android.widget.ImageView;
-import android.widget.SpinnerAdapter;
-import android.widget.Toast;
 
 public class ImgLoaderActivity extends Activity {
 	/** Called when the activity is first created. */
@@ -45,10 +28,12 @@ public class ImgLoaderActivity extends Activity {
 	Context context;
 	ImageView image;
 	
+	
 	Vector<File[]> files;
 	int folderIndex = -1;
 	int imageIndex = -1;
-	int w, h;	//
+	int w, h;
+	String pathString;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -82,18 +67,28 @@ public class ImgLoaderActivity extends Activity {
 			public void onItemClick(AdapterView parent, View v, int position, long id) {
 				imageIndex = position;
 				//image.setImageBitmap(BitmapFactory.decodeFile(files.get(folderIndex)[imageIndex].getPath()));
+				pathString = files.get(folderIndex)[position].getPath();
+				Bitmap bm = BitmapFactory.decodeFile(pathString);
 				
-				Bitmap bm = BitmapFactory.decodeFile(files.get(folderIndex)[position].getPath());
-				//記憶體會爆 所以要縮圖 
+				/*String q = bm.toString();
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				bm.compress(Bitmap.CompressFormat.PNG, 100, out);
+				byte[] array= out.toByteArray();
+				bm = BitmapFactory.decodeByteArray(array, 0, array.length);*/
+				
 				int width = bm.getWidth();
-				int height = bm.getHeight();
-	            float scale = (float) w / width;
-                Matrix matrix = new Matrix();
-                matrix.postScale(scale, scale);
-                Bitmap img = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
-                bm.recycle();
-				image.setImageBitmap(img);
-				
+				if(width > w){
+					//記憶體會爆 所以要縮圖 
+					int height = bm.getHeight();
+		            float scale = (float) w / width;
+	                Matrix matrix = new Matrix();
+	                matrix.postScale(scale, scale);
+	                Bitmap img = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
+	                bm.recycle();
+	                image.setImageBitmap(img);
+				}else{
+					image.setImageBitmap(bm);
+				}
 				backgroundType(image);
 			}
 		});
@@ -103,6 +98,17 @@ public class ImgLoaderActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+				Bundle b = new Bundle();
+				Intent intent = new Intent();
+				
+				b.putString("imgPath", pathString);
+				intent.putExtras(b);
+				
+				intent.setClass(ImgLoaderActivity.this, MyCanvas.class);
+				//startActivity(intent);
+				/* 因為是用 start Activity for result 跳過來的, 所以 set result 之後 finish 就可以回去了*/
+				setResult(RESULT_OK, intent);
+
 				finish();
 			}
 		});
@@ -132,8 +138,8 @@ public class ImgLoaderActivity extends Activity {
 			if (imageIndex == -1)
 				i.setImageResource(folderImageId);
 			else{
-				
 				Bitmap bm = BitmapFactory.decodeFile(files.get(folderIndex)[position].getPath());
+				
 				if (bm != null){
 					//記憶體會爆 所以要縮圖 這裡會導致滾動lag
 					int width = bm.getWidth();

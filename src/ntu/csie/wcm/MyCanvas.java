@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -148,7 +150,22 @@ public class MyCanvas extends Activity{
 		return super.onOptionsItemSelected(item);
 	}
 	
-
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data){
+		Log.d("Debug","onActivityResult: 從 ImageLoader 回來了");
+		super.onActivityResult(requestCode, resultCode, data);
+		//facebook.authorizeCallback(requestCode, resultCode, data);
+		if (requestCode == 1 && resultCode == RESULT_OK){
+			Bundle b = data.getExtras();
+			String path = b.getString("imgPath");
+			
+			Log.d("Debug","Decode Returned Bitmap");
+			Bitmap img = BitmapFactory.decodeFile(path);
+			mView.testBGImg(img);
+			
+			
+		}
+	}
 
 	
  
