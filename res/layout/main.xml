@@ -6,7 +6,9 @@
     >
     <TextView android:layout_width="fill_parent" android:text="@string/hello" android:layout_height="wrap_content"></TextView>
     
+
 <Button android:id="@+id/hostBtn" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Host Start"></Button>
 <Button android:text="Client Start" android:id="@+id/clientBtn" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
 <Button android:text="Jump to imgLoader" android:id="@+id/button2" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
+
 </LinearLayout>

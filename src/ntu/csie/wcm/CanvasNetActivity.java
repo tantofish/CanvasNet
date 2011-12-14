@@ -12,17 +12,21 @@ import android.widget.EditText;
 public class CanvasNetActivity extends Activity {
 	/** Called when the activity is first created. */
 
+
 	Button HostStartBtn,ClientStartBtn; 
 	Button imgLoaderActivityJumper; // tantofish:temporary use.
+
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+
 		HostStartBtn = (Button) findViewById(R.id.hostBtn);
 
 		HostStartBtn.setOnClickListener(new View.OnClickListener() {
+
 			public void onClick(View v) {
 				openDialog(new HostPositiveListener(),"Using Host",true);
 			}
@@ -37,6 +41,7 @@ public class CanvasNetActivity extends Activity {
 			}
 
 		});
+
 		
 		
 		
@@ -54,6 +59,7 @@ public class CanvasNetActivity extends Activity {
 			}
 
 		});
+
 	}
 	
 	

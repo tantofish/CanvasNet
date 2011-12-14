@@ -4,6 +4,7 @@ package ntu.csie.wcm;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -113,7 +114,11 @@ public class MyCanvas extends Activity{
 			Toast.makeText(MyCanvas.this, "還沒做", Toast.LENGTH_SHORT).show();
 			break;
 		case 2:
-			Toast.makeText(MyCanvas.this, "正在做", Toast.LENGTH_SHORT).show();
+			Intent intent = new Intent();
+			intent.setClass(MyCanvas.this, ImgLoaderActivity.class);
+			Bundle bundle = new Bundle();
+			intent.putExtras(bundle);
+			startActivityForResult(intent, 1);
 			break;
 		case 3:
 			LayoutInflater inflater = LayoutInflater.from(MyCanvas.this);  
