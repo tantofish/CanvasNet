@@ -1,28 +1,18 @@
-/*package ntu.csie.wcm;
+package ntu.csie.wcm;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.text.format.Formatter;
 import android.util.Log;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
 public class MySocket {
 
 
 
-	private MyCanvas c;
+	private MySurfaceView c;
 	
 	private java.io.ObjectInputStream ib;
 	private java.io.ObjectOutputStream ob;
@@ -36,18 +26,22 @@ public class MySocket {
     private Thread tmp;
     
     
+    
 //
 // here has to modify the canvas class name
 //
-    public MySocket(MyCanvas canvas , int listen){
+    public MySocket(MySurfaceView canvas , int listen, String ip){
     	c = canvas;
     	listenPort = listen;
     	
-    	WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
-        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        int ipAddress = wifiInfo.getIpAddress();
-        String s = new String(Formatter.formatIpAddress(ipAddress));
-        localhost = InetAddress.getByName(s);
+
+        try {
+			localhost = InetAddress.getByName(ip);
+			Log.e("IP", ip);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
     public void server(){
@@ -68,9 +62,16 @@ public class MySocket {
 //here has to be modify!!!
 //		           
 					while(true){									
-						sleep(1000);
-						WCM temp = (WCM)ib.readObject();	
+						try {
+							sleep(1000);
+						
+						Commands.BaseCmd temp = (Commands.BaseCmd)ib.readObject();	
 						c.process(temp);
+						
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 		    		}		    		      		         
 		        } catch (IOException e) {	Log.d("proj","[server] Socket ERROR");       }		      		   
 			}
@@ -84,9 +85,9 @@ public class MySocket {
 			InetAddress serverIp;
 			try {
 				serverIp = InetAddress.getByName(ip);
-				 
+		    Log.e("connecttttttttt", "ready");
 			clientSocket=new Socket(serverIp,port);
-			
+			Log.e("connecttttttttt", "success");
 			ob = new java.io.ObjectOutputStream(clientSocket.getOutputStream());
 			if(ob != null)	Log.d("proj" , "client ob not null");					
 			ib = new java.io.ObjectInputStream(clientSocket.getInputStream());
@@ -97,17 +98,26 @@ public class MySocket {
 
 					while(true){
 
-							sleep(1000);
-							WCM temp = (WCM)ib.readObject();
+							try {
+								sleep(1000);
+							
+							Commands.BaseCmd temp = (Commands.BaseCmd)ib.readObject();
+							
 							c.process(temp);
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 					}							
 				}						
-			};	
+			};
+			
+			tmp.start();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}	
-			tmp.start();		
+					
     	
     }
     
@@ -128,7 +138,7 @@ public class MySocket {
 //
 // need to modify the the class name of object     
 //    	
-    public void send(WCM obj){
+    public void send(Commands.BaseCmd obj){
     	
         try {
 			ob.writeObject(obj);
@@ -138,4 +148,4 @@ public class MySocket {
     
     
 }
-*/
+

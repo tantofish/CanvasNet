@@ -1,13 +1,17 @@
 package ntu.csie.wcm;
 
 
+import java.math.BigDecimal;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,6 +25,9 @@ public class MyCanvas extends Activity{
 
 	MyCanvas mSelf;
 	MySurfaceView mView;
+	public static MySocket mSocket;
+	
+	boolean mIsServer;
 	
 	
 	@Override
@@ -30,10 +37,33 @@ public class MyCanvas extends Activity{
 		setContentView(R.layout.canvaslayout);
 		
 		mSelf = this;
-		
-	
 		mView = (MySurfaceView)findViewById(R.id.mySurfaceView1);
 		
+		//get local ip
+    	WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        int ipAddress = wifiInfo.getIpAddress();
+        String ip = new String(Formatter.formatIpAddress(ipAddress));
+        mSocket  =new MySocket(mView , 5050, ip);
+        
+        Bundle bundle = this.getIntent().getExtras(); 
+  	    
+        mIsServer = bundle.getBoolean("isServer");
+        if(mIsServer)
+        {
+        	mSocket.server();
+        }
+        else
+        {
+        	String remoteIP = bundle.getString("IP");
+        	mSocket.client(remoteIP, 5050);
+        }
+        
+
+        
+        
+        
+        
 		
 		Button CcBtn;  //change color button
 		CcBtn = (Button) findViewById(R.id.ChangeColorBt);
@@ -139,6 +169,7 @@ public class MyCanvas extends Activity{
 	        builder.show();
 			break;
 		case 4:
+			mSocket.disconnect();
 			this.finish();
 			break;
 		case 5:

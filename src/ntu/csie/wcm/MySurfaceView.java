@@ -22,6 +22,7 @@ public class MySurfaceView extends View {
 
 	private final int BITMAP_CACHE_SIZE = 10;
 
+	public Commands mCommands;
 	private Paint mPaint;
 	private ArrayList<Bitmap> mBitmaps;
 	Bitmap mBitmap;
@@ -49,6 +50,7 @@ public class MySurfaceView extends View {
 
 		mPath = new Path();
 		mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+		mCommands = new Commands();
 
 	}
 
@@ -103,7 +105,13 @@ public class MySurfaceView extends View {
 
 		mCanvas.drawPath(mPath, mPaint);
 		undoCounter = 0;
-
+		
+		
+		
+      //  Commands.DrawPathCmd tt = mCommands.new DrawPathCmd(mPath);
+		MyCanvas.mSocket.send(mCommands.new SendNumberCmd(77)); //for testing use
+		//MyCanvas.mSocket.send(mCommands.new DrawPathCmd(mPath));
+		
 		saveBitmap();
 
 		mPath.reset();
@@ -131,7 +139,7 @@ public class MySurfaceView extends View {
 			invalidate();
 		}
 
-		Log.e("test", Integer.toString(undoCounter) + " " + mBitmaps.size());
+		//Log.e("test", Integer.toString(undoCounter) + " " + mBitmaps.size());
 	}
 
 	public void redo() {
@@ -197,6 +205,29 @@ public class MySurfaceView extends View {
 			break;
 		}
 		return true;
+	}
+	
+	
+	public void process(Commands.BaseCmd cmd)
+	{
+		switch (cmd.ID)
+		{
+		case 1:
+			
+			Commands.DrawPathCmd Dpc = (Commands.DrawPathCmd) cmd;
+			mCanvas.drawPath(Dpc.getPath(), mPaint);
+			//mPath.reset();
+			invalidate();
+		break;
+		case 2:
+		    Commands.SendNumberCmd Snc = (Commands.SendNumberCmd) cmd;
+			Log.e("receive num", Integer.toString(Snc.getNum()));
+			Log.e("receive num2", Integer.toString(Snc.getNum()));
+			Log.e("receive num3", Integer.toString(Snc.getNum()));
+			//mPath.reset();
+			//invalidate();
+			
+		}
 	}
 
 }

@@ -80,7 +80,7 @@ public class CanvasNetActivity extends Activity {
 			Intent intent = new Intent();
 			intent.setClass(CanvasNetActivity.this, MyCanvas.class);
 			Bundle bundle = new Bundle();
-			bundle.putBoolean("isHost", true);
+			bundle.putBoolean("isServer", true);
 			intent.putExtras(bundle);
 			
 			startActivity(intent);
@@ -97,7 +97,7 @@ public class CanvasNetActivity extends Activity {
 			Intent intent = new Intent();
 			intent.setClass(CanvasNetActivity.this, MyCanvas.class);
 			Bundle bundle = new Bundle();
-			bundle.putBoolean("isHost", false);
+			bundle.putBoolean("isServer", false);
 			bundle.putString("IP", input.getText().toString());
 			intent.putExtras(bundle);
 			
@@ -115,6 +115,7 @@ public class CanvasNetActivity extends Activity {
         {
         	// Set an EditText view to get user input 
         	input = new EditText(this);
+        	input.setInputType(0x00000014);
         	builder.setView(input);
         	
         }
