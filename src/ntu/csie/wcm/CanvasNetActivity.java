@@ -1,16 +1,18 @@
 package ntu.csie.wcm;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 public class CanvasNetActivity extends Activity {
 	/** Called when the activity is first created. */
 
-	Button temp; // e98877331:temporary use.
+	Button HostStartBtn,ClientStartBtn; 
 	Button imgLoaderActivityJumper; // tantofish:temporary use.
 	
 	@Override
@@ -18,21 +20,28 @@ public class CanvasNetActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		temp = (Button) findViewById(R.id.button1);
-		imgLoaderActivityJumper
-		     = (Button) findViewById(R.id.button2);
-		temp.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
+		HostStartBtn = (Button) findViewById(R.id.hostBtn);
 
-				Intent intent = new Intent();
-				intent.setClass(CanvasNetActivity.this, MyCanvas.class);
-				Bundle bundle = new Bundle();
-				intent.putExtras(bundle);
-				
-				startActivity(intent);
+		HostStartBtn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				openDialog(new HostPositiveListener(),"Using Host",true);
 			}
 
 		});
+		
+		ClientStartBtn = (Button) findViewById(R.id.clientBtn);
+
+		ClientStartBtn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				openDialog(new ClientPositiveListener(),"Using client, please input IP",false);
+			}
+
+		});
+		
+		
+		
+		imgLoaderActivityJumper
+		     = (Button) findViewById(R.id.button2);
 		imgLoaderActivityJumper.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 
@@ -46,4 +55,78 @@ public class CanvasNetActivity extends Activity {
 
 		});
 	}
+	
+	
+	
+	
+	
+	class BasePositiveListener implements DialogInterface.OnClickListener {
+    	public void onClick(DialogInterface dialog, int id) {}
+	}
+
+	class HostPositiveListener extends BasePositiveListener {
+		@Override
+		public void onClick(DialogInterface dialog, int id) {
+			// TODO Auto-generated method stub
+			super.onClick(dialog, id);
+			
+			
+			Intent intent = new Intent();
+			intent.setClass(CanvasNetActivity.this, MyCanvas.class);
+			Bundle bundle = new Bundle();
+			bundle.putBoolean("isHost", true);
+			intent.putExtras(bundle);
+			
+			startActivity(intent);
+		}
+	}
+
+	EditText input;
+	class ClientPositiveListener extends BasePositiveListener{
+		@Override
+		public void onClick(DialogInterface dialog, int id) {
+			// TODO Auto-generated method stub
+			super.onClick(dialog, id);
+			
+			Intent intent = new Intent();
+			intent.setClass(CanvasNetActivity.this, MyCanvas.class);
+			Bundle bundle = new Bundle();
+			bundle.putBoolean("isHost", false);
+			bundle.putString("IP", input.getText().toString());
+			intent.putExtras(bundle);
+			
+			startActivity(intent);
+		}
+    }
+	
+	private void openDialog(BasePositiveListener l,String message,boolean isHost)
+	{
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        
+        builder.setMessage(message);
+        builder.setCancelable(false);
+        if(!isHost)
+        {
+        	// Set an EditText view to get user input 
+        	input = new EditText(this);
+        	builder.setView(input);
+        	
+        }
+        builder.setPositiveButton("Yes", l);
+        
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+        	public void onClick(DialogInterface dialog, int id) {
+        	}
+        });   
+         
+        
+        AlertDialog alert = builder.create();
+        alert.show();
+		
+	}
+	
+	
 }
+
+
+

@@ -27,11 +27,12 @@ public final class R {
     public static final class id {
         public static final int ChangeColorBt=0x7f050002;
         public static final int EraserBt=0x7f050003;
-        public static final int button1=0x7f05000b;
-        public static final int button2=0x7f05000c;
+        public static final int button2=0x7f05000d;
         public static final int clearBt=0x7f050006;
+        public static final int clientBtn=0x7f05000c;
         public static final int gallery1=0x7f050009;
         public static final int gallery_folder=0x7f050008;
+        public static final int hostBtn=0x7f05000b;
         public static final int imageView1=0x7f05000a;
         public static final int ipTextView=0x7f050007;
         public static final int linearLayout1=0x7f050001;
