@@ -20,7 +20,7 @@ public class MySurfaceView extends View {
 	
 
     
-    public static Paint   mPaint;
+    public static  Paint   mPaint;
     private Bitmap  mBitmap;
     private Canvas  mCanvas;
     private Path    mPath;
@@ -48,12 +48,14 @@ public class MySurfaceView extends View {
         mPath = new Path();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         
+
         
  
         
     
     
     }
+
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {

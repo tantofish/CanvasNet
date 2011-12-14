@@ -17,22 +17,26 @@ import android.view.View;
 
 public class ColorPickDialog extends Dialog {
 
-    public interface OnColorChangedListener {
-        void colorChanged(int color);
-    }
 
-    private OnColorChangedListener mListener;
+
+  
     private int mInitialColor;
+    private Paint mPaintToChange;
+  
 
     private static class ColorPickerView extends View {
+    	private Paint mPaintToChange;
         private Paint mPaint;
         private Paint mCenterPaint;
         private final int[] mColors;
-        private OnColorChangedListener mListener;
+        private ColorPickDialog mSelf;
+    
 
-        ColorPickerView(Context c, OnColorChangedListener l, int color) {
+        ColorPickerView(Context c, Paint paint, int color,ColorPickDialog self) {
             super(c);
-            mListener = l;
+            mSelf = self;
+            mPaintToChange = paint;
+           
             mColors = new int[] {
                 0xFFFF0000, 0xFFFF00FF, 0xFF0000FF, 0xFF00FFFF, 0xFF00FF00,
                 0xFFFFFF00, 0xFFFF0000
@@ -189,7 +193,8 @@ public class ColorPickDialog extends Dialog {
                 case MotionEvent.ACTION_UP:
                     if (mTrackingCenter) {
                         if (inCenter) {
-                            mListener.colorChanged(mCenterPaint.getColor());
+                            colorChanged(mCenterPaint.getColor());
+                            
                         }
                         mTrackingCenter = false;    // so we draw w/o halo
                         invalidate();
@@ -198,29 +203,32 @@ public class ColorPickDialog extends Dialog {
             }
             return true;
         }
+        
+        public void colorChanged(int color) {
+        	mPaintToChange.setColor(color);
+        	mSelf.dismiss();
+        }
     }
 
     public ColorPickDialog(Context context,
-                             OnColorChangedListener listener,
+                             Paint paint,
                              int initialColor) {
         super(context);
 
-        mListener = listener;
+     
+        mPaintToChange = paint;
         mInitialColor = initialColor;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        OnColorChangedListener l = new OnColorChangedListener() {
-            public void colorChanged(int color) {
-                mListener.colorChanged(color);
-                dismiss();
-            }
-        };
-        Log.e("test","in");
-        setContentView(new ColorPickerView(getContext(), l, mInitialColor));
-        Log.e("test","out");
+
+        
+        setContentView(new ColorPickerView(getContext(), mPaintToChange, mInitialColor,this));
+      
         setTitle("Pick a Color");
     }
+    
+    
 }
