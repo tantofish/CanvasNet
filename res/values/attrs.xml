@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>  
+    <declare-styleable name="Gallery">  
+        <attr name="android:galleryItemBackground">  
+        </attr>  
+    </declare-styleable>  
+</resources>
