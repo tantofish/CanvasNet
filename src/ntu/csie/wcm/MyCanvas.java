@@ -17,13 +17,17 @@ import android.widget.Toast;
 
 public class MyCanvas extends Activity{
 
+	MyCanvas mSelf;
 	MySurfaceView mView;
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.canvaslayout);
+		
+		mSelf = this;
 		
 	
 		mView = (MySurfaceView)findViewById(R.id.mySurfaceView1);
@@ -71,7 +75,7 @@ public class MyCanvas extends Activity{
 		clearBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
-				mView.clearCanvas();
+				mView.clearCanvas(mSelf);
 			}
 		});
 

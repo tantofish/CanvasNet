@@ -2,7 +2,9 @@ package ntu.csie.wcm;
 
 import java.util.ArrayList;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -17,7 +19,7 @@ public class MySurfaceView extends View {
 
 	private static final float MINP = 0.25f;
 	private static final float MAXP = 0.75f;
-	
+
 	private final int BITMAP_CACHE_SIZE = 10;
 
 	private Paint mPaint;
@@ -27,7 +29,7 @@ public class MySurfaceView extends View {
 	private Path mPath;
 	private Paint mBitmapPaint;
 	private Context mContext;
-	private int mWidth,mHeight;
+	private int mWidth, mHeight;
 
 	public MySurfaceView(Context c, AttributeSet attrs) {
 		super(c, attrs);
@@ -50,15 +52,14 @@ public class MySurfaceView extends View {
 
 	}
 
-	public Paint getPaint()
-	{
-	 return mPaint;
+	public Paint getPaint() {
+		return mPaint;
 	}
-	
+
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
-		
+
 		mWidth = w;
 		mHeight = h;
 		mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
@@ -99,66 +100,83 @@ public class MySurfaceView extends View {
 
 	private void touch_up() {
 		mPath.lineTo(mX, mY);
-		
+
 		mCanvas.drawPath(mPath, mPaint);
 		undoCounter = 0;
+
 		saveBitmap();
-	
+
 		mPath.reset();
 	}
-	
-	
+
 	private int undoCounter = 0;
+
 	// function to save bitmap, so that undo can load it
 	private void saveBitmap() {
 		if (mBitmaps.size() > BITMAP_CACHE_SIZE)
 			mBitmaps.remove(0);
-		
-		
+
 		mBitmaps.add(Bitmap.createBitmap(mBitmap));
 	}
 
-	// undo function  e98877331:FIXME: undo then touch_up() will break
+	// undo function e98877331:FIXME: undo then touch_up() will break
 	public void undo() {
-		
-				
-		if(undoCounter <mBitmaps.size()-1)
-		{
-			++undoCounter;
-		mBitmap = mBitmaps.get(mBitmaps.size()-1-undoCounter);
-	
 
-		mCanvas = new Canvas(mBitmap);
-		
-		
-		invalidate();
+		if (undoCounter < mBitmaps.size() - 1) {
+			++undoCounter;
+			mBitmap = mBitmaps.get(mBitmaps.size() - 1 - undoCounter);
+
+			mCanvas = new Canvas(mBitmap);
+
+			invalidate();
 		}
-		
+
 		Log.e("test", Integer.toString(undoCounter) + " " + mBitmaps.size());
 	}
 
 	public void redo() {
-		
-		if (undoCounter > 0)
-		{
+
+		if (undoCounter > 0) {
 			--undoCounter;
-		mBitmap = mBitmaps.get(mBitmaps.size()-1-undoCounter);
-		mCanvas = new Canvas(mBitmap);
+			mBitmap = mBitmaps.get(mBitmaps.size() - 1 - undoCounter);
+			mCanvas = new Canvas(mBitmap);
 		}
-		
+
 		invalidate();
 	}
-	 
 
-    public void clearCanvas()
-    { 
-		mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
-		mCanvas = new Canvas(mBitmap);
-		mBitmaps.clear();    
-		invalidate();
-    }
-    
-    
+	public void clearCanvas(MyCanvas mc) {
+		
+        AlertDialog.Builder builder = new AlertDialog.Builder(mc);
+        
+        builder.setMessage("Clear Canvas?");
+        builder.setCancelable(false);
+        
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        	public void onClick(DialogInterface dialog, int id) {
+        		
+        		mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+        		mCanvas = new Canvas(mBitmap);
+        		mBitmaps.clear();
+        		invalidate();
+        	}
+        });
+        
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+        	public void onClick(DialogInterface dialog, int id) {
+        	}
+        });   
+        
+        AlertDialog alert = builder.create();
+        alert.show();
+
+		
+		
+		
+		
+
+	}
+
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		float x = event.getX();
