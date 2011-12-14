@@ -29,15 +29,15 @@ public final class R {
         public static final int EraserBt=0x7f050003;
         public static final int button1=0x7f05000b;
         public static final int button2=0x7f05000c;
-        public static final int button3=0x7f050004;
-        public static final int button4=0x7f050005;
-        public static final int button5=0x7f050006;
+        public static final int clearBt=0x7f050006;
         public static final int gallery1=0x7f050009;
         public static final int gallery_folder=0x7f050008;
         public static final int imageView1=0x7f05000a;
         public static final int ipTextView=0x7f050007;
         public static final int linearLayout1=0x7f050001;
         public static final int mySurfaceView1=0x7f050000;
+        public static final int redoBt=0x7f050005;
+        public static final int undoBt=0x7f050004;
     }
     public static final class layout {
         public static final int canvaslayout=0x7f030000;
