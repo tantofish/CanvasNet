@@ -13,7 +13,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="Canvas"></activity>
+        <activity android:name=".MyCanvas"></activity>
 
     </application>
 </manifest>

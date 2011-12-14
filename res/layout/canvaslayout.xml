@@ -7,9 +7,16 @@
     
 
        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-    <ntu.csie.wcm.MySurfaceView android:id="@+id/mySurfaceView1" android:layout_height="fill_parent" android:layout_width="fill_parent"></ntu.csie.wcm.MySurfaceView>
+   			 android:layout_width="fill_parent"
+   	         android:layout_height="fill_parent">
+           <ntu.csie.wcm.MySurfaceView android:id="@+id/mySurfaceView1" android:layout_width="wrap_content" android:layout_height="wrap_content"></ntu.csie.wcm.MySurfaceView>
+           <LinearLayout android:id="@+id/linearLayout1" android:layout_width="match_parent" android:layout_height="wrap_content">
+               <Button android:text="Bt1" android:layout_width="0pt" android:layout_weight="1" android:layout_height="wrap_content" android:background="@android:color/transparent" android:id="@+id/ChangeColorBt"></Button>
+               <Button android:text="bt2" android:id="@+id/EraserBt" android:layout_width="0pt" android:layout_weight="1"  android:layout_height="wrap_content" android:background="@android:color/transparent"></Button>
+               <Button android:text="bt3" android:id="@+id/button3" android:layout_width="0pt" android:layout_weight="1" android:layout_height="wrap_content" android:background="@android:color/transparent"></Button>
+               <Button android:text="bt4" android:id="@+id/button4" android:layout_width="0pt" android:layout_weight="1" android:layout_height="wrap_content" android:background="@android:color/transparent"></Button>
+               <Button android:text="bt5" android:id="@+id/button5" android:layout_height="wrap_content" android:background="@android:color/transparent" android:layout_width="0pt" android:layout_weight="1"></Button>
+           </LinearLayout>
    </FrameLayout>
    
 </LinearLayout>

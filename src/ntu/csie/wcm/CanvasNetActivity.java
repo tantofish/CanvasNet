@@ -24,7 +24,7 @@ public class CanvasNetActivity extends Activity {
 			public void onClick(View v) {
 
 				Intent intent = new Intent();
-				intent.setClass(CanvasNetActivity.this, Canvas.class);
+				intent.setClass(CanvasNetActivity.this, MyCanvas.class);
 				Bundle bundle = new Bundle();
 				intent.putExtras(bundle);
 				
