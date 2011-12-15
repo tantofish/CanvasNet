@@ -2,12 +2,14 @@ package ntu.csie.wcm;
 
 import java.util.ArrayList;
 
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
@@ -75,7 +77,7 @@ public class MySurfaceView extends View {
 		canvas.drawColor(Color.WHITE);
 
 		canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
-
+		
 		canvas.drawPath(mPath, mPaint);
 	}
 
@@ -135,7 +137,8 @@ public class MySurfaceView extends View {
 			mBitmap = mBitmaps.get(mBitmaps.size() - 1 - undoCounter);
 
 			mCanvas = new Canvas(mBitmap);
-
+			
+			
 			invalidate();
 		}
 
@@ -152,6 +155,45 @@ public class MySurfaceView extends View {
 
 		invalidate();
 	}
+	
+	public void testBGImg(Bitmap img) {	//tantofish: pass selected image from external storage
+
+		float marginX = 0.9f;
+		float marginY = 0.8f;
+		
+		int width  = img.getWidth();
+		int height = img.getHeight();
+        int bm_w   = mBitmap.getWidth()  ;
+        int bm_h   = mBitmap.getHeight() ;
+        
+        float scaleX = (float) bm_w * marginX / width;
+        float scaleY = (float) bm_h * marginY / height;
+        
+        float scale = java.lang.Math.min(scaleX, scaleY);
+        Matrix matrix = new Matrix();
+        matrix.postScale(scale, scale);
+        Bitmap scaledImg = Bitmap.createBitmap(img, 0, 0, width, height, matrix, true);
+        img.recycle();
+        
+        width  = scaledImg.getWidth();
+        height = scaledImg.getHeight();
+        
+        int xOffset = (bm_w - width)/2;
+        int yOffset = (bm_h - height)/2;
+        		
+			for(int j = 0 ; j < height ; j++)
+				for(int i = 0 ; i < width ; i++)
+					mBitmap.setPixel(i+xOffset, j+yOffset, scaledImg.getPixel(i, j));
+			mCanvas = new Canvas(mBitmap);
+		
+			
+			invalidate();
+		
+
+		Log.d("test", "bit map" + scaledImg.getHeight() + scaledImg.getWidth());
+	}
+	
+	
 
 	public void clearCanvas(MyCanvas mc) {
 		
