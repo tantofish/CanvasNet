@@ -166,6 +166,7 @@ public class ColorPickDialog extends Dialog {
             boolean inCenter = java.lang.Math.sqrt(x*x + y*y) <= CENTER_RADIUS;
 
             switch (event.getAction()) {
+        
                 case MotionEvent.ACTION_DOWN:
                     mTrackingCenter = inCenter;
                     if (inCenter) {
@@ -206,6 +207,7 @@ public class ColorPickDialog extends Dialog {
         
         public void colorChanged(int color) {
         	mPaintToChange.setColor(color);
+        	
         	mSelf.dismiss();
         }
     }
