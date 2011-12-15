@@ -3,6 +3,7 @@ package ntu.csie.wcm;
 import java.util.ArrayList;
 
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -31,7 +32,7 @@ public class MySurfaceView extends View {
 	private Canvas mCanvas;
 	private Path mPath;
 	private Paint mBitmapPaint;
-	private Context mContext;
+	public Context mContext;
 	private int mWidth, mHeight;
 
 	public MySurfaceView(Context c, AttributeSet attrs) {
@@ -111,7 +112,7 @@ public class MySurfaceView extends View {
 		
 		
       //  Commands.DrawPathCmd tt = mCommands.new DrawPathCmd(mPath);
-		MyCanvas.mSocket.send(mCommands.new SendNumberCmd(77)); //for testing use
+		//MyCanvas.mSocket.send(mCommands.new SendNumberCmd(77)); //for testing use
 		//MyCanvas.mSocket.send(mCommands.new DrawPathCmd(mPath));
 		
 		saveBitmap();
@@ -234,14 +235,17 @@ public class MySurfaceView extends View {
 
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
+			MyCanvas.mSocket.send(mCommands.new SendPointCmd(x, y, 1)); 
 			touch_start(x, y);
 			invalidate();
 			break;
 		case MotionEvent.ACTION_MOVE:
+			MyCanvas.mSocket.send(mCommands.new SendPointCmd(x, y, 2)); 
 			touch_move(x, y);
 			invalidate();
 			break;
 		case MotionEvent.ACTION_UP:
+			MyCanvas.mSocket.send(mCommands.new SendPointCmd(x, y, 3)); 
 			touch_up();
 			invalidate();
 			break;
@@ -255,9 +259,20 @@ public class MySurfaceView extends View {
 		switch (cmd.ID)
 		{
 		case 1:
-			
-			Commands.DrawPathCmd Dpc = (Commands.DrawPathCmd) cmd;
-			mCanvas.drawPath(Dpc.getPath(), mPaint);
+
+			Commands.SendPointCmd Dpc = (Commands.SendPointCmd) cmd;
+			if(Dpc.getType() == 1)
+			{
+				touch_start(Dpc.getX(),Dpc.getY());
+			}
+			else if(Dpc.getType() == 2)
+			{
+				touch_move(Dpc.getX(),Dpc.getY());
+			}
+			else if(Dpc.getType() == 3)
+			{
+				touch_up();
+			}
 			//mPath.reset();
 			invalidate();
 		break;
@@ -271,5 +286,6 @@ public class MySurfaceView extends View {
 			
 		}
 	}
+
 
 }

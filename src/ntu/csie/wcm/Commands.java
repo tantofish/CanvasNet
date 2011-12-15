@@ -1,6 +1,6 @@
 package ntu.csie.wcm;
 
-import ntu.csie.wcm.Commands.DrawPathCmd;
+
 import android.graphics.Path;
 
 public class Commands  implements java.io.Serializable {
@@ -18,19 +18,32 @@ public class Commands  implements java.io.Serializable {
 	}
 	
 	
-	public class DrawPathCmd  extends BaseCmd implements java.io.Serializable
+	public class SendPointCmd  extends BaseCmd implements java.io.Serializable
 	{
-		private Path mPath;
-		public DrawPathCmd(Path p)
+		
+		private float[] point = new float[2];
+		private int mType;
+		public SendPointCmd(float x,float y,int type)
 		{
 			super(1);
-			mPath = p;
-			
+			point[0] = x;
+			point[1] = y;
+			mType = type;
 		}
 		
-		public Path getPath()
+		public float getX()
 		{
-			return mPath;
+			return point[0];
+		}
+		
+		public float getY()
+		{
+			return point[1];
+		}
+		
+		public int getType()
+		{
+			return mType;
 		}
 		
 	}

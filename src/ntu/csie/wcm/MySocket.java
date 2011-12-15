@@ -1,11 +1,13 @@
 package ntu.csie.wcm;
 
 import java.io.IOException;
+import java.io.OptionalDataException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import android.app.Activity;
 import android.util.Log;
 
 public class MySocket {
@@ -14,7 +16,7 @@ public class MySocket {
 
 	private MySurfaceView c;
 	
-	private java.io.ObjectInputStream ib;
+	public java.io.ObjectInputStream ib;
 	private java.io.ObjectOutputStream ob;
 	
 	private ServerSocket serverSocket;		
@@ -65,9 +67,32 @@ public class MySocket {
 						try {
 							sleep(1000);
 						
-						Commands.BaseCmd temp = (Commands.BaseCmd)ib.readObject();	
-						c.process(temp);
+							
 						
+				
+						((Activity) c.mContext).runOnUiThread(new Runnable() {
+							
+							@Override
+							public void run() {
+								// TODO Auto-generated method stub
+								
+								
+								
+								Commands.BaseCmd temp;
+								try {
+									temp = (Commands.BaseCmd)ib.readObject();
+									c.process(temp);
+									
+								} catch (Exception e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								
+							}
+						});
+						
+						
+							
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -85,9 +110,9 @@ public class MySocket {
 			InetAddress serverIp;
 			try {
 				serverIp = InetAddress.getByName(ip);
-		    Log.e("connecttttttttt", "ready");
+		 
 			clientSocket=new Socket(serverIp,port);
-			Log.e("connecttttttttt", "success");
+			
 			ob = new java.io.ObjectOutputStream(clientSocket.getOutputStream());
 			if(ob != null)	Log.d("proj" , "client ob not null");					
 			ib = new java.io.ObjectInputStream(clientSocket.getInputStream());
@@ -139,6 +164,9 @@ public class MySocket {
 // need to modify the the class name of object     
 //    	
     public void send(Commands.BaseCmd obj){
+    	
+    	if(ib == null)
+    		return;
     	
         try {
 			ob.writeObject(obj);
