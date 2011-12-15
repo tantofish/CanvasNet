@@ -25,9 +25,9 @@ import android.widget.Toast;
 
 public class MyCanvas extends Activity{
 
-	MyCanvas mSelf;
-	MySurfaceView mView;
-	public static MySocket mSocket;
+	private MyCanvas mSelf;
+	private MySurfaceView mView;
+	private MySocket mSocket;
 	
 	boolean mIsServer;
 	
@@ -41,12 +41,9 @@ public class MyCanvas extends Activity{
 		mSelf = this;
 		mView = (MySurfaceView)findViewById(R.id.mySurfaceView1);
 		
-		//get local ip
-    	WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
-        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        int ipAddress = wifiInfo.getIpAddress();
-        String ip = new String(Formatter.formatIpAddress(ipAddress));
-        mSocket  =new MySocket(mView , 5050, ip);
+        mSocket  =new MySocket(mView , 5050, (WifiManager) getSystemService(WIFI_SERVICE));
+        
+        mView.setSocket(mSocket);
         
         Bundle bundle = this.getIntent().getExtras(); 
   	    

@@ -25,10 +25,13 @@ public class MySurfaceView extends View {
 
 	private final int BITMAP_CACHE_SIZE = 10;
 
+	
 	public Commands mCommands;
+	
+	private MySocket mMySocket;
 	private Paint mPaint;
 	private ArrayList<Bitmap> mBitmaps;
-	Bitmap mBitmap;
+	private Bitmap mBitmap;
 	private Canvas mCanvas;
 	private Path mPath;
 	private Paint mBitmapPaint;
@@ -57,6 +60,10 @@ public class MySurfaceView extends View {
 
 	}
 
+	public void setSocket(MySocket ms)
+	{
+		mMySocket = ms;
+	}
 	public Paint getPaint() {
 		return mPaint;
 	}
@@ -109,12 +116,7 @@ public class MySurfaceView extends View {
 		mCanvas.drawPath(mPath, mPaint);
 		undoCounter = 0;
 		
-		
-		
-      //  Commands.DrawPathCmd tt = mCommands.new DrawPathCmd(mPath);
-		//MyCanvas.mSocket.send(mCommands.new SendNumberCmd(77)); //for testing use
-		//MyCanvas.mSocket.send(mCommands.new DrawPathCmd(mPath));
-		
+
 		saveBitmap();
 
 		mPath.reset();
@@ -235,17 +237,17 @@ public class MySurfaceView extends View {
 
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
-			MyCanvas.mSocket.send(mCommands.new SendPointCmd(x, y, 1)); 
+			mMySocket.send(mCommands.new SendPointCmd(x, y, 1)); 
 			touch_start(x, y);
 			invalidate();
 			break;
 		case MotionEvent.ACTION_MOVE:
-			MyCanvas.mSocket.send(mCommands.new SendPointCmd(x, y, 2)); 
+			mMySocket.send(mCommands.new SendPointCmd(x, y, 2)); 
 			touch_move(x, y);
 			invalidate();
 			break;
 		case MotionEvent.ACTION_UP:
-			MyCanvas.mSocket.send(mCommands.new SendPointCmd(x, y, 3)); 
+			mMySocket.send(mCommands.new SendPointCmd(x, y, 3)); 
 			touch_up();
 			invalidate();
 			break;

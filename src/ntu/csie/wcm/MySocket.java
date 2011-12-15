@@ -8,6 +8,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import android.app.Activity;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.text.format.Formatter;
 import android.util.Log;
 
 public class MySocket {
@@ -32,10 +35,15 @@ public class MySocket {
 //
 // here has to modify the canvas class name
 //
-    public MySocket(MySurfaceView canvas , int listen, String ip){
+    public MySocket(MySurfaceView canvas , int listen, WifiManager wifiManager ){
     	c = canvas;
     	listenPort = listen;
     	
+    	
+    	
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        int ipAddress = wifiInfo.getIpAddress();
+        String ip = new String(Formatter.formatIpAddress(ipAddress));
 
         try {
 			localhost = InetAddress.getByName(ip);
