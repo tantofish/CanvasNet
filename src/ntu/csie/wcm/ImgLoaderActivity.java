@@ -180,6 +180,8 @@ public class ImgLoaderActivity extends Activity {
 	
 	public void readExternalStoragePublicPicture() {
 		/* Get the folder path: "mnt/sdcard/Pictures" */
+		
+		
 		File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 		
 		/* Two filters that can tell if the file is a directory or a file */
@@ -190,32 +192,30 @@ public class ImgLoaderActivity extends Activity {
 		    public boolean accept(File file) {	return file.isDirectory();	}
 		};
 		
-		/* Get all the directorys in the path */
-		File[] dirs = path.listFiles(dirFilter);
+		File[] dirs;
+		File[] f;
 		files = new Vector<File[]>();
 		
-		/* Get all files in those directorys above */
-		File [] f = path.listFiles(fileFilter);
-		if(f.length>0) files.add(f);	// block those directory who has no files inside from being shown
-		
-		for(int i = 0 ; i < dirs.length ; i++){
-			File newpath = new File(path.toString(), dirs[i].getName());
-			f = newpath.listFiles(fileFilter);
-			if(f.length>0) files.add(f);
+		if(path.exists()){
+			/* Get all the directorys in the path */
+			dirs = path.listFiles(dirFilter);
+			
+			/* Get all files in those directorys above */
+			f = path.listFiles(fileFilter);
+			
+			if(f.length>0 && f != null) files.add(f);	// block those directory who has no files inside from being shown
+			
+			for(int i = 0 ; i < dirs.length ; i++){
+				File newpath = new File(path.toString(), dirs[i].getName());
+				f = newpath.listFiles(fileFilter);
+				if(f.length>0) files.add(f);
+			}
 		}
-		
-		
 		File DCIM = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
 		File newpath = new File(DCIM.toString(), "Camera");
-		f = newpath.listFiles(fileFilter);
-		if(f.length>0) files.add(f);
-		
-		/* Debug Message */
-		for(int i = 0 ; i < dirs.length; i++){
-			f = files.get(i);
-			for(int j = 0 ; j < f.length ; j++){
-				Log.d("DEBUG_GET_FILE", "DIR " + f[j].getPath());
-			}
+		if(newpath.exists()){
+			f = newpath.listFiles(fileFilter);
+			if(f.length>0) files.add(f);
 		}
 	}
 	/*public void createExternalStoragePublicPicture() {
