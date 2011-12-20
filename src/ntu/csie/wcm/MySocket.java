@@ -1,23 +1,23 @@
 package ntu.csie.wcm;
 
 import java.io.IOException;
-import java.io.OptionalDataException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import android.app.Activity;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Bundle;
+import android.os.Message;
 import android.text.format.Formatter;
 import android.util.Log;
 
 public class MySocket {
 
-    private final int SLEEP_TIME = 1000;
+    private final int SLEEP_TIME = 5;
     
-	private MySurfaceView c;
+	private MySurfaceView mMySurfaceView;
 	
 	public java.io.ObjectInputStream ib;
 	private java.io.ObjectOutputStream ob;
@@ -36,7 +36,7 @@ public class MySocket {
 // here has to modify the canvas class name
 //
     public MySocket(MySurfaceView canvas , int listen, WifiManager wifiManager ){
-    	c = canvas;
+    	mMySurfaceView = canvas;
     	listenPort = listen;
     	
     	
@@ -75,39 +75,17 @@ public class MySocket {
 					while(true){									
 						try {
 							sleep(SLEEP_TIME);
-						
-							
-						
-				
-						((Activity) c.mContext).runOnUiThread(new Runnable() {
-							
-							@Override
-							public void run() {
-								// TODO Auto-generated method stub
-								
-								
-								
-								Commands.BaseCmd temp;
-								try {
-									temp = (Commands.BaseCmd)ib.readObject();
-								//	c.process(temp);
-								//	Commands.SendPointCmd Dpc = (Commands.SendPointCmd) temp;
-									
-									
-									
-								} catch (Exception e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-								
-							}
-						}); 
-						
-						
-							
-						//	Commands.BaseCmd temp = (Commands.BaseCmd)ib.readObject();
-							
-						//	c.process(temp);
+			    	
+//get command from ib then send to UIthread
+					    	Commands.BaseCmd tempC;
+			                tempC = (Commands.BaseCmd)ib.readObject();
+			                Bundle tempB = new Bundle();
+			                tempB.putSerializable("cmd", tempC);
+					        Message m = new Message();
+					    	m.what = MySurfaceView.GET_COMMAND;
+					    	m.setData(tempB);
+			                
+					    	mMySurfaceView.handler.sendMessage(m);
 							
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -142,33 +120,19 @@ public class MySocket {
 							try {
 								sleep(SLEEP_TIME);
 								
-								((Activity) c.mContext).runOnUiThread(new Runnable() {
-									
-									@Override
-									public void run() {
-										// TODO Auto-generated method stub
-										
-										
-										
-										Commands.BaseCmd temp;
-										try {
-											temp = (Commands.BaseCmd)ib.readObject();
-									//		c.process(temp);
-											//Commands.SendPointCmd Dpc = (Commands.SendPointCmd) temp;
-											
-											
-											
-										} catch (Exception e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										}
-										
-									}
-								}); 
-							
-						//	Commands.BaseCmd temp = (Commands.BaseCmd)ib.readObject();
-							
-						//	c.process(temp);
+								//get command from ib then send to UIthread
+								
+						    	Commands.BaseCmd tempC;
+				                tempC = (Commands.BaseCmd)ib.readObject();				                
+				                Bundle tempB = new Bundle();
+				                tempB.putSerializable("cmd", tempC);
+						        Message m = new Message();
+						    	m.what = MySurfaceView.GET_COMMAND;
+						    	m.setData(tempB);
+				                
+						    	mMySurfaceView.handler.sendMessage(m);
+								
+
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();

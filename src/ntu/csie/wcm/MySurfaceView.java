@@ -1,9 +1,5 @@
 package ntu.csie.wcm;
 
-import java.util.ArrayList;
-
-
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,6 +9,9 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -25,6 +24,9 @@ public class MySurfaceView extends View {
 
 	private final int BITMAP_CACHE_SIZE = 10;
 
+	//handleruse 
+	 public static final int GET_COMMAND = 9527; 
+	
 	
     //public variable
 	public Context mContext;
@@ -41,6 +43,25 @@ public class MySurfaceView extends View {
 	private Paint mBitmapPaint;
 	private int mWidth, mHeight;
 
+    public Handler handler = new Handler() 
+    {
+
+        public void handleMessage(Message msg) 
+        {
+   	    switch (msg.what) 
+	    {
+	        case GET_COMMAND:
+	        	Bundle tempB = msg.getData();
+	        	process((Commands.BaseCmd)tempB.getSerializable("cmd"));
+		    break;
+
+            }
+	    super.handleMessage(msg);
+        }
+
+    };
+    
+	
 	public MySurfaceView(Context c, AttributeSet attrs) {
 		super(c, attrs);
 
@@ -59,6 +80,8 @@ public class MySurfaceView extends View {
 
 		mPath = new Path();
 		mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+		
+		
 
 
 	}
@@ -262,11 +285,10 @@ public class MySurfaceView extends View {
 			
 			
 			Commands.SendPointCmd Dpc = (Commands.SendPointCmd) cmd;
-		//	Log.e("receive num", Float.toString(Dpc.getX()) + "," + Float.toString(Dpc.getY()));
-			Log.e("receive num", Float.toString(Dpc.getX()) + "," + Float.toString(Dpc.getY()));
+			//Log.e("receive num", Float.toString(Dpc.getX()) + "," + Float.toString(Dpc.getY()));
 			
 			
-			/*
+			
 			if(Dpc.getType() == 1)
 			{
 				touch_start(Dpc.getX(),Dpc.getY());
@@ -282,7 +304,7 @@ public class MySurfaceView extends View {
 			//mPath.reset();
 			invalidate();
 			
-			*/
+		//	*/
 		break;
 		case 2:
 		    Commands.SendNumberCmd Snc = (Commands.SendNumberCmd) cmd;
