@@ -1,11 +1,10 @@
 package ntu.csie.wcm;
 
 
-import android.graphics.Path;
-
 public class Commands  implements java.io.Serializable {
+	private static final long serialVersionUID = 1L;
 	
-	public class BaseCmd implements java.io.Serializable
+	public static class BaseCmd implements java.io.Serializable
 	{
 		int ID;
 		private static final long serialVersionUID = 1L;
@@ -18,8 +17,9 @@ public class Commands  implements java.io.Serializable {
 	}
 	
 	
-	public class SendPointCmd  extends BaseCmd implements java.io.Serializable
+	public static class SendPointCmd  extends BaseCmd implements java.io.Serializable
 	{
+		private static final long serialVersionUID = 1L;
 		
 		private float[] point = new float[2];
 		private int mType;
@@ -48,8 +48,9 @@ public class Commands  implements java.io.Serializable {
 		
 	}
 	
-	public class SendNumberCmd  extends BaseCmd implements java.io.Serializable
+	public static class SendNumberCmd  extends BaseCmd implements java.io.Serializable
 	{
+		private static final long serialVersionUID = 1L;
 		private int mNum;
 		public SendNumberCmd(int i)
 		{
