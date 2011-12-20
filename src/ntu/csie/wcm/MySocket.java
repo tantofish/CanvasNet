@@ -15,8 +15,8 @@ import android.util.Log;
 
 public class MySocket {
 
-
-
+    private final int SLEEP_TIME = 1000;
+    
 	private MySurfaceView c;
 	
 	public java.io.ObjectInputStream ib;
@@ -60,7 +60,8 @@ public class MySocket {
 			public void run(){								        
 		        try {		 		
 		            serverSocket =new ServerSocket(listenPort);		            
-		            Socket socket=serverSocket.accept();			          		           
+		            Socket socket=serverSocket.accept();
+		            Log.e("socket", "server accept!!");
 		            ob = new java.io.ObjectOutputStream(socket.getOutputStream());	
 		            if(ob != null)	Log.d("proj" , "server ob new");
 		            ib = new java.io.ObjectInputStream(socket.getInputStream());
@@ -73,7 +74,7 @@ public class MySocket {
 //		           
 					while(true){									
 						try {
-							sleep(1000);
+							sleep(SLEEP_TIME);
 						
 							
 						
@@ -89,7 +90,10 @@ public class MySocket {
 								Commands.BaseCmd temp;
 								try {
 									temp = (Commands.BaseCmd)ib.readObject();
-									c.process(temp);
+								//	c.process(temp);
+								//	Commands.SendPointCmd Dpc = (Commands.SendPointCmd) temp;
+									
+									
 									
 								} catch (Exception e) {
 									// TODO Auto-generated catch block
@@ -97,9 +101,13 @@ public class MySocket {
 								}
 								
 							}
-						});
+						}); 
 						
 						
+							
+						//	Commands.BaseCmd temp = (Commands.BaseCmd)ib.readObject();
+							
+						//	c.process(temp);
 							
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -132,11 +140,35 @@ public class MySocket {
 					while(true){
 
 							try {
-								sleep(1000);
+								sleep(SLEEP_TIME);
+								
+								((Activity) c.mContext).runOnUiThread(new Runnable() {
+									
+									@Override
+									public void run() {
+										// TODO Auto-generated method stub
+										
+										
+										
+										Commands.BaseCmd temp;
+										try {
+											temp = (Commands.BaseCmd)ib.readObject();
+									//		c.process(temp);
+											//Commands.SendPointCmd Dpc = (Commands.SendPointCmd) temp;
+											
+											
+											
+										} catch (Exception e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+										
+									}
+								}); 
 							
-							Commands.BaseCmd temp = (Commands.BaseCmd)ib.readObject();
+						//	Commands.BaseCmd temp = (Commands.BaseCmd)ib.readObject();
 							
-							c.process(temp);
+						//	c.process(temp);
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();

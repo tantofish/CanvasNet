@@ -254,11 +254,19 @@ public class MySurfaceView extends View {
 	
 	public void process(Commands.BaseCmd cmd)
 	{
+		
 		switch (cmd.ID)
 		{
 		case 1:
 
+			
+			
 			Commands.SendPointCmd Dpc = (Commands.SendPointCmd) cmd;
+		//	Log.e("receive num", Float.toString(Dpc.getX()) + "," + Float.toString(Dpc.getY()));
+			Log.e("receive num", Float.toString(Dpc.getX()) + "," + Float.toString(Dpc.getY()));
+			
+			
+			/*
 			if(Dpc.getType() == 1)
 			{
 				touch_start(Dpc.getX(),Dpc.getY());
@@ -273,12 +281,13 @@ public class MySurfaceView extends View {
 			}
 			//mPath.reset();
 			invalidate();
+			
+			*/
 		break;
 		case 2:
 		    Commands.SendNumberCmd Snc = (Commands.SendNumberCmd) cmd;
 			Log.e("receive num", Integer.toString(Snc.getNum()));
-			Log.e("receive num2", Integer.toString(Snc.getNum()));
-			Log.e("receive num3", Integer.toString(Snc.getNum()));
+			
 
 			
 		}
