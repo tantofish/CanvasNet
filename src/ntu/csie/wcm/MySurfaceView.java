@@ -127,6 +127,7 @@ public class MySurfaceView extends View {
 		//save current bitmap
 		mBufferDealer.onTouchStep(Bitmap.createBitmap(mBitmap),mCanvas);
 
+
 		mPath.reset();
 	}
 
@@ -142,7 +143,8 @@ public class MySurfaceView extends View {
 			mCanvas = new Canvas(mBitmap);
 
 			invalidate();
-	
+
+
 	}
 
 	public void redo() {

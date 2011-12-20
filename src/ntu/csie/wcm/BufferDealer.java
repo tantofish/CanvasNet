@@ -33,12 +33,14 @@ public class BufferDealer {
 			for(int i = undoCounter;i>0;i--)
 			{
 				mBitmaps.remove(mBitmaps.size()-1);
+
 			}
 			isUndoing = false;
 			undoCounter = 0;
 		}
 		
 		saveBitmap(bmap);
+
 	}
 	
 	public void saveBitmap(Bitmap bmap) {
@@ -47,6 +49,7 @@ public class BufferDealer {
 		
 
 		mBitmaps.add(Bitmap.createBitmap(bmap));
+
 
 	}
 	
@@ -58,6 +61,7 @@ public class BufferDealer {
 			
 
 		}
+
         return mBitmaps.get(mBitmaps.size() - 1 - undoCounter);
 	}
 
