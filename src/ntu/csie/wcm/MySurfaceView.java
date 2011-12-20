@@ -26,24 +26,27 @@ public class MySurfaceView extends View {
 	private final int BITMAP_CACHE_SIZE = 10;
 
 	
-	public Commands mCommands;
+    //public variable
+	public Context mContext;
 	
+	
+	//private variable
+	private BufferDealer mBufferDealer;
 	private MySocket mMySocket;
 	private Paint mPaint;
-	private ArrayList<Bitmap> mBitmaps;
+
 	private Bitmap mBitmap;
 	private Canvas mCanvas;
 	private Path mPath;
 	private Paint mBitmapPaint;
-	public Context mContext;
 	private int mWidth, mHeight;
 
 	public MySurfaceView(Context c, AttributeSet attrs) {
 		super(c, attrs);
+
 		mContext = c;
 
-		mBitmaps = new ArrayList<Bitmap>();
-
+		mBufferDealer = new BufferDealer();
 		// mPaint = MyCanvas.mPaint;
 		mPaint = new Paint();
 		mPaint.setAntiAlias(true);
@@ -56,7 +59,11 @@ public class MySurfaceView extends View {
 
 		mPath = new Path();
 		mBitmapPaint = new Paint(Paint.DITHER_FLAG);
-		mCommands = new Commands();
+		//mCommands = new Commands();
+
+		Log.e("test", "add blank bitmap");
+		Log.e("save","testing 22222222222222");
+		
 
 	}
 
@@ -72,11 +79,16 @@ public class MySurfaceView extends View {
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
 
+		mBufferDealer.clear();
+		
 		mWidth = w;
 		mHeight = h;
-		mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+		mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+		mBufferDealer.saveBitmap(Bitmap.createBitmap(mBitmap));
+	
 		mCanvas = new Canvas(mBitmap);
-		mBitmaps.clear();
+
+		
 	}
 
 	@Override
@@ -116,47 +128,33 @@ public class MySurfaceView extends View {
 		mCanvas.drawPath(mPath, mPaint);
 		undoCounter = 0;
 		
-
-		saveBitmap();
+		//save current bitmap
+		mBufferDealer.onTouchStep(Bitmap.createBitmap(mBitmap),mCanvas);
+		//mCanvas = new Canvas(mBitmap);
+	
 
 		mPath.reset();
 	}
 
 	private int undoCounter = 0;
 
-	// function to save bitmap, so that undo can load it
-	private void saveBitmap() {
-		if (mBitmaps.size() > BITMAP_CACHE_SIZE)
-			mBitmaps.remove(0);
 
-		mBitmaps.add(Bitmap.createBitmap(mBitmap));
-	}
 
 	// undo function e98877331:FIXME: undo then touch_up() will break
 	public void undo() {
-
-		if (undoCounter < mBitmaps.size() - 1) {
-			++undoCounter;
-			mBitmap = mBitmaps.get(mBitmaps.size() - 1 - undoCounter);
-
+			mBitmap = Bitmap.createBitmap(mBufferDealer.getP());
+			mBufferDealer.undoing();
+			//mCanvas = new Canvas(mBitmap);
 			mCanvas = new Canvas(mBitmap);
-			
-			
-			invalidate();
-		}
 
+			invalidate();
 		//Log.e("test", Integer.toString(undoCounter) + " " + mBitmaps.size());
 	}
 
 	public void redo() {
-
-		if (undoCounter > 0) {
-			--undoCounter;
-			mBitmap = mBitmaps.get(mBitmaps.size() - 1 - undoCounter);
-			mCanvas = new Canvas(mBitmap);
-		}
-
-		invalidate();
+		mBitmap = Bitmap.createBitmap(mBufferDealer.getN());
+		mCanvas = new Canvas(mBitmap);
+			invalidate();
 	}
 	
 	public void testBGImg(Bitmap img) {	//tantofish: pass selected image from external storage
@@ -207,10 +205,12 @@ public class MySurfaceView extends View {
         
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
         	public void onClick(DialogInterface dialog, int id) {
-        		
+        		mBufferDealer.clear();
         		mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+        		mBufferDealer.saveBitmap(Bitmap.createBitmap(mBitmap));
+        		
         		mCanvas = new Canvas(mBitmap);
-        		mBitmaps.clear();
+        		
         		invalidate();
         	}
         });
@@ -237,17 +237,17 @@ public class MySurfaceView extends View {
 
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
-			mMySocket.send(mCommands.new SendPointCmd(x, y, 1)); 
+			mMySocket.send(new Commands.SendPointCmd(x, y, 1)); 	
 			touch_start(x, y);
 			invalidate();
 			break;
 		case MotionEvent.ACTION_MOVE:
-			mMySocket.send(mCommands.new SendPointCmd(x, y, 2)); 
+			mMySocket.send(new Commands.SendPointCmd(x, y, 2)); 
 			touch_move(x, y);
 			invalidate();
 			break;
 		case MotionEvent.ACTION_UP:
-			mMySocket.send(mCommands.new SendPointCmd(x, y, 3)); 
+		mMySocket.send(new Commands.SendPointCmd(x, y, 3)); 
 			touch_up();
 			invalidate();
 			break;

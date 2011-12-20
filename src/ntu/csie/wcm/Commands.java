@@ -5,7 +5,7 @@ import android.graphics.Path;
 
 public class Commands  implements java.io.Serializable {
 	
-	public class BaseCmd implements java.io.Serializable
+	public static class BaseCmd implements java.io.Serializable
 	{
 		int ID;
 		private static final long serialVersionUID = 1L;
@@ -18,7 +18,7 @@ public class Commands  implements java.io.Serializable {
 	}
 	
 	
-	public class SendPointCmd  extends BaseCmd implements java.io.Serializable
+	public static class SendPointCmd  extends BaseCmd implements java.io.Serializable
 	{
 		
 		private float[] point = new float[2];
@@ -48,7 +48,7 @@ public class Commands  implements java.io.Serializable {
 		
 	}
 	
-	public class SendNumberCmd  extends BaseCmd implements java.io.Serializable
+	public static class SendNumberCmd  extends BaseCmd implements java.io.Serializable
 	{
 		private int mNum;
 		public SendNumberCmd(int i)
