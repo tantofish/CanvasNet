@@ -56,10 +56,9 @@ public class BufferDealer {
 	//get previous bitmap
 	public Bitmap getP() {
 
-		if (undoCounter < mBitmaps.size() - 1) {
+		//if (undoCounter < mBitmaps.size() - 1) {
+		if(isUndoValid()){
 			++undoCounter;
-			
-
 		}
 
         return mBitmaps.get(mBitmaps.size() - 1 - undoCounter);
@@ -68,7 +67,8 @@ public class BufferDealer {
 	//get next bitmap
 	public Bitmap getN() {
 
-		if (undoCounter > 0) {
+		//if (undoCounter > 0) {
+		if(isRedoValid()){
 			--undoCounter;
 		}
 
@@ -89,8 +89,14 @@ public class BufferDealer {
 		isUndoing = true;
 	}
 	
-	public int getUndoCounter(){
-		return undoCounter;
+	// return true if I can perform undo
+	public boolean isUndoValid(){
+		return (undoCounter < mBitmaps.size() - 1);
+	}
+	
+	// return true if I can perform redo
+	public boolean isRedoValid(){
+		return (undoCounter > 0);
 	}
 
 }

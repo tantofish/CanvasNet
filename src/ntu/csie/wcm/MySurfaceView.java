@@ -64,7 +64,6 @@ public class MySurfaceView extends View {
 	
 	public MySurfaceView(Context c, AttributeSet attrs) {
 		super(c, attrs);
-
 		mContext = c;
 
 		mBufferDealer = new BufferDealer();
@@ -107,7 +106,6 @@ public class MySurfaceView extends View {
 	
 		mCanvas = new Canvas(mBitmap);
 
-		
 	}
 
 	@Override
@@ -150,8 +148,7 @@ public class MySurfaceView extends View {
 		
 		//save current bitmap
 		mBufferDealer.onTouchStep(Bitmap.createBitmap(mBitmap),mCanvas);
-
-
+		
 		mPath.reset();
 	}
 
@@ -181,7 +178,7 @@ public class MySurfaceView extends View {
 	
 	public void testBGImg(Bitmap img) {	//tantofish: pass selected image from external storage
 
-		float marginX = 0.9f;
+		/*float marginX = 0.9f;
 		float marginY = 0.8f;
 		
 		int width  = img.getWidth();
@@ -196,24 +193,26 @@ public class MySurfaceView extends View {
         Matrix matrix = new Matrix();
         matrix.postScale(scale, scale);
         Bitmap scaledImg = Bitmap.createBitmap(img, 0, 0, width, height, matrix, true);
-        img.recycle();
+        img.recycle();*/
         
-        width  = scaledImg.getWidth();
-        height = scaledImg.getHeight();
+		int bm_w   = mBitmap.getWidth()  ;
+        int bm_h   = mBitmap.getHeight() ;
+		int width  = img.getWidth();
+        int height = img.getHeight();
         
         int xOffset = (bm_w - width)/2;
         int yOffset = (bm_h - height)/2;
         		
 			for(int j = 0 ; j < height ; j++)
 				for(int i = 0 ; i < width ; i++)
-					mBitmap.setPixel(i+xOffset, j+yOffset, scaledImg.getPixel(i, j));
+					mBitmap.setPixel(i+xOffset, j+yOffset, img.getPixel(i, j));
 			mCanvas = new Canvas(mBitmap);
 		
 			
 			invalidate();
 		
 
-		Log.d("test", "bit map" + scaledImg.getHeight() + scaledImg.getWidth());
+		//Log.d("test", "bit map" + scaledImg.getHeight() + scaledImg.getWidth());
 	}
 	
 	
@@ -277,9 +276,22 @@ public class MySurfaceView extends View {
 			invalidate();
 			break;
 		}
+		
 		return true;
 	}
 	
+	/* tantofish start */
+	// tantofish: mySurfaceView will need to tell MyCanvas that if the undo/redo button should be gray
+	public boolean IcanRedo(){
+		return mBufferDealer.isRedoValid();
+	}
+	public boolean IcanUndo(){
+		return mBufferDealer.isUndoValid();
+	}
+	// tantofish: i need to know the canvas's width and height in MyCanvas to compress bg image
+	
+	
+	/* tantofish end */
 	
 	public void process(Commands.BaseCmd cmd)
 	{
@@ -342,17 +354,8 @@ public class MySurfaceView extends View {
 				redo();
 			break;
 			
-			
-			
-        
-            
+
 			
 		}
 	}
-	
-	public int getBufferDealerUndoCounter(){
-		return mBufferDealer.getUndoCounter();
-	}
-
-
 }

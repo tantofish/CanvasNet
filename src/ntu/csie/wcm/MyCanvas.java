@@ -9,11 +9,13 @@ import android.graphics.AvoidXfermode.Mode;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,8 +33,18 @@ public class MyCanvas extends Activity{
 	private MySocket mMySocket;
 	
 	boolean mIsServer;
-	private PorterDuffColorFilter cf;
+	private PorterDuffColorFilter mColorFilter;
 
+	private ImageButton CcBtn;
+	private ImageButton eraserBtn;
+	private ImageButton undoBtn;
+	private ImageButton redoBtn;
+	private ImageButton clearBtn;
+	
+	
+	private boolean iCanUndo;
+	private boolean iCanRedo;
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +62,7 @@ public class MyCanvas extends Activity{
         Bundle bundle = this.getIntent().getExtras(); 
   	    
         // color filter
-        cf = new PorterDuffColorFilter(Color.argb(180, 200, 200, 200), PorterDuff.Mode.SRC_ATOP);
+        mColorFilter = new PorterDuffColorFilter(Color.argb(180, 200, 200, 200), PorterDuff.Mode.SRC_ATOP);
         
         mIsServer = bundle.getBoolean("isServer");
         if(mIsServer)
@@ -66,7 +78,7 @@ public class MyCanvas extends Activity{
         
         
 		
-		final ImageButton CcBtn;  //change color button
+		//change color button
 		CcBtn = (ImageButton) findViewById(R.id.ChangeColorBt);
 		
 		CcBtn.setOnClickListener(new View.OnClickListener() {
@@ -90,7 +102,7 @@ public class MyCanvas extends Activity{
 		
 
 		
-		final ImageButton eraserBtn;
+		// eraser button
 		eraserBtn = (ImageButton) findViewById(R.id.EraserBt);
 		eraserBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -100,6 +112,8 @@ public class MyCanvas extends Activity{
 				mMySocket.send(new Commands.ChangeColorCmd(mView.getPaint().getColor()));
 			}
 		});
+		
+		// tantofish: this will let the button change color when clicked
 		eraserBtn.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -112,21 +126,26 @@ public class MyCanvas extends Activity{
 			}
 		});
 		
-		final ImageButton undoBtn = (ImageButton) findViewById(R.id.undoBt);
-		undoBtn.setColorFilter(cf);
+		
+		undoBtn = (ImageButton) findViewById(R.id.undoBt);
+		undoBtn.setColorFilter(mColorFilter);
 		undoBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				// Perform action on click
 				
+				// Perform action on click
 				mView.undo();
-	            //send command to remote
+	            // send command to remote
 				mMySocket.send(new Commands.UndoRedoCmd(true));
+				// tantofish: chenge undo redo arrow color (gray->color or color->gray)
+				checkUnReDoValid();
 			}
 		});
 		
+		// tantofish: this will let the button change color when clicked
 		undoBtn.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
+				if(!iCanUndo)	return false;
 				if(event.getAction() == MotionEvent.ACTION_DOWN){
 					undoBtn.setImageResource(R.drawable.bt_undo_down_128);
 				}else if(event.getAction() == MotionEvent.ACTION_UP){
@@ -136,19 +155,25 @@ public class MyCanvas extends Activity{
 			}
 		});
 		
-		final ImageButton redoBtn = (ImageButton) findViewById(R.id.redoBt);
-		redoBtn.setColorFilter(cf);
+		redoBtn = (ImageButton) findViewById(R.id.redoBt);
+		redoBtn.setColorFilter(mColorFilter);
 		redoBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+				
 				// Perform action on click
 				mView.redo();
-				 //send command to remote
+				// Send command to remote
 				mMySocket.send(new Commands.UndoRedoCmd(false));
+				// tantofish: chenge undo redo arrow color (gray->color or color->gray)
+				checkUnReDoValid();
 			}
 		});
+		
+		// tantofish: this will let the button change color when clicked
 		redoBtn.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
+				if(!iCanRedo)	return false;
 				if(event.getAction() == MotionEvent.ACTION_DOWN){
 					redoBtn.setImageResource(R.drawable.bt_redo_down_128);
 				}else if(event.getAction() == MotionEvent.ACTION_UP){
@@ -158,7 +183,7 @@ public class MyCanvas extends Activity{
 			}
 		});
 		
-		final ImageButton clearBtn = (ImageButton) findViewById(R.id.clearBt);
+		clearBtn = (ImageButton) findViewById(R.id.clearBt);
 		clearBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
@@ -209,10 +234,10 @@ public class MyCanvas extends Activity{
 		// 依據itemId來判斷使用者點選哪一個item
 		switch (item.getItemId()) {
 		case 0:
-			Toast.makeText(MyCanvas.this, "還沒做", Toast.LENGTH_SHORT).show();
+			Toast.makeText(MyCanvas.this, "施工中...", Toast.LENGTH_SHORT).show();
 			break;
 		case 1:
-			Toast.makeText(MyCanvas.this, "還沒做", Toast.LENGTH_SHORT).show();
+			Toast.makeText(MyCanvas.this, "施工中...", Toast.LENGTH_SHORT).show();
 			break;
 		case 2:
 			Intent intent = new Intent();
@@ -244,7 +269,30 @@ public class MyCanvas extends Activity{
 			
 			Log.d("Debug","Decode Returned Bitmap");
 			Bitmap img = BitmapFactory.decodeFile(path);
-			mView.testBGImg(img);
+			
+			
+			
+			float marginX = 0.9f;
+			float marginY = 0.8f;
+			
+			int width  = img.getWidth();
+			int height = img.getHeight();
+	        int bm_w   = mView.getWidth()  ;
+	        int bm_h   = mView.getHeight() ;
+	        
+	        float scaleX = (float) bm_w * marginX / width;
+	        float scaleY = (float) bm_h * marginY / height;
+	        
+	        float scale = java.lang.Math.min(scaleX, scaleY);
+	        Matrix matrix = new Matrix();
+	        matrix.postScale(scale, scale);
+	        Bitmap scaledImg = Bitmap.createBitmap(img, 0, 0, width, height, matrix, true);
+	        img.recycle();
+	        
+			
+			
+			
+			mView.testBGImg(scaledImg);
 			
 			
 		}
@@ -271,7 +319,22 @@ public class MyCanvas extends Activity{
         dialog.show();
 	}
 
-	
+	public void checkUnReDoValid(){
+
+		iCanRedo = mView.IcanRedo();
+		iCanUndo = mView.IcanUndo();
+
+		if(iCanRedo)
+			redoBtn.clearColorFilter();	// set button to color type 
+		else
+			redoBtn.setColorFilter(mColorFilter); // set button to gray type
+		
+		if(iCanUndo)
+			undoBtn.clearColorFilter();
+		else
+			undoBtn.setColorFilter(mColorFilter);
+		  
+	}
  
     
     

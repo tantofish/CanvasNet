@@ -70,11 +70,14 @@ public class ImgLoaderActivity extends Activity {
 				pathString = files.get(folderIndex)[position].getPath();
 				Bitmap bm = BitmapFactory.decodeFile(pathString);
 				
-				/*String q = bm.toString();
+				//String q = bm.toString();
 				ByteArrayOutputStream out = new ByteArrayOutputStream();
 				bm.compress(Bitmap.CompressFormat.PNG, 100, out);
 				byte[] array= out.toByteArray();
-				bm = BitmapFactory.decodeByteArray(array, 0, array.length);*/
+				bm = BitmapFactory.decodeByteArray(array, 0, array.length);
+
+
+				
 				
 				int width = bm.getWidth();
 				if(width > w){
