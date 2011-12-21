@@ -1,25 +1,25 @@
 package ntu.csie.wcm;
 
 
-import java.math.BigDecimal;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.AvoidXfermode.Mode;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.net.wifi.WifiInfo;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.text.format.Formatter;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,6 +32,7 @@ public class MyCanvas extends Activity{
 	
 	boolean mIsServer;
 	
+
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,7 @@ public class MyCanvas extends Activity{
         if(mIsServer)
         {
         	mSocket.server();
+        	checkIP();
         }
         else
         {
@@ -59,13 +61,9 @@ public class MyCanvas extends Activity{
         	mSocket.client(remoteIP, 5050);
         }
         
-
-        
-        
-        
         
 		
-		ImageButton CcBtn;  //change color button
+		final ImageButton CcBtn;  //change color button
 		CcBtn = (ImageButton) findViewById(R.id.ChangeColorBt);
 		CcBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -73,11 +71,21 @@ public class MyCanvas extends Activity{
 				useColorPicker();
 			}
 		});
-		
+		CcBtn.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if(event.getAction() == MotionEvent.ACTION_DOWN){
+					CcBtn.setImageResource(R.drawable.bt_palette_down_128);
+				}else if(event.getAction() == MotionEvent.ACTION_UP){
+					CcBtn.setImageResource(R.drawable.bt_palette_128);
+				}
+				return false;
+			}
+		});
 		
 
 		
-		ImageButton eraserBtn;
+		final ImageButton eraserBtn;
 		eraserBtn = (ImageButton) findViewById(R.id.EraserBt);
 		eraserBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -85,8 +93,19 @@ public class MyCanvas extends Activity{
 				mView.getPaint().setColor(Color.WHITE);
 			}
 		});
+		eraserBtn.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if(event.getAction() == MotionEvent.ACTION_DOWN){
+					eraserBtn.setImageResource(R.drawable.bt_eraser_down_128);
+				}else if(event.getAction() == MotionEvent.ACTION_UP){
+					eraserBtn.setImageResource(R.drawable.bt_eraser_128);
+				}
+				return false;
+			}
+		});
 		
-		ImageButton undoBtn = (ImageButton) findViewById(R.id.undoBt);
+		final ImageButton undoBtn = (ImageButton) findViewById(R.id.undoBt);
 		undoBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
@@ -95,22 +114,60 @@ public class MyCanvas extends Activity{
 			}
 		});
 		
-		ImageButton redoBtn = (ImageButton) findViewById(R.id.redoBt);
+		undoBtn.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if(event.getAction() == MotionEvent.ACTION_DOWN){
+					undoBtn.setImageResource(R.drawable.bt_undo_down_128);
+					PorterDuffColorFilter cf = new PorterDuffColorFilter(
+							   Color.argb(200, 0, 200, 0), PorterDuff.Mode.SRC_ATOP
+							);
+					undoBtn.setColorFilter(cf);
+				}else if(event.getAction() == MotionEvent.ACTION_UP){
+					undoBtn.setImageResource(R.drawable.bt_undo_128);
+				}
+				return false;
+			}
+		});
+		
+		final ImageButton redoBtn = (ImageButton) findViewById(R.id.redoBt);
 		redoBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
 				mView.redo();
 			}
 		});
+		redoBtn.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if(event.getAction() == MotionEvent.ACTION_DOWN){
+					redoBtn.setImageResource(R.drawable.bt_redo_down_128);
+				}else if(event.getAction() == MotionEvent.ACTION_UP){
+					redoBtn.setImageResource(R.drawable.bt_redo_128);
+				}
+				return false;
+			}
+		});
 		
-		ImageButton clearBtn = (ImageButton) findViewById(R.id.clearBt);
+		final ImageButton clearBtn = (ImageButton) findViewById(R.id.clearBt);
 		clearBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
 				mView.clearCanvas(mSelf);
 			}
 		});
-
+		clearBtn.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if(event.getAction() == MotionEvent.ACTION_DOWN){
+					clearBtn.setImageResource(R.drawable.bt_clear_down_128);
+				}else if(event.getAction() == MotionEvent.ACTION_UP){
+					clearBtn.setImageResource(R.drawable.bt_clear_128);
+				}
+				return false;
+			}
+		});
+		
 		
 	}
 
@@ -124,11 +181,11 @@ public class MyCanvas extends Activity{
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// 把计1:竤舱id, 把计2:itemId, 把计3:item抖, 把计4:item嘿
-		menu.add(0, 0, 0, "next page");
-		menu.add(0, 1, 1, "frame select");
-		menu.add(0, 2, 2, "load image");
-		menu.add(0, 3, 3, "check ip");
-		menu.add(0, 4, 4, "disconnect");
+		menu.add(0, 0, 0, "Next Page");
+		menu.add(0, 1, 1, "Frame Select");
+		menu.add(0, 2, 2, "Load Image");
+		menu.add(0, 3, 3, "Check IP");
+		menu.add(0, 4, 4, "Disconnect");
 		return super.onCreateOptionsMenu(menu);
 	}
 	
@@ -150,30 +207,11 @@ public class MyCanvas extends Activity{
 			startActivityForResult(intent, 1);
 			break;
 		case 3:
-			LayoutInflater inflater = LayoutInflater.from(MyCanvas.this);  
-	        final View textEntryView = inflater.inflate(R.layout.dialog, null);  
-	        final TextView ipTextView=(TextView)textEntryView.findViewById(R.id.ipTextView);
-	        //String ip = "192.168.xxx.test";
-	        
-	        ipTextView.setText(mSocket.getIP());
-	        final ProgressDialog.Builder builder = new ProgressDialog.Builder(MyCanvas.this); 
-	        builder.setCancelable(false);  
-	        builder.setTitle("毙");  
-	        builder.setView(textEntryView);
-	        builder.setNegativeButton("絋﹚",  
-	                new DialogInterface.OnClickListener() {  
-	                    public void onClick(DialogInterface dialog, int whichButton) {  
-	                        setTitle("");  
-	                    }  
-	                });  
-	        builder.show();
+			checkIP();
 			break;
 		case 4:
 			mSocket.disconnect();
 			this.finish();
-			break;
-		case 5:
-			Toast.makeText(MyCanvas.this, "い", Toast.LENGTH_SHORT).show();
 			break;
 		default:
 		}
@@ -195,6 +233,27 @@ public class MyCanvas extends Activity{
 			
 			
 		}
+	}
+	
+	public void checkIP(){
+
+		// tantofish : I use a layout "dialog.xml" because I want to set the text size,
+		//             and I have no idea how to achieve this without using an extra xml.
+		LayoutInflater inflater = LayoutInflater.from(MyCanvas.this);  
+        final View textEntryView = inflater.inflate(R.layout.dialog, null);  
+        final TextView ipTextView=(TextView)textEntryView.findViewById(R.id.ipTextView);
+        String ip = mSocket.getIP();
+        ipTextView.setText(ip.subSequence(1, ip.length()));
+        final ProgressDialog.Builder dialog = new ProgressDialog.Builder(MyCanvas.this); 
+        dialog.setCancelable(false);  
+        //dialog.setTitle("IP address");  
+        dialog.setView(textEntryView);
+        dialog.setNegativeButton("OK",  
+                new DialogInterface.OnClickListener() {  
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                });  
+        dialog.show();
 	}
 
 	

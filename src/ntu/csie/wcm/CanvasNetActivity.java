@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,13 +26,24 @@ public class CanvasNetActivity extends Activity {
 
 
 		HostStartBtn = (ImageButton) findViewById(R.id.hostBtn);
-
+		
 		HostStartBtn.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
 				openDialog(new HostPositiveListener(),"Using Host",true);
 			}
-
+		});
+		// tantofish : chenge button image when click
+		HostStartBtn.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if(event.getAction() == MotionEvent.ACTION_DOWN){
+					HostStartBtn.setImageResource(R.drawable.bt_host_down);
+				}else if(event.getAction() == MotionEvent.ACTION_UP){
+					HostStartBtn.setImageResource(R.drawable.bt_host);
+				}
+				return false;
+			}
 		});
 		
 		ClientStartBtn = (ImageButton) findViewById(R.id.clientBtn);
@@ -40,7 +52,18 @@ public class CanvasNetActivity extends Activity {
 			public void onClick(View v) {
 				openDialog(new ClientPositiveListener(),"Using client, please input IP",false);
 			}
-
+		});
+		ClientStartBtn.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				// TODO Auto-generated method stub
+				if(event.getAction() == MotionEvent.ACTION_DOWN){
+					ClientStartBtn.setImageResource(R.drawable.bt_client_down);
+				}else if(event.getAction() == MotionEvent.ACTION_UP){
+					ClientStartBtn.setImageResource(R.drawable.bt_client);
+				}
+				return false;
+			}
 		});
 
 		
@@ -66,7 +89,12 @@ public class CanvasNetActivity extends Activity {
 	
 	
 	
-	
+
+
+
+
+
+
 	class BasePositiveListener implements DialogInterface.OnClickListener {
     	public void onClick(DialogInterface dialog, int id) {}
 	}

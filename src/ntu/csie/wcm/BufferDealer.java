@@ -88,5 +88,9 @@ public class BufferDealer {
 	{
 		isUndoing = true;
 	}
+	
+	public int getUndoCounter(){
+		return undoCounter;
+	}
 
 }

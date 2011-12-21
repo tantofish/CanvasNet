@@ -145,6 +145,7 @@ public class MySurfaceView extends View {
 		mPath.lineTo(mX, mY);
 
 		mCanvas.drawPath(mPath, mPaint);
+		
 		undoCounter = 0;
 		
 		//save current bitmap
@@ -313,6 +314,10 @@ public class MySurfaceView extends View {
 
 			
 		}
+	}
+	
+	public int getBufferDealerUndoCounter(){
+		return mBufferDealer.getUndoCounter();
 	}
 
 
