@@ -28,7 +28,7 @@ public class MyCanvas extends Activity{
 
 	private MyCanvas mSelf;
 	private MySurfaceView mView;
-	private MySocket mSocket;
+	private MySocket mMySocket;
 	
 	boolean mIsServer;
 	
@@ -42,21 +42,21 @@ public class MyCanvas extends Activity{
 		mSelf = this;
 		mView = (MySurfaceView)findViewById(R.id.mySurfaceView1);
 		
-        mSocket  =new MySocket(mView , 5050, (WifiManager) getSystemService(WIFI_SERVICE));
+		mMySocket  =new MySocket(mView , 5050, (WifiManager) getSystemService(WIFI_SERVICE));
         
-        mView.setSocket(mSocket);
+        mView.setSocket(mMySocket);
         
         Bundle bundle = this.getIntent().getExtras(); 
   	    
         mIsServer = bundle.getBoolean("isServer");
         if(mIsServer)
         {
-        	mSocket.server();
+        	mMySocket.server();
         }
         else
         {
         	String remoteIP = bundle.getString("IP");
-        	mSocket.client(remoteIP, 5050);
+        	mMySocket.client(remoteIP, 5050);
         }
         
 
@@ -71,6 +71,7 @@ public class MyCanvas extends Activity{
 			public void onClick(View v) {
 				// Perform action on click
 				useColorPicker();
+							
 			}
 		});
 		
@@ -83,6 +84,8 @@ public class MyCanvas extends Activity{
 			public void onClick(View v) {
 				// Perform action on click
 				mView.getPaint().setColor(Color.WHITE);
+				
+				mMySocket.send(new Commands.ChangeColorCmd(mView.getPaint().getColor()));
 			}
 		});
 		
@@ -92,6 +95,8 @@ public class MyCanvas extends Activity{
 				// Perform action on click
 
 				mView.undo();
+	            //send command to remote
+				mMySocket.send(new Commands.UndoRedoCmd(true));
 			}
 		});
 		
@@ -100,6 +105,8 @@ public class MyCanvas extends Activity{
 			public void onClick(View v) {
 				// Perform action on click
 				mView.redo();
+				 //send command to remote
+				mMySocket.send(new Commands.UndoRedoCmd(false));
 			}
 		});
 		
@@ -107,7 +114,9 @@ public class MyCanvas extends Activity{
 		clearBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
-				mView.clearCanvas(mSelf);
+				mView.clearCanvas();
+				
+				
 			}
 		});
 
@@ -115,6 +124,10 @@ public class MyCanvas extends Activity{
 	}
 
 	
+	public MySocket getSocket()
+	{
+		return mMySocket;
+	}
 	
 	private void useColorPicker()
 	{
@@ -155,7 +168,7 @@ public class MyCanvas extends Activity{
 	        final TextView ipTextView=(TextView)textEntryView.findViewById(R.id.ipTextView);
 	        //String ip = "192.168.xxx.test";
 	        
-	        ipTextView.setText(mSocket.getIP());
+	        ipTextView.setText(mMySocket.getIP());
 	        final ProgressDialog.Builder builder = new ProgressDialog.Builder(MyCanvas.this); 
 	        builder.setCancelable(false);  
 	        builder.setTitle("±Ð«Ç¦ì§}");  
@@ -169,7 +182,7 @@ public class MyCanvas extends Activity{
 	        builder.show();
 			break;
 		case 4:
-			mSocket.disconnect();
+			mMySocket.disconnect();
 			this.finish();
 			break;
 		case 5:

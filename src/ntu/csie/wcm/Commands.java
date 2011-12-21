@@ -65,7 +65,55 @@ public class Commands  implements java.io.Serializable {
 		}
 		
 	}
+	
+	public static class ChangeColorCmd  extends BaseCmd implements java.io.Serializable
+	{
+		private static final long serialVersionUID = 1L;
+		private int mColorNum;
+		public ChangeColorCmd(int i)
+		{
+			super(3);
+			mColorNum = i;
+			
+		}
+		
+		public int getColor()
+		{
+			return mColorNum;
+		}
+		
+	}
 
+	
+	public static class ClearCanvasCmd  extends BaseCmd implements java.io.Serializable
+	{
+		private static final long serialVersionUID = 1L;
+
+		public ClearCanvasCmd()
+		{
+			super(4);
+		}
+		
+	}
+	
+	public static class UndoRedoCmd  extends BaseCmd implements java.io.Serializable
+	{
+		private static final long serialVersionUID = 1L;
+
+		private boolean UnOrRe;
+		
+		public UndoRedoCmd(boolean uor) //true for Undo, false for Redo
+		{
+			super(5);
+			UnOrRe = uor;
+		}
+		
+		public boolean getUnOrRe()
+		{
+			return UnOrRe;
+		}
+		
+	}
 	
 
 }
