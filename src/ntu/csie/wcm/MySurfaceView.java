@@ -166,6 +166,7 @@ public class MySurfaceView extends View {
 			//mCanvas = new Canvas(mBitmap);
 			mCanvas = new Canvas(mBitmap);
 
+			
 			invalidate();
 
 
@@ -174,7 +175,8 @@ public class MySurfaceView extends View {
 	public void redo() {
 		mBitmap = Bitmap.createBitmap(mBufferDealer.getN());
 		mCanvas = new Canvas(mBitmap);
-			invalidate();
+
+		invalidate();
 	}
 	
 	public void testBGImg(Bitmap img) {	//tantofish: pass selected image from external storage
@@ -216,22 +218,18 @@ public class MySurfaceView extends View {
 	
 	
 
-	public void clearCanvas(MyCanvas mc) {
+	public void clearCanvas() { //use ask to decide whether to confirm the move 
 		
-        AlertDialog.Builder builder = new AlertDialog.Builder(mc);
+		
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         
         builder.setMessage("Clear Canvas?");
         builder.setCancelable(false);
         
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
         	public void onClick(DialogInterface dialog, int id) {
-        		mBufferDealer.clear();
-        		mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
-        		mBufferDealer.saveBitmap(Bitmap.createBitmap(mBitmap));
-        		
-        		mCanvas = new Canvas(mBitmap);
-        		
-        		invalidate();
+        		DoClearCanvas();
+        		mMySocket.send(new Commands.ClearCanvasCmd());
         	}
         });
         
@@ -242,12 +240,19 @@ public class MySurfaceView extends View {
         
         AlertDialog alert = builder.create();
         alert.show();
-
-		
-		
-		
 		
 
+	}
+	
+	public void DoClearCanvas()
+	{
+		mBufferDealer.clear();
+		mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+		mBufferDealer.saveBitmap(Bitmap.createBitmap(mBitmap));
+		
+		mCanvas = new Canvas(mBitmap);
+		
+		invalidate();
 	}
 
 	@Override
@@ -281,6 +286,8 @@ public class MySurfaceView extends View {
 		
 		switch (cmd.ID)
 		{
+		
+		//Receive onTouch command
 		case 1:
 
 			
@@ -306,12 +313,39 @@ public class MySurfaceView extends View {
 			invalidate();
 			
 		//	*/
-		break;
+		break; 
+		//Receive command which is added for debug
 		case 2:
 		    Commands.SendNumberCmd Snc = (Commands.SendNumberCmd) cmd;
 			Log.e("receive num", Integer.toString(Snc.getNum()));
+			break;
 			
+		//Receive change color command 
+		case 3:
+			Commands.ChangeColorCmd CCC = (Commands.ChangeColorCmd) cmd;
+			mPaint.setColor(CCC.getColor());
 
+			break;
+		
+		//Receive clear command
+		case 4:
+            DoClearCanvas();
+            break;
+		//Recieve UndoOrRedo Command
+		case 5:
+			Commands.UndoRedoCmd URC = (Commands.UndoRedoCmd) cmd;
+			
+			Log.e("Comamnd", "receive undo redo");
+			if(URC.getUnOrRe())
+				undo();
+			else
+				redo();
+			break;
+			
+			
+			
+        
+            
 			
 		}
 	}

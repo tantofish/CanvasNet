@@ -28,10 +28,10 @@ public class MyCanvas extends Activity{
 
 	private MyCanvas mSelf;
 	private MySurfaceView mView;
-	private MySocket mSocket;
+	private MySocket mMySocket;
 	
 	boolean mIsServer;
-	
+	private PorterDuffColorFilter cf;
 
 	
 	@Override
@@ -43,32 +43,37 @@ public class MyCanvas extends Activity{
 		mSelf = this;
 		mView = (MySurfaceView)findViewById(R.id.mySurfaceView1);
 		
-        mSocket  =new MySocket(mView , 5050, (WifiManager) getSystemService(WIFI_SERVICE));
+		mMySocket  =new MySocket(mView , 5050, (WifiManager) getSystemService(WIFI_SERVICE));
         
-        mView.setSocket(mSocket);
+        mView.setSocket(mMySocket);
         
         Bundle bundle = this.getIntent().getExtras(); 
   	    
+        // color filter
+        cf = new PorterDuffColorFilter(Color.argb(180, 200, 200, 200), PorterDuff.Mode.SRC_ATOP);
+        
         mIsServer = bundle.getBoolean("isServer");
         if(mIsServer)
         {
-        	mSocket.server();
+        	mMySocket.server();
         	checkIP();
         }
         else
         {
         	String remoteIP = bundle.getString("IP");
-        	mSocket.client(remoteIP, 5050);
+        	mMySocket.client(remoteIP, 5050);
         }
         
         
 		
 		final ImageButton CcBtn;  //change color button
 		CcBtn = (ImageButton) findViewById(R.id.ChangeColorBt);
+		
 		CcBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
 				useColorPicker();
+							
 			}
 		});
 		CcBtn.setOnTouchListener(new View.OnTouchListener() {
@@ -91,6 +96,8 @@ public class MyCanvas extends Activity{
 			public void onClick(View v) {
 				// Perform action on click
 				mView.getPaint().setColor(Color.WHITE);
+				
+				mMySocket.send(new Commands.ChangeColorCmd(mView.getPaint().getColor()));
 			}
 		});
 		eraserBtn.setOnTouchListener(new View.OnTouchListener() {
@@ -106,11 +113,14 @@ public class MyCanvas extends Activity{
 		});
 		
 		final ImageButton undoBtn = (ImageButton) findViewById(R.id.undoBt);
+		undoBtn.setColorFilter(cf);
 		undoBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
-
+				
 				mView.undo();
+	            //send command to remote
+				mMySocket.send(new Commands.UndoRedoCmd(true));
 			}
 		});
 		
@@ -119,10 +129,6 @@ public class MyCanvas extends Activity{
 			public boolean onTouch(View v, MotionEvent event) {
 				if(event.getAction() == MotionEvent.ACTION_DOWN){
 					undoBtn.setImageResource(R.drawable.bt_undo_down_128);
-					PorterDuffColorFilter cf = new PorterDuffColorFilter(
-							   Color.argb(200, 0, 200, 0), PorterDuff.Mode.SRC_ATOP
-							);
-					undoBtn.setColorFilter(cf);
 				}else if(event.getAction() == MotionEvent.ACTION_UP){
 					undoBtn.setImageResource(R.drawable.bt_undo_128);
 				}
@@ -131,10 +137,13 @@ public class MyCanvas extends Activity{
 		});
 		
 		final ImageButton redoBtn = (ImageButton) findViewById(R.id.redoBt);
+		redoBtn.setColorFilter(cf);
 		redoBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
 				mView.redo();
+				 //send command to remote
+				mMySocket.send(new Commands.UndoRedoCmd(false));
 			}
 		});
 		redoBtn.setOnTouchListener(new View.OnTouchListener() {
@@ -153,7 +162,9 @@ public class MyCanvas extends Activity{
 		clearBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
-				mView.clearCanvas(mSelf);
+				mView.clearCanvas();
+				
+				
 			}
 		});
 		clearBtn.setOnTouchListener(new View.OnTouchListener() {
@@ -172,6 +183,10 @@ public class MyCanvas extends Activity{
 	}
 
 	
+	public MySocket getSocket()
+	{
+		return mMySocket;
+	}
 	
 	private void useColorPicker()
 	{
@@ -210,7 +225,7 @@ public class MyCanvas extends Activity{
 			checkIP();
 			break;
 		case 4:
-			mSocket.disconnect();
+			mMySocket.disconnect();
 			this.finish();
 			break;
 		default:
@@ -242,7 +257,7 @@ public class MyCanvas extends Activity{
 		LayoutInflater inflater = LayoutInflater.from(MyCanvas.this);  
         final View textEntryView = inflater.inflate(R.layout.dialog, null);  
         final TextView ipTextView=(TextView)textEntryView.findViewById(R.id.ipTextView);
-        String ip = mSocket.getIP();
+        String ip = mMySocket.getIP();
         ipTextView.setText(ip.subSequence(1, ip.length()));
         final ProgressDialog.Builder dialog = new ProgressDialog.Builder(MyCanvas.this); 
         dialog.setCancelable(false);  

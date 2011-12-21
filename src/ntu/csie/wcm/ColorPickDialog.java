@@ -22,6 +22,7 @@ public class ColorPickDialog extends Dialog {
   
     private int mInitialColor;
     private Paint mPaintToChange;
+    private Context mContext;
   
 
     private static class ColorPickerView extends View {
@@ -208,6 +209,8 @@ public class ColorPickDialog extends Dialog {
         public void colorChanged(int color) {
         	mPaintToChange.setColor(color);
         	
+        	//send to remote
+            ((MyCanvas)(mSelf.mContext)).getSocket().send(new Commands.ChangeColorCmd(color));
         	mSelf.dismiss();
         }
     }
@@ -220,6 +223,7 @@ public class ColorPickDialog extends Dialog {
      
         mPaintToChange = paint;
         mInitialColor = initialColor;
+        mContext = context;
     }
 
     @Override
