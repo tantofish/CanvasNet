@@ -277,6 +277,7 @@ public class MySurfaceView extends View {
 			touch_up();
 			invalidate();
 			
+			((MyCanvas)mContext).enableUndoDisableRedo();
 			
 			break;
 		}

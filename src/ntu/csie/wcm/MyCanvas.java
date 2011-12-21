@@ -352,9 +352,12 @@ public class MyCanvas extends Activity{
 			undoBtn.setColorFilter(mColorFilter);
 		  
 	}
-	
-	public void enableRedo(){
-		
+	// carefully use this
+	public void enableUndoDisableRedo(){
+		iCanUndo = true;
+		undoBtn.clearColorFilter();
+		iCanRedo = false;
+		redoBtn.setColorFilter(mColorFilter);
 	}
     
     
