@@ -1,4 +1,16 @@
+/*
+ * Chengyan:
+ * 
+ * this class includes all the command type which are use for sending
+ */
+
+
 package ntu.csie.wcm;
+
+import java.io.ByteArrayOutputStream;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 
 public class Commands  implements java.io.Serializable {
@@ -115,5 +127,28 @@ public class Commands  implements java.io.Serializable {
 		
 	}
 	
+	
+	public static class SendBitmapCommit  extends BaseCmd implements java.io.Serializable
+	{
+		private static final long serialVersionUID = 1L;
+
+		private byte[] array;
+		
+		
+		public SendBitmapCommit(byte[] bmp) //true for Undo, false for Redo
+		{
+			super(6);
+			
+			array = bmp;
+
+		}
+		
+		public byte[] getBytearray()
+		{
+			return array;
+		}
+		
+		
+	}
 
 }
