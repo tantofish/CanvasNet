@@ -298,7 +298,7 @@ public class MyCanvas extends Activity{
 			
 			
 			
-			mView.testBGImg(scaledImg);
+			mView.drawImgOntoCanvas(scaledImg);
 
 		  
 
@@ -308,13 +308,9 @@ public class MyCanvas extends Activity{
 			mView.getSocket().send(
 				new Commands.SendBitmapCommit(out.toByteArray()));
 		   
-       
-			//mView.testBGImg(img);
-			//img.recycle();
+			scaledImg.recycle();
 			
-
-			
-			
+	
 		}
 	}
 	
@@ -339,6 +335,7 @@ public class MyCanvas extends Activity{
         dialog.show();
 	}
 
+	// tantofish : 
 	public void checkUnReDoValid(){
 
 		iCanRedo = mView.IcanRedo();
@@ -355,7 +352,10 @@ public class MyCanvas extends Activity{
 			undoBtn.setColorFilter(mColorFilter);
 		  
 	}
- 
+	
+	public void enableRedo(){
+		
+	}
     
     
 
