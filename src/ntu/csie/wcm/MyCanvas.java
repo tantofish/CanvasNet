@@ -1,6 +1,9 @@
 package ntu.csie.wcm;
 
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -258,16 +261,19 @@ public class MyCanvas extends Activity{
 		return super.onOptionsItemSelected(item);
 	}
 	
+	
+	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data){
 		Log.d("Debug","onActivityResult: 從 ImageLoader 回來了");
 		super.onActivityResult(requestCode, resultCode, data);
-		//facebook.authorizeCallback(requestCode, resultCode, data);
+		
 		if (requestCode == 1 && resultCode == RESULT_OK){
 			Bundle b = data.getExtras();
 			String path = b.getString("imgPath");
 			
 			Log.d("Debug","Decode Returned Bitmap");
+
 			Bitmap img = BitmapFactory.decodeFile(path);
 			
 			
@@ -293,6 +299,20 @@ public class MyCanvas extends Activity{
 			
 			
 			mView.testBGImg(scaledImg);
+
+		  
+
+			// Chengyan: transfer bitmap to byte stream then send 
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			scaledImg.compress(Bitmap.CompressFormat.PNG, 100, out);
+			mView.getSocket().send(
+				new Commands.SendBitmapCommit(out.toByteArray()));
+		   
+       
+			//mView.testBGImg(img);
+			//img.recycle();
+			
+
 			
 			
 		}

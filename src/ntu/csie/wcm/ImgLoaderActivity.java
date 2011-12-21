@@ -71,10 +71,10 @@ public class ImgLoaderActivity extends Activity {
 				Bitmap bm = BitmapFactory.decodeFile(pathString);
 				
 				//String q = bm.toString();
-				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				/*ByteArrayOutputStream out = new ByteArrayOutputStream();
 				bm.compress(Bitmap.CompressFormat.PNG, 100, out);
 				byte[] array= out.toByteArray();
-				bm = BitmapFactory.decodeByteArray(array, 0, array.length);
+				bm = BitmapFactory.decodeByteArray(array, 0, array.length);*/
 
 
 				

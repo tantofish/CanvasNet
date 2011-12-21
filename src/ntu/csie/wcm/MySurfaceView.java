@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -19,12 +20,7 @@ import android.view.View;
 
 public class MySurfaceView extends View {
 
-	private static final float MINP = 0.25f;
-	private static final float MAXP = 0.75f;
-
-	private final int BITMAP_CACHE_SIZE = 10;
-
-	//handleruse 
+	//handler use 
 	 public static final int GET_COMMAND = 9527; 
 	
 	
@@ -89,6 +85,12 @@ public class MySurfaceView extends View {
 	{
 		mMySocket = ms;
 	}
+	
+	public MySocket getSocket()
+	{
+		return mMySocket;
+	}
+	
 	public Paint getPaint() {
 		return mPaint;
 	}
@@ -352,6 +354,14 @@ public class MySurfaceView extends View {
 				undo();
 			else
 				redo();
+			break;
+		
+		case 6:
+			Commands.SendBitmapCommit SBC = (Commands.SendBitmapCommit) cmd;
+			Bitmap tempBmp = BitmapFactory.decodeByteArray(SBC.getBytearray(), 0, SBC.getBytearray().length);
+			testBGImg(tempBmp);
+			tempBmp.recycle();
+			Log.e("Comamnd", "receive bitmap");
 			break;
 			
 
