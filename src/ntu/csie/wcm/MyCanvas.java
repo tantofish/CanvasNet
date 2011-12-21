@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,8 +65,8 @@ public class MyCanvas extends Activity{
         
         
 		
-		Button CcBtn;  //change color button
-		CcBtn = (Button) findViewById(R.id.ChangeColorBt);
+		ImageButton CcBtn;  //change color button
+		CcBtn = (ImageButton) findViewById(R.id.ChangeColorBt);
 		CcBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
@@ -76,8 +77,8 @@ public class MyCanvas extends Activity{
 		
 
 		
-		Button eraserBtn;
-		eraserBtn = (Button) findViewById(R.id.EraserBt);
+		ImageButton eraserBtn;
+		eraserBtn = (ImageButton) findViewById(R.id.EraserBt);
 		eraserBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
@@ -85,7 +86,7 @@ public class MyCanvas extends Activity{
 			}
 		});
 		
-		Button undoBtn = (Button) findViewById(R.id.undoBt);
+		ImageButton undoBtn = (ImageButton) findViewById(R.id.undoBt);
 		undoBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
@@ -94,7 +95,7 @@ public class MyCanvas extends Activity{
 			}
 		});
 		
-		Button redoBtn = (Button) findViewById(R.id.redoBt);
+		ImageButton redoBtn = (ImageButton) findViewById(R.id.redoBt);
 		redoBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
@@ -102,7 +103,7 @@ public class MyCanvas extends Activity{
 			}
 		});
 		
-		Button clearBtn = (Button) findViewById(R.id.clearBt);
+		ImageButton clearBtn = (ImageButton) findViewById(R.id.clearBt);
 		clearBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
@@ -128,7 +129,6 @@ public class MyCanvas extends Activity{
 		menu.add(0, 2, 2, "load image");
 		menu.add(0, 3, 3, "check ip");
 		menu.add(0, 4, 4, "disconnect");
-		menu.add(0, 5, 5, "我好帥!");
 		return super.onCreateOptionsMenu(menu);
 	}
 	
@@ -153,8 +153,9 @@ public class MyCanvas extends Activity{
 			LayoutInflater inflater = LayoutInflater.from(MyCanvas.this);  
 	        final View textEntryView = inflater.inflate(R.layout.dialog, null);  
 	        final TextView ipTextView=(TextView)textEntryView.findViewById(R.id.ipTextView);
-	        String ip = "192.168.xxx.test";
-	        ipTextView.setText(ip);
+	        //String ip = "192.168.xxx.test";
+	        
+	        ipTextView.setText(mSocket.getIP());
 	        final ProgressDialog.Builder builder = new ProgressDialog.Builder(MyCanvas.this); 
 	        builder.setCancelable(false);  
 	        builder.setTitle("教室位址");  

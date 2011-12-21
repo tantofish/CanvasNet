@@ -178,6 +178,8 @@ public class MySocket {
 		} catch (IOException e) {e.printStackTrace();}                  	
     }
     
-    
+    public String getIP(){
+    	return this.localhost.toString();
+    }
 }
 

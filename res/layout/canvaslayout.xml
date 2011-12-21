@@ -11,12 +11,13 @@
    	         android:layout_height="fill_parent">
            <ntu.csie.wcm.MySurfaceView android:id="@+id/mySurfaceView1" android:layout_width="wrap_content" android:layout_height="wrap_content"></ntu.csie.wcm.MySurfaceView>
            <LinearLayout android:id="@+id/linearLayout1" android:layout_width="match_parent" android:layout_height="wrap_content">
-               <Button android:text="Bt1" android:layout_width="0pt" android:layout_weight="1" android:background="@android:color/transparent" android:id="@+id/ChangeColorBt" android:layout_height="20pt"></Button>
-               <Button android:text="bt2" android:id="@+id/EraserBt" android:layout_width="0pt" android:layout_weight="1"   android:background="@android:color/transparent" android:layout_height="20pt"></Button>
-               <Button android:text="bt3" android:id="@+id/undoBt" android:layout_width="0pt" android:layout_weight="1"  android:background="@android:color/transparent" android:layout_height="20pt"></Button>
-               <Button android:text="bt4" android:id="@+id/redoBt" android:layout_width="0pt" android:layout_weight="1"  android:background="@android:color/transparent" android:layout_height="20pt"></Button>
-               <Button android:text="bt5" android:id="@+id/clearBt"  android:background="@android:color/transparent" android:layout_width="0pt" android:layout_weight="1" android:layout_height="20pt"></Button>
+               <ImageButton android:src="@drawable/bt_palette_128" android:text="Bt1" android:layout_width="0pt" android:layout_weight="1" android:background="@android:color/transparent" android:id="@+id/ChangeColorBt" android:layout_height="20pt" android:scaleType="centerInside"></ImageButton>
+               <ImageButton android:src="@drawable/bt_eraser_128" android:text="bt2" android:id="@+id/EraserBt" android:layout_width="0pt" android:layout_weight="1"   android:background="@android:color/transparent" android:layout_height="20pt" android:scaleType="fitCenter"></ImageButton>
+               <ImageButton android:src="@drawable/bt_undo_128" android:text="bt3" android:id="@+id/undoBt" android:layout_width="0pt" android:layout_weight="1"  android:background="@android:color/transparent" android:layout_height="20pt" android:scaleType="fitCenter"></ImageButton>
+               <ImageButton android:src="@drawable/bt_redo_128" android:text="bt4" android:id="@+id/redoBt" android:layout_width="0pt" android:layout_weight="1"  android:background="@android:color/transparent" android:layout_height="20pt" android:scaleType="fitCenter"></ImageButton>
+               <ImageButton android:src="@drawable/bt_clear_128" android:text="bt5" android:id="@+id/clearBt"  android:background="@android:color/transparent" android:layout_width="0pt" android:layout_weight="1" android:layout_height="20pt" android:scaleType="fitCenter"></ImageButton>
            </LinearLayout>
+           
    </FrameLayout>
    
 </LinearLayout>

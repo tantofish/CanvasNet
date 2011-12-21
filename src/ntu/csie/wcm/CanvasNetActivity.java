@@ -8,13 +8,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 public class CanvasNetActivity extends Activity {
 	/** Called when the activity is first created. */
 
 
-	Button HostStartBtn,ClientStartBtn; 
-	Button imgLoaderActivityJumper; // tantofish:temporary use.
+	ImageButton HostStartBtn,ClientStartBtn; 
+	//Button imgLoaderActivityJumper; // tantofish:temporary use.
 
 	
 	@Override
@@ -23,7 +24,7 @@ public class CanvasNetActivity extends Activity {
 		setContentView(R.layout.main);
 
 
-		HostStartBtn = (Button) findViewById(R.id.hostBtn);
+		HostStartBtn = (ImageButton) findViewById(R.id.hostBtn);
 
 		HostStartBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -33,7 +34,7 @@ public class CanvasNetActivity extends Activity {
 
 		});
 		
-		ClientStartBtn = (Button) findViewById(R.id.clientBtn);
+		ClientStartBtn = (ImageButton) findViewById(R.id.clientBtn);
 
 		ClientStartBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -44,7 +45,7 @@ public class CanvasNetActivity extends Activity {
 
 		
 		
-		
+		/*
 		imgLoaderActivityJumper
 		     = (Button) findViewById(R.id.button2);
 		imgLoaderActivityJumper.setOnClickListener(new View.OnClickListener() {
@@ -58,7 +59,7 @@ public class CanvasNetActivity extends Activity {
 				startActivity(intent);
 			}
 
-		});
+		});*/
 
 	}
 	
