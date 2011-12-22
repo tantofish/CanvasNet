@@ -55,6 +55,10 @@ public class MySocket {
     }
     
     public void server(){
+    	
+    	
+    	
+    	
 
 		tmp = new Thread(){
 			public void run(){								        
@@ -66,6 +70,8 @@ public class MySocket {
 		            if(ob != null)	Log.d("proj" , "server ob new");
 		            ib = new java.io.ObjectInputStream(socket.getInputStream());
 		            if(ib != null)	Log.d("proj" , "server ib new");
+		            
+		         //   mMySurfaceView.errorToast("Connect Constructed!!");
 		            
            //there is no message to display when the connection is setup		            
 		            //listen to the input stream
@@ -89,7 +95,14 @@ public class MySocket {
 							
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
+							disconnect();
+							//mMySurfaceView.errorToast("Connect Lost");
+							
 							e.printStackTrace();
+							
+							break;
+							
+							
 						}
 		    		}		    		      		         
 		        } catch (IOException e) {	Log.d("proj","[server] Socket ERROR");       }		      		   
@@ -131,10 +144,12 @@ public class MySocket {
 						    	m.setData(tempB);
 				                
 						    	mMySurfaceView.handler.sendMessage(m);
-								
+						    	
 
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
+								disconnect();
+								Log.e("disconnect", "disconnect");
 								e.printStackTrace();
 							}
 					}							
@@ -144,6 +159,9 @@ public class MySocket {
 			tmp.start();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
+				mMySurfaceView.errorToast("Connect Faild");
+				((MyCanvas)(mMySurfaceView.mContext)).finish();
+			
 				e.printStackTrace();
 			}	
 					

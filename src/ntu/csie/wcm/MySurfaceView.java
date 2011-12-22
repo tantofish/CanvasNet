@@ -17,6 +17,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 public class MySurfaceView extends View {
 
@@ -75,6 +76,8 @@ public class MySurfaceView extends View {
 
 		mPath = new Path();
 		mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+		
+		
 		
 		
 
@@ -211,6 +214,7 @@ public class MySurfaceView extends View {
 			mCanvas = new Canvas(mBitmap);
 		
 			
+			
 			invalidate();
 		
 
@@ -293,12 +297,15 @@ public class MySurfaceView extends View {
 	public boolean IcanUndo(){
 		return mBufferDealer.isUndoValid();
 	}
-	public void enableRedo(){
-		
-	}
-	
-	
+
+	// tantofish: i need to know the canvas's width and height in MyCanvas to compress bg image
+
 	/* tantofish end */
+	
+	public void errorToast(String str)
+	{
+		Toast.makeText(mContext, str, Toast.LENGTH_SHORT).show();
+	}
 	
 	public void process(Commands.BaseCmd cmd)
 	{

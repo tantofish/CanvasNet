@@ -55,6 +55,9 @@ public class MyCanvas extends Activity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.canvaslayout);
 		
+		//lock rotate
+		setRequestedOrientation(1);
+		
 		mSelf = this;
 		mView = (MySurfaceView)findViewById(R.id.mySurfaceView1);
 		
