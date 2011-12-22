@@ -6,8 +6,8 @@
     android:background="@drawable/background_800_480">
     <TextView android:layout_width="fill_parent" android:text="@string/hello" android:layout_height="wrap_content"></TextView>
     <RelativeLayout android:layout_height="match_parent" android:id="@+id/relativeLayout1" android:layout_width="match_parent">
-        <ImageButton android:layout_height="wrap_content" android:src="@drawable/bt_host" android:scaleType="fitCenter" android:background="@android:color/transparent" android:layout_width="100pt" android:id="@+id/hostBtn" android:layout_above="@+id/clientBtn" android:layout_alignParentLeft="true" android:layout_marginLeft="26dp"></ImageButton>
-        <ImageButton android:layout_height="wrap_content" android:src="@drawable/bt_client" android:scaleType="fitCenter" android:background="@android:color/transparent" android:layout_width="80pt" android:id="@+id/clientBtn" android:layout_alignParentBottom="true" android:layout_alignParentRight="true" android:layout_marginBottom="66dp"></ImageButton>
+        <ImageButton android:id="@+id/clientBtn" android:src="@drawable/bt_client" android:layout_width="60pt" android:layout_height="80dp" android:background="@android:color/transparent" android:scaleType="fitCenter" android:layout_alignParentBottom="true" android:layout_alignParentRight="true" android:layout_marginRight="18dp" android:layout_marginBottom="24dp"></ImageButton>
+        <ImageButton android:id="@+id/hostBtn" android:src="@drawable/bt_host" android:layout_width="100pt" android:layout_height="wrap_content" android:background="@android:color/transparent" android:scaleType="fitCenter" android:layout_alignParentTop="true" android:layout_alignParentLeft="true" android:layout_marginLeft="20dp" android:layout_marginTop="60dp"></ImageButton>
     </RelativeLayout>
 
 
