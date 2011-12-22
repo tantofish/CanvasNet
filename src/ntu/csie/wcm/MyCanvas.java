@@ -224,6 +224,17 @@ public class MyCanvas extends Activity{
 		new ColorPickDialog(this , mView.getPaint() , mView.getPaint().getColor()).show();
 	}
 	
+	
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		Log.e("MyCanvas", "onPause");
+		
+		mMySocket.disconnect();
+	}
+	
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// 把计1:竤舱id, 把计2:itemId, 把计3:item抖, 把计4:item嘿
@@ -328,7 +339,7 @@ public class MyCanvas extends Activity{
         ipTextView.setText(ip.subSequence(1, ip.length()));
         final ProgressDialog.Builder dialog = new ProgressDialog.Builder(MyCanvas.this); 
         dialog.setCancelable(false);  
-        //dialog.setTitle("IP address");  
+        dialog.setTitle("Your IP is");  
         dialog.setView(textEntryView);
         dialog.setNegativeButton("OK",  
                 new DialogInterface.OnClickListener() {  

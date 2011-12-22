@@ -137,7 +137,7 @@ public class CanvasNetActivity extends Activity {
 	private void openDialog(BasePositiveListener l,String message,boolean isHost)
 	{
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        
+       
         builder.setMessage(message);
         builder.setCancelable(false);
         if(!isHost)
@@ -157,6 +157,7 @@ public class CanvasNetActivity extends Activity {
          
         
         AlertDialog alert = builder.create();
+     
         alert.show();
 		
 	}
