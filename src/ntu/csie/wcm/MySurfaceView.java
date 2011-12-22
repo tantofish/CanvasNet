@@ -181,7 +181,7 @@ public class MySurfaceView extends View {
 		invalidate();
 	}
 	
-	public void testBGImg(Bitmap img) {	//tantofish: pass selected image from external storage
+	public void drawImgOntoCanvas(Bitmap img) {	//tantofish: pass selected image from external storage
 
 		/*float marginX = 0.9f;
 		float marginY = 0.8f;
@@ -264,7 +264,7 @@ public class MySurfaceView extends View {
 	public boolean onTouchEvent(MotionEvent event) {
 		float x = event.getX();
 		float y = event.getY();
-
+		
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			mMySocket.send(new Commands.SendPointCmd(x, y, 1)); 	
@@ -277,9 +277,12 @@ public class MySurfaceView extends View {
 			invalidate();
 			break;
 		case MotionEvent.ACTION_UP:
-		mMySocket.send(new Commands.SendPointCmd(x, y, 3)); 
+			mMySocket.send(new Commands.SendPointCmd(x, y, 3)); 
 			touch_up();
 			invalidate();
+			
+			((MyCanvas)mContext).enableUndoDisableRedo();
+			
 			break;
 		}
 		
@@ -294,7 +297,9 @@ public class MySurfaceView extends View {
 	public boolean IcanUndo(){
 		return mBufferDealer.isUndoValid();
 	}
+
 	// tantofish: i need to know the canvas's width and height in MyCanvas to compress bg image
+
 	/* tantofish end */
 	
 	public void errorToast(String str)
@@ -366,7 +371,7 @@ public class MySurfaceView extends View {
 		case 6:
 			Commands.SendBitmapCommit SBC = (Commands.SendBitmapCommit) cmd;
 			Bitmap tempBmp = BitmapFactory.decodeByteArray(SBC.getBytearray(), 0, SBC.getBytearray().length);
-			testBGImg(tempBmp);
+			drawImgOntoCanvas(tempBmp);
 			tempBmp.recycle();
 			Log.e("Comamnd", "receive bitmap");
 			break;
