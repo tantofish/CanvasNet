@@ -212,6 +212,16 @@ public class MyCanvas extends Activity{
 		
 		
 	}
+	
+	@Override
+	public void onBackPressed() {
+		// TODO Auto-generated method stub
+		super.onBackPressed();
+
+		Log.e("MyCanvas", "onPause");
+		
+		mMySocket.disconnect();
+	}
 
 	
 	public MySocket getSocket()
@@ -225,14 +235,7 @@ public class MyCanvas extends Activity{
 	}
 	
 	
-	@Override
-	protected void onPause() {
-		// TODO Auto-generated method stub
-		super.onPause();
-		Log.e("MyCanvas", "onPause");
-		
-		mMySocket.disconnect();
-	}
+
 	
 	
 	@Override
