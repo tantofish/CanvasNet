@@ -114,25 +114,29 @@ public class CanvasNetActivity extends Activity {
 		}
 	}
 
-	EditText input;
+	private EditText input;
+	 private String IpCache;
 	class ClientPositiveListener extends BasePositiveListener{
 		@Override
 		public void onClick(DialogInterface dialog, int id) {
 			// TODO Auto-generated method stub
 			super.onClick(dialog, id);
-			
+			IpCache = input.getText().toString();
 			Intent intent = new Intent();
 			intent.setClass(CanvasNetActivity.this, MyCanvas.class);
 			Bundle bundle = new Bundle();
 			bundle.putBoolean("isServer", false);
-			bundle.putString("IP", input.getText().toString());
+			bundle.putString("IP", IpCache);
 			intent.putExtras(bundle);
 			
 			startActivity(intent);
+			
+			
+			
 		}
     }
 	
-	
+
 	private void openDialog(BasePositiveListener l,String message,boolean isHost)
 	{
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -142,8 +146,11 @@ public class CanvasNetActivity extends Activity {
         if(!isHost)
         {
         	// Set an EditText view to get user input 
+        	//if(input == null)
         	input = new EditText(this);
         	input.setInputType(0x00000014);
+        	if(IpCache != null)
+        		input.setText(IpCache);
         	builder.setView(input);
         	
         }
@@ -154,8 +161,8 @@ public class CanvasNetActivity extends Activity {
         	}
         });   
          
-        
-        AlertDialog alert = builder.create();
+       
+       AlertDialog alert = builder.create();
      
         alert.show();
 		

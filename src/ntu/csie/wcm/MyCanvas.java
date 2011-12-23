@@ -61,6 +61,7 @@ public class MyCanvas extends Activity{
 		mSelf = this;
 		mView = (MySurfaceView)findViewById(R.id.mySurfaceView1);
 		
+		Log.e("MySocket Construction", "MySocket Construction");
 		mMySocket  =new MySocket(mView , 5050, (WifiManager) getSystemService(WIFI_SERVICE));
         
         mView.setSocket(mMySocket);
@@ -221,6 +222,7 @@ public class MyCanvas extends Activity{
 		Log.e("MyCanvas", "onPause");
 		
 		mMySocket.disconnect();
+		this.finish();
 	}
 
 	
@@ -272,13 +274,12 @@ public class MyCanvas extends Activity{
 		case 4:
 			mMySocket.disconnect();
 			this.finish();
+		//	this.finalize();
 			break;
 		default:
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
-	
 	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data){

@@ -23,6 +23,7 @@ public class MySurfaceView extends View {
 
 	//handler use 
 	 public static final int GET_COMMAND = 9527; 
+	 public static final int GET_SHOW_TOAST = 9528;
 	
 	
     //public variable
@@ -51,8 +52,12 @@ public class MySurfaceView extends View {
 	        	Bundle tempB = msg.getData();
 	        	process((Commands.BaseCmd)tempB.getSerializable("cmd"));
 		    break;
+	        case GET_SHOW_TOAST:
+	        	Bundle tempB1 = msg.getData();
+	        	errorToast(tempB1.getString("message"));
+	        	break;
 
-            }
+        }
 	    super.handleMessage(msg);
         }
 
@@ -102,6 +107,7 @@ public class MySurfaceView extends View {
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
 
+		//Log.e("onSizeChanged", "onSizeChanged");
 		mBufferDealer.clear();
 		
 		mWidth = w;
@@ -309,6 +315,8 @@ public class MySurfaceView extends View {
 	
 	public void process(Commands.BaseCmd cmd)
 	{
+		
+		Log.e("receive command", Integer.toString(cmd.ID));
 		
 		switch (cmd.ID)
 		{
