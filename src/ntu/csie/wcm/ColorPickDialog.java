@@ -1,3 +1,8 @@
+/*
+ * ChengYan: this class creates a ColorPickDialog when color pick button in MyCanvas is
+ * touched.
+ */
+
 package ntu.csie.wcm;
 
 
@@ -11,9 +16,12 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.SweepGradient;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
 
 public class ColorPickDialog extends Dialog {
 
@@ -23,23 +31,27 @@ public class ColorPickDialog extends Dialog {
     private int mInitialColor;
     private Paint mPaintToChange;
     private Context mContext;
-  
-
+    private SeekBar mAlphaSB;
+    private SeekBar mWidthSB;
+    private int mCurrentAlpha;
+    
     private static class ColorPickerView extends View {
     	private Paint mPaintToChange;
         private Paint mPaint;
         private Paint mCenterPaint;
         private final int[] mColors;
         private ColorPickDialog mSelf;
+       
     
 
         ColorPickerView(Context c, Paint paint, int color,ColorPickDialog self) {
             super(c);
+            
             mSelf = self;
             mPaintToChange = paint;
-           
+            
             mColors = new int[] {
-                0xFFFF0000, 0xFFFF00FF, 0xFF0000FF, 0xFF00FFFF, 0xFF00FF00,
+                0xFFFF0000, 0xFFFF00FF, 0xFF0000FF, Color.BLACK,Color.BLACK,0xFF00FFFF, 0xFF00FF00,
                 0xFFFFFF00, 0xFFFF0000
             };
             Shader s = new SweepGradient(0, 0, mColors, null);
@@ -47,16 +59,25 @@ public class ColorPickDialog extends Dialog {
             mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mPaint.setShader(s);
             mPaint.setStyle(Paint.Style.STROKE);
-            mPaint.setStrokeWidth(32);
+            mPaint.setStrokeWidth(60);//origional:32
 
             mCenterPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mCenterPaint.setColor(color);
-            mCenterPaint.setStrokeWidth(5);
+            mCenterPaint.setStrokeWidth(5); 
         }
 
         private boolean mTrackingCenter;
         private boolean mHighlightCenter;
 
+        public void paintAlphaChange(int alpha)
+        {
+        	mPaintToChange.setAlpha(alpha);
+        	mPaint.setAlpha(alpha);
+        	mCenterPaint.setAlpha(alpha);
+        	invalidate();
+        }
+        
+        
         @Override
         protected void onDraw(Canvas canvas) {
             float r = CENTER_X - mPaint.getStrokeWidth()*0.5f;
@@ -65,6 +86,10 @@ public class ColorPickDialog extends Dialog {
 
             canvas.drawOval(new RectF(-r, -r, r, r), mPaint);
             canvas.drawCircle(0, 0, CENTER_RADIUS, mCenterPaint);
+            
+            
+            //ChengYan: draw StrokeWidth Bar         
+            canvas.drawLine(-r, r+STROKE_WIDTH, r, r+STROKE_WIDTH, mPaintToChange);
 
             if (mTrackingCenter) {
                 int c = mCenterPaint.getColor();
@@ -86,12 +111,13 @@ public class ColorPickDialog extends Dialog {
 
         @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-            setMeasuredDimension(CENTER_X*2, CENTER_Y*2);
+            setMeasuredDimension(CENTER_X*2, CENTER_Y*2 + STROKE_WIDTH);
         }
 
-        private static final int CENTER_X = 100;
-        private static final int CENTER_Y = 100;
+        private static final int CENTER_X = 120;
+        private static final int CENTER_Y = 120;
         private static final int CENTER_RADIUS = 32;
+        private static final int STROKE_WIDTH = 60;
 
         private int floatToByte(float x) {
             int n = java.lang.Math.round(x);
@@ -125,12 +151,14 @@ public class ColorPickDialog extends Dialog {
             // now p is just the fractional part [0...1) and i is the index
             int c0 = colors[i];
             int c1 = colors[i+1];
-            int a = ave(Color.alpha(c0), Color.alpha(c1), p);
+           // int a = ave(Color.alpha(c0), Color.alpha(c1), p);
+            int a = mPaint.getAlpha();
             int r = ave(Color.red(c0), Color.red(c1), p);
             int g = ave(Color.green(c0), Color.green(c1), p);
             int b = ave(Color.blue(c0), Color.blue(c1), p);
 
             return Color.argb(a, r, g, b);
+           
         }
 
         private int rotateColor(int color, float rad) {
@@ -189,6 +217,7 @@ public class ColorPickDialog extends Dialog {
                             unit += 1;
                         }
                         mCenterPaint.setColor(interpColor(mColors, unit));
+                        mPaintToChange.setColor(interpColor(mColors, unit));
                         invalidate();
                     }
                     break;
@@ -208,9 +237,8 @@ public class ColorPickDialog extends Dialog {
         
         public void colorChanged(int color) {
         	mPaintToChange.setColor(color);
-        	
         	//send to remote
-            ((MyCanvas)(mSelf.mContext)).getSocket().send(new Commands.ChangeColorCmd(color));
+            ((MyCanvas)(mSelf.mContext)).getSocket().send(new Commands.ChangeColorCmd(color,mPaintToChange.getStrokeWidth()));
         	mSelf.dismiss();
         }
     }
@@ -220,8 +248,9 @@ public class ColorPickDialog extends Dialog {
                              int initialColor) {
         super(context);
 
-     
+        
         mPaintToChange = paint;
+        mCurrentAlpha = paint.getAlpha();
         mInitialColor = initialColor;
         mContext = context;
     }
@@ -229,9 +258,95 @@ public class ColorPickDialog extends Dialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        final ColorPickerView cpv = new ColorPickerView(getContext(), mPaintToChange, mInitialColor,this);
+        
+        //change all paints alpha value in ColorPickerView
+        cpv.paintAlphaChange(mCurrentAlpha);
+        
+        //create Alpha seek bar
+        mAlphaSB = new SeekBar(mContext);
+       
+        mAlphaSB.setProgress((int)(mAlphaSB.getMax() * ((float)mCurrentAlpha/255)));     
+        mAlphaSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {
+				// TODO Auto-generated method stub
+				int alpha = (int)((float)255 *((float)progress/(float)seekBar.getMax()));
+				mCurrentAlpha = alpha;
+				cpv.paintAlphaChange(mCurrentAlpha);
+				
+				
+			}
+		});
+        
+        //create Stroke Width seek bar
+        mWidthSB = new SeekBar(mContext);
+        
+        mWidthSB.setProgress((int)(mWidthSB.getMax() * ((float)(mPaintToChange.getStrokeWidth())/ColorPickerView.STROKE_WIDTH)));     
+        mWidthSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {
+				// TODO Auto-generated method stub
+				int swidth = (int)((float)ColorPickerView.STROKE_WIDTH *((float)progress/(float)seekBar.getMax()));
+				
+				cpv.mPaintToChange.setStrokeWidth(swidth);
+				cpv.invalidate();
+				
+				
+			}
+		});
+        
+        
+        //create dialog layout
+        LinearLayout ll = new LinearLayout(mContext);
+        ll.setOrientation(LinearLayout.VERTICAL);
+        //add ColorPickerView
+        ll.addView(cpv);
+        //add alpha text
+        TextView atext = new TextView(mContext);
+        atext.setText("Set Alpha");
+        ll.addView(atext);
+        //add alpha seek bar
+        ll.addView(mAlphaSB);
+        
+        //add stroke width text
+        TextView stext = new TextView(mContext);
+        stext.setText("Set Brush Width");
+        ll.addView(stext);
+        //add stroke width bar
+        ll.addView(mWidthSB);
 
         
-        setContentView(new ColorPickerView(getContext(), mPaintToChange, mInitialColor,this));
+        setContentView(ll);
       
         setTitle("Pick a Color");
     }

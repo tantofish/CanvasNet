@@ -354,10 +354,11 @@ public class MySurfaceView extends View {
 			Log.e("receive num", Integer.toString(Snc.getNum()));
 			break;
 			
-		//Receive change color command 
+		//Receive change color and brush width command 
 		case 3:
 			Commands.ChangeColorCmd CCC = (Commands.ChangeColorCmd) cmd;
 			mPaint.setColor(CCC.getColor());
+			mPaint.setStrokeWidth(CCC.getWidth());
 
 			break;
 		

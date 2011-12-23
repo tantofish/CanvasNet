@@ -116,7 +116,7 @@ public class MyCanvas extends Activity{
 				// Perform action on click
 				mView.getPaint().setColor(Color.WHITE);
 				
-				mMySocket.send(new Commands.ChangeColorCmd(mView.getPaint().getColor()));
+				mMySocket.send(new Commands.ChangeColorCmd(mView.getPaint().getColor(),mView.getPaint().getStrokeWidth()));
 			}
 		});
 		

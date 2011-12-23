@@ -78,21 +78,31 @@ public class Commands  implements java.io.Serializable {
 		
 	}
 	
+	//change color and width
 	public static class ChangeColorCmd  extends BaseCmd implements java.io.Serializable
 	{
 		private static final long serialVersionUID = 1L;
 		private int mColorNum;
-		public ChangeColorCmd(int i)
+		private float mBWidth; //brush width
+		
+		public ChangeColorCmd(int i,float w)
 		{
 			super(3);
 			mColorNum = i;
-			
+			mBWidth = w;
+
 		}
 		
 		public int getColor()
 		{
 			return mColorNum;
 		}
+		
+		public float getWidth()
+		{
+			return mBWidth;
+		}
+
 		
 	}
 
