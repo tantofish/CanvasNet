@@ -12,7 +12,7 @@ import android.util.Log;
 
 
 public class BufferDealer {
-	private final int BITMAP_CACHE_SIZE = 2;
+	private final int BITMAP_CACHE_SIZE = 5;
 	private ArrayList<Bitmap> mBitmaps;
 	private boolean isUndoing;
 	private int undoCounter;
@@ -45,11 +45,11 @@ public class BufferDealer {
 	
 	public void saveBitmap(Bitmap bmap) {
 		if (mBitmaps.size() > BITMAP_CACHE_SIZE)
-			mBitmaps.remove(0);
+			mBitmaps.remove(0).recycle();
 		
 
-		mBitmaps.add(Bitmap.createBitmap(bmap)); //chengyan: should change to mBitmaps.add(bmap);
-
+		
+		mBitmaps.add(bmap);
 
 	}
 	

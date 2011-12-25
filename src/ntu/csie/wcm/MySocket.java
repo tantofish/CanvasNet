@@ -117,6 +117,7 @@ public class MySocket {
 			serverIp = InetAddress.getByName(ip);
 
 			clientSocket = new Socket(serverIp, port);
+			MySocket.this.sendMessageToUIThread("Connect to" + ip);
 
 			ob = new java.io.ObjectOutputStream(clientSocket.getOutputStream());
 			if (ob != null)
