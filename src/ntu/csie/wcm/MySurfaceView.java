@@ -37,7 +37,7 @@ public class MySurfaceView extends View {
 
 	private Bitmap mBitmap;
 	private Canvas mCanvas;
-	private Path mPath;
+	private Path mPath,mRemotePath;
 	private Paint mBitmapPaint;
 	private int mWidth, mHeight;
 
@@ -80,6 +80,9 @@ public class MySurfaceView extends View {
 		mPaint.setStrokeWidth(12);
 
 		mPath = new Path();
+		
+		//path for receive from remote
+		mRemotePath = new Path();
 		mBitmapPaint = new Paint(Paint.DITHER_FLAG);
 		
 		
@@ -127,40 +130,44 @@ public class MySurfaceView extends View {
 		canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
 		
 		canvas.drawPath(mPath, mPaint);
+		//canvas.drawPath(mRemotePath, mPaint);
+	
+
+		
 	}
 
 	private float mX, mY;
 	private static final float TOUCH_TOLERANCE = 4;// 4;
 
-	private void touch_start(float x, float y) {
+	private void touch_start(float x, float y, Path p) {
 
 		// mPath.reset();
-		mPath.moveTo(x, y);
+		p.moveTo(x, y);
 		mX = x;
 		mY = y;
 	}
 
-	private void touch_move(float x, float y) {
+	private void touch_move(float x, float y,Path p) {
 		float dx = Math.abs(x - mX);
 		float dy = Math.abs(y - mY);
 		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-			mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
+			p.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
 			mX = x;
 			mY = y;
 		}
 	}
 
-	private void touch_up() {
-		mPath.lineTo(mX, mY);
+	private void touch_up(Path p) {
+		p.lineTo(mX, mY);
 
-		mCanvas.drawPath(mPath, mPaint);
+		mCanvas.drawPath(p, mPaint);
 		
 		undoCounter = 0;
 		
 		//save current bitmap
 		mBufferDealer.onTouchStep(Bitmap.createBitmap(mBitmap),mCanvas);
 		
-		mPath.reset();
+		p.reset();
 	}
 
 	private int undoCounter = 0;
@@ -274,17 +281,17 @@ public class MySurfaceView extends View {
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			mMySocket.send(new Commands.SendPointCmd(x, y, 1)); 	
-			touch_start(x, y);
+			touch_start(x, y,mPath);
 			invalidate();
 			break;
 		case MotionEvent.ACTION_MOVE:
 			mMySocket.send(new Commands.SendPointCmd(x, y, 2)); 
-			touch_move(x, y);
+			touch_move(x, y,mPath);
 			invalidate();
 			break;
 		case MotionEvent.ACTION_UP:
 			mMySocket.send(new Commands.SendPointCmd(x, y, 3)); 
-			touch_up();
+			touch_up(mPath);
 			invalidate();
 			
 			((MyCanvas)mContext).enableUndoDisableRedo();
@@ -333,15 +340,15 @@ public class MySurfaceView extends View {
 			
 			if(Dpc.getType() == 1)
 			{
-				touch_start(Dpc.getX(),Dpc.getY());
+				touch_start(Dpc.getX(),Dpc.getY(),mRemotePath);
 			}
 			else if(Dpc.getType() == 2)
 			{
-				touch_move(Dpc.getX(),Dpc.getY());
+				touch_move(Dpc.getX(),Dpc.getY(),mRemotePath);
 			}
 			else if(Dpc.getType() == 3)
 			{
-				touch_up();
+				touch_up(mRemotePath);
 			}
 			//mPath.reset();
 			invalidate();
