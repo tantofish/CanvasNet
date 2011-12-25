@@ -37,10 +37,12 @@ public class MySurfaceView extends View {
 
 	private Bitmap mBitmap;
 	private Canvas mCanvas;
+	//ChengYan: mRemotePath for remote drawing action
 	private Path mPath,mRemotePath;
 	private Paint mBitmapPaint;
 	private int mWidth, mHeight;
-
+   
+	//ChengYan: Hander for receive message from socket thread
     public Handler handler = new Handler() 
     {
 
@@ -48,10 +50,12 @@ public class MySurfaceView extends View {
         {
    	    switch (msg.what) 
 	    {
+   	        //ChengYan: receive command from socket thread
 	        case GET_COMMAND:
 	        	Bundle tempB = msg.getData();
 	        	process((Commands.BaseCmd)tempB.getSerializable("cmd"));
 		    break;
+		    //ChengYan: show Toast when other threads needs
 	        case GET_SHOW_TOAST:
 	        	Bundle tempB1 = msg.getData();
 	        	errorToast(tempB1.getString("message"));
@@ -78,18 +82,11 @@ public class MySurfaceView extends View {
 		mPaint.setStrokeJoin(Paint.Join.ROUND);
 		mPaint.setStrokeCap(Paint.Cap.ROUND);
 		mPaint.setStrokeWidth(12);
-
 		mPath = new Path();
-		
 		//path for receive from remote
 		mRemotePath = new Path();
 		mBitmapPaint = new Paint(Paint.DITHER_FLAG);
 		
-		
-		
-		
-
-
 	}
 
 	public void setSocket(MySocket ms)
@@ -110,7 +107,6 @@ public class MySurfaceView extends View {
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
 
-		//Log.e("onSizeChanged", "onSizeChanged");
 		mBufferDealer.clear();
 		
 		mWidth = w;
@@ -129,42 +125,46 @@ public class MySurfaceView extends View {
 
 		canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
 		
+		//ChengYan: draw local path
 		canvas.drawPath(mPath, mPaint);
-		//canvas.drawPath(mRemotePath, mPaint);
+		//ChengYan: draw remote path
+		canvas.drawPath(mRemotePath, mPaint);
+
 	
 
 		
 	}
-
-	private float mX, mY;
+    //ChengYan: temporary initialize, array number should depend on client number
+	private float[] mX = {0,0}, mY = {0,0};
 	private static final float TOUCH_TOLERANCE = 4;// 4;
 
-	private void touch_start(float x, float y, Path p) {
+	//ChengYan: pNumber indicates which mX,mY to use (local or remote#?)
+	private void touch_start(float x, float y, Path p,int pNumber) {
 
 		// mPath.reset();
 		p.moveTo(x, y);
-		mX = x;
-		mY = y;
+		mX[pNumber] = x;
+		mY[pNumber] = y;
 	}
 
-	private void touch_move(float x, float y,Path p) {
-		float dx = Math.abs(x - mX);
-		float dy = Math.abs(y - mY);
+	private void touch_move(float x, float y,Path p,int pNumber) {
+		float dx = Math.abs(x - mX[pNumber]);
+		float dy = Math.abs(y - mY[pNumber]);
 		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-			p.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
-			mX = x;
-			mY = y;
+			p.quadTo(mX[pNumber], mY[pNumber], (x + mX[pNumber]) / 2, (y + mY[pNumber]) / 2);
+			mX[pNumber] = x;
+			mY[pNumber] = y;
 		}
 	}
 
-	private void touch_up(Path p) {
-		p.lineTo(mX, mY);
+	private void touch_up(Path p,int pNumber) {
+		p.lineTo(mX[pNumber], mY[pNumber]);
 
 		mCanvas.drawPath(p, mPaint);
 		
 		undoCounter = 0;
 		
-		//save current bitmap
+		//ChengYan: save current bitmap
 		mBufferDealer.onTouchStep(Bitmap.createBitmap(mBitmap),mCanvas);
 		
 		p.reset();
@@ -174,7 +174,7 @@ public class MySurfaceView extends View {
 
 
 
-	// undo function 
+	//ChengYan: undo function 
 	public void undo() {
 			mBitmap = Bitmap.createBitmap(mBufferDealer.getP());
 			mBufferDealer.undoing();
@@ -186,7 +186,7 @@ public class MySurfaceView extends View {
 
 
 	}
-
+	//ChengYan: redo function
 	public void redo() {
 		mBitmap = Bitmap.createBitmap(mBufferDealer.getN());
 		mCanvas = new Canvas(mBitmap);
@@ -229,14 +229,11 @@ public class MySurfaceView extends View {
 			
 			
 			invalidate();
-		
 
-		//Log.d("test", "bit map" + scaledImg.getHeight() + scaledImg.getWidth());
 	}
 	
-	
-
-	public void clearCanvas() { //use ask to decide whether to confirm the move 
+	//ChengYan: pop dialog to confirm the action 
+	public void clearCanvas() {
 		
 		
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
@@ -262,6 +259,7 @@ public class MySurfaceView extends View {
 
 	}
 	
+	
 	public void DoClearCanvas()
 	{
 		mBufferDealer.clear();
@@ -281,17 +279,17 @@ public class MySurfaceView extends View {
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			mMySocket.send(new Commands.SendPointCmd(x, y, 1)); 	
-			touch_start(x, y,mPath);
+			touch_start(x, y,mPath,0); //ChengYan: pNumber = 0 means use mPath's mX,mY
 			invalidate();
 			break;
 		case MotionEvent.ACTION_MOVE:
 			mMySocket.send(new Commands.SendPointCmd(x, y, 2)); 
-			touch_move(x, y,mPath);
+			touch_move(x, y,mPath,0);
 			invalidate();
 			break;
 		case MotionEvent.ACTION_UP:
 			mMySocket.send(new Commands.SendPointCmd(x, y, 3)); 
-			touch_up(mPath);
+			touch_up(mPath,0);
 			invalidate();
 			
 			((MyCanvas)mContext).enableUndoDisableRedo();
@@ -328,40 +326,35 @@ public class MySurfaceView extends View {
 		switch (cmd.ID)
 		{
 		
-		//Receive onTouch command
+		//ChengYan: Receive onTouch command
 		case 1:
-
-			
 			
 			Commands.SendPointCmd Dpc = (Commands.SendPointCmd) cmd;
-			//Log.e("receive num", Float.toString(Dpc.getX()) + "," + Float.toString(Dpc.getY()));
-			
-			
-			
+	
 			if(Dpc.getType() == 1)
 			{
-				touch_start(Dpc.getX(),Dpc.getY(),mRemotePath);
+				touch_start(Dpc.getX(),Dpc.getY(),mRemotePath,1); //ChengYan: pNumber = 1 means use remotePath#1's mX,mY 
 			}
 			else if(Dpc.getType() == 2)
 			{
-				touch_move(Dpc.getX(),Dpc.getY(),mRemotePath);
+				touch_move(Dpc.getX(),Dpc.getY(),mRemotePath,1);
 			}
 			else if(Dpc.getType() == 3)
 			{
-				touch_up(mRemotePath);
+				touch_up(mRemotePath,1);
 			}
 			//mPath.reset();
 			invalidate();
 			
 		//	*/
 		break; 
-		//Receive command which is added for debug
+		//ChengYan: Receive command which is added for debug
 		case 2:
 		    Commands.SendNumberCmd Snc = (Commands.SendNumberCmd) cmd;
 			Log.e("receive num", Integer.toString(Snc.getNum()));
 			break;
 			
-		//Receive change color and brush width command 
+		//ChengYan: Receive change color and brush width command 
 		case 3:
 			Commands.ChangeColorCmd CCC = (Commands.ChangeColorCmd) cmd;
 			mPaint.setColor(CCC.getColor());
@@ -369,11 +362,11 @@ public class MySurfaceView extends View {
 
 			break;
 		
-		//Receive clear command
+		//ChengYan: Receive clear command
 		case 4:
             DoClearCanvas();
             break;
-		//Recieve UndoOrRedo Command
+		//ChengYan: Receive UndoOrRedo Command
 		case 5:
 			Commands.UndoRedoCmd URC = (Commands.UndoRedoCmd) cmd;
 			
@@ -383,7 +376,7 @@ public class MySurfaceView extends View {
 			else
 				redo();
 			break;
-		
+		//ChengYan: Receive BitMap	
 		case 6:
 			Commands.SendBitmapCommit SBC = (Commands.SendBitmapCommit) cmd;
 			Bitmap tempBmp = BitmapFactory.decodeByteArray(SBC.getBytearray(), 0, SBC.getBytearray().length);
