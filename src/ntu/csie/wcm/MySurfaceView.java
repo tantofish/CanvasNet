@@ -24,6 +24,7 @@ public class MySurfaceView extends View {
 
 	//handler use 
 	 public static final int GET_COMMAND = 9527; 
+	 public static final int GET_SHOW_TOAST = 9528;
 	
 	
     //public variable
@@ -37,18 +38,18 @@ public class MySurfaceView extends View {
 
 	private Bitmap mBitmap;
 	private Canvas mCanvas;
-	private Path mPath;
+	//ChengYan: mRemotePath for remote drawing action
+	private Path mPath,mRemotePath;
 	private Paint mBitmapPaint;
 	private int mWidth, mHeight;
 
-	
 	// tantofish : test for multitouch
 	private Bitmap previewBitmap;
 	private Path previewPath;
 	private boolean isMultitouching = false;
 	
-	
-	
+	//ChengYan: Hander for receive message from socket thread
+
     public Handler handler = new Handler() 
     {
 
@@ -56,12 +57,18 @@ public class MySurfaceView extends View {
         {
    	    switch (msg.what) 
 	    {
+   	        //ChengYan: receive command from socket thread
 	        case GET_COMMAND:
 	        	Bundle tempB = msg.getData();
 	        	process((Commands.BaseCmd)tempB.getSerializable("cmd"));
 		    break;
+		    //ChengYan: show Toast when other threads needs
+	        case GET_SHOW_TOAST:
+	        	Bundle tempB1 = msg.getData();
+	        	errorToast(tempB1.getString("message"));
+	        	break;
 
-            }
+        }
 	    super.handleMessage(msg);
         }
 
@@ -82,15 +89,11 @@ public class MySurfaceView extends View {
 		mPaint.setStrokeJoin(Paint.Join.ROUND);
 		mPaint.setStrokeCap(Paint.Cap.ROUND);
 		mPaint.setStrokeWidth(12);
-
 		mPath = new Path();
+		//path for receive from remote
+		mRemotePath = new Path();
 		mBitmapPaint = new Paint(Paint.DITHER_FLAG);
 		
-		
-		
-		
-
-
 	}
 
 	public void setSocket(MySocket ms)
@@ -129,42 +132,55 @@ public class MySurfaceView extends View {
 
 		canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
 		
+		//ChengYan: draw local path
 		canvas.drawPath(mPath, mPaint);
-	}
+		//ChengYan: draw remote path
+		canvas.drawPath(mRemotePath, mPaint);
 
-	private float mX, mY;
+	
+
+		
+	}
+    //ChengYan: temporary initialize, array number should depend on client number
+	private float[] mX = {0,0}, mY = {0,0};
 	private static final float TOUCH_TOLERANCE = 4;// 4;
 
-	private void touch_start(float x, float y) {
+	//ChengYan: pNumber indicates which mX,mY to use (local or remote#?)
+	private void touch_start(float x, float y, Path p,int pNumber) {
 
 		// mPath.reset();
-		mPath.moveTo(x, y);
-		mX = x;
-		mY = y;
+		p.moveTo(x, y);
+		mX[pNumber] = x;
+		mY[pNumber] = y;
 	}
 
-	private void touch_move(float x, float y) {
-		float dx = Math.abs(x - mX);
-		float dy = Math.abs(y - mY);
+	private void touch_move(float x, float y,Path p,int pNumber) {
+		float dx = Math.abs(x - mX[pNumber]);
+		float dy = Math.abs(y - mY[pNumber]);
 		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-			mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
-			mX = x;
-			mY = y;
+			p.quadTo(mX[pNumber], mY[pNumber], (x + mX[pNumber]) / 2, (y + mY[pNumber]) / 2);
+			mX[pNumber] = x;
+			mY[pNumber] = y;
 		}
 	}
 
-	private void touch_up() {
-		mPath.lineTo(mX, mY);
+	private void touch_up(Path p,int pNumber) {
+		p.lineTo(mX[pNumber], mY[pNumber]);
 
-		mCanvas.drawPath(mPath, mPaint);
+		mCanvas.drawPath(p, mPaint);
 		
-		//save current bitmap
+		undoCounter = 0;
+		
+		//ChengYan: save current bitmap
 		mBufferDealer.onTouchStep(Bitmap.createBitmap(mBitmap),mCanvas);
 		
-		mPath.reset();
+		p.reset();
 	}
 
 	/* Undo function */ 
+	private int undoCounter = 0;
+
+	/* ChengYan: Undo function */ 
 	public void undo() {
 			mBitmap = Bitmap.createBitmap(mBufferDealer.getP());
 			mBufferDealer.undoing();
@@ -177,7 +193,7 @@ public class MySurfaceView extends View {
 
 	}
 
-	/* Redo function */
+	/* ChengYan: Redo function */
 	public void redo() {
 		mBitmap = Bitmap.createBitmap(mBufferDealer.getN());
 		mCanvas = new Canvas(mBitmap);
@@ -204,16 +220,15 @@ public class MySurfaceView extends View {
 				mBitmap.setPixel(i, j, img.getPixel(i, j));
 		mCanvas = new Canvas(mBitmap);
 		
-		invalidate();
-		
 
-		//Log.d("test", "bit map" + scaledImg.getHeight() + scaledImg.getWidth());
+		invalidate();
+
 	}
 	
-	/*
-	 * use alert dialog to ask whether the user decides to confirm the move or not. 
-	 */
-	public void clearCanvas() { 
+
+	//ChengYan: pop dialog to confirm the action 
+	public void clearCanvas() {
+		
 		
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         
@@ -237,6 +252,7 @@ public class MySurfaceView extends View {
 		
 	}
 	
+
 	/* Actually clear the canvas */
 	public void DoClearCanvas()
 	{
@@ -261,50 +277,17 @@ public class MySurfaceView extends View {
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			mMySocket.send(new Commands.SendPointCmd(x, y, 1)); 	
-			touch_start(x, y);
-			
+			touch_start(x, y,mPath,0); //ChengYan: pNumber = 0 means use mPath's mX,mY
 			invalidate();
 			break;
 		case MotionEvent.ACTION_MOVE:
-			
-			pointerCount = event.getPointerCount();	// how many points touch on the screen
-			switch (pointerCount){
-			case 1:	// single point touch
-				mMySocket.send(new Commands.SendPointCmd(x, y, 2)); 
-				touch_move(x, y);
-				invalidate();
-				break;
-			case 2:	// two points touch
-				int x1 = (int) event.getX(0);  // first touch point
-				int y1 = (int) event.getY(0);
-				int x2 = (int) event.getX(1);  // second touch point
-				int y2 = (int) event.getY(1);
-				
-				
-				// tantofish : draw circle for test multitouch
-				int centerX = (int) ((x1 + x2) * 0.5);
-				int centerY = (int) ((y1 + y2) * 0.5);
-				int radius = (int)(Math.sqrt( Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2))/2);
-
-				if(!isMultitouching){
-					isMultitouching = true;
-					previewBitmap = Bitmap.createBitmap(mBitmap);	
-				}else{
-					mBitmap = Bitmap.createBitmap(previewBitmap);	
-				}
-				
-				mCanvas = new Canvas(mBitmap);
-				mCanvas.drawCircle( centerX, centerY, radius, mPaint );
-				
-				invalidate();
-				
-				
-				break;
-			}
+			mMySocket.send(new Commands.SendPointCmd(x, y, 2)); 
+			touch_move(x, y,mPath,0);
+			invalidate();
 			break;
 		case MotionEvent.ACTION_UP:
 			mMySocket.send(new Commands.SendPointCmd(x, y, 3)); 
-			touch_up();
+			touch_up(mPath,0);
 			invalidate();
 			
 			if(isMultitouching) isMultitouching = false;
@@ -344,54 +327,52 @@ public class MySurfaceView extends View {
 	public void process(Commands.BaseCmd cmd)
 	{
 		
+		Log.e("receive command", Integer.toString(cmd.ID));
+		
 		switch (cmd.ID)
 		{
 		
-		//Receive onTouch command
+		//ChengYan: Receive onTouch command
 		case 1:
-
-			
 			
 			Commands.SendPointCmd Dpc = (Commands.SendPointCmd) cmd;
-			//Log.e("receive num", Float.toString(Dpc.getX()) + "," + Float.toString(Dpc.getY()));
-			
-			
-			
+	
 			if(Dpc.getType() == 1)
 			{
-				touch_start(Dpc.getX(),Dpc.getY());
+				touch_start(Dpc.getX(),Dpc.getY(),mRemotePath,1); //ChengYan: pNumber = 1 means use remotePath#1's mX,mY 
 			}
 			else if(Dpc.getType() == 2)
 			{
-				touch_move(Dpc.getX(),Dpc.getY());
+				touch_move(Dpc.getX(),Dpc.getY(),mRemotePath,1);
 			}
 			else if(Dpc.getType() == 3)
 			{
-				touch_up();
+				touch_up(mRemotePath,1);
 			}
 			//mPath.reset();
 			invalidate();
 			
 		//	*/
 		break; 
-		//Receive command which is added for debug
+		//ChengYan: Receive command which is added for debug
 		case 2:
 		    Commands.SendNumberCmd Snc = (Commands.SendNumberCmd) cmd;
 			Log.e("receive num", Integer.toString(Snc.getNum()));
 			break;
 			
-		//Receive change color command 
+		//ChengYan: Receive change color and brush width command 
 		case 3:
 			Commands.ChangeColorCmd CCC = (Commands.ChangeColorCmd) cmd;
 			mPaint.setColor(CCC.getColor());
+			mPaint.setStrokeWidth(CCC.getWidth());
 
 			break;
 		
-		//Receive clear command
+		//ChengYan: Receive clear command
 		case 4:
             DoClearCanvas();
             break;
-		//Recieve UndoOrRedo Command
+		//ChengYan: Receive UndoOrRedo Command
 		case 5:
 			Commands.UndoRedoCmd URC = (Commands.UndoRedoCmd) cmd;
 			
@@ -401,7 +382,7 @@ public class MySurfaceView extends View {
 			else
 				redo();
 			break;
-		
+		//ChengYan: Receive BitMap	
 		case 6:
 			Commands.SendBitmapCommit SBC = (Commands.SendBitmapCommit) cmd;
 			Bitmap tempBmp = BitmapFactory.decodeByteArray(SBC.getBytearray(), 0, SBC.getBytearray().length);

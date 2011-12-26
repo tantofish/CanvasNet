@@ -95,6 +95,8 @@ public class MyCanvas extends Activity{
 		
 		mSelf = this;
 
+		Log.e("MySocket Construction", "MySocket Construction");
+
 		mMySocket  =new MySocket(mView , 5050, (WifiManager) getSystemService(WIFI_SERVICE));
         
         mView.setSocket(mMySocket);
@@ -143,7 +145,7 @@ public class MyCanvas extends Activity{
 			public void onClick(View v) {
 				// Perform action on click
 				mView.getPaint().setColor(Color.WHITE);
-				mMySocket.send(new Commands.ChangeColorCmd(mView.getPaint().getColor()));
+				mMySocket.send(new Commands.ChangeColorCmd(mView.getPaint().getColor(),mView.getPaint().getStrokeWidth()));
 			}
 		});
 		// tantofish: this will let the button change color when clicked
@@ -259,6 +261,7 @@ public class MyCanvas extends Activity{
 		Log.e("MyCanvas", "onPause");
 		
 		mMySocket.disconnect();
+		this.finish();
 	}
 
 	
@@ -310,13 +313,12 @@ public class MyCanvas extends Activity{
 		case 4:
 			mMySocket.disconnect();
 			this.finish();
+		//	this.finalize();
 			break;
 		default:
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
-	
 	
 	/*
 	 * Tantofish: load image activity has bean dead and thus return to there 

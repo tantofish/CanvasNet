@@ -32,7 +32,7 @@ public class BufferDealer {
 		{
 			for(int i = undoCounter;i>0;i--)
 			{
-				mBitmaps.remove(mBitmaps.size()-1);
+				mBitmaps.remove(mBitmaps.size()-1).recycle();
 
 			}
 			isUndoing = false;
@@ -45,11 +45,11 @@ public class BufferDealer {
 	
 	public void saveBitmap(Bitmap bmap) {
 		if (mBitmaps.size() > BITMAP_CACHE_SIZE)
-			mBitmaps.remove(0);
+			mBitmaps.remove(0).recycle();
 		
 
-		mBitmaps.add(Bitmap.createBitmap(bmap));
-
+		
+		mBitmaps.add(bmap);
 
 	}
 	

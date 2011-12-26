@@ -43,7 +43,7 @@ public class MySocket {
 
 		try {
 			localhost = InetAddress.getByName(ip);
-			Log.e("IP", ip);
+			Log.e("IPpppp", ip);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -57,6 +57,7 @@ public class MySocket {
 				try {
 					serverSocket = new ServerSocket(listenPort);
 					Socket socket = serverSocket.accept();
+					
 					Log.e("socket", "server accept!!");
 					ob = new java.io.ObjectOutputStream(
 							socket.getOutputStream());
@@ -67,7 +68,7 @@ public class MySocket {
 						Log.d("proj", "server ib new");
 
 					// mMySurfaceView.errorToast("Connect Constructed!!");
-
+					MySocket.this.sendMessageToUIThread("Connect Constructed!!");
 					// there is no message to display when the connection is
 					// setup
 					// listen to the input stream
@@ -92,7 +93,8 @@ public class MySocket {
 							// TODO Auto-generated catch block
 							disconnect();
 							// mMySurfaceView.errorToast("Connect Lost");
-
+							MySocket.this.sendMessageToUIThread("Connect Lost");
+                       
 							e.printStackTrace();
 							server();
 							break;
@@ -108,13 +110,14 @@ public class MySocket {
 
 	}
 
-	public void client(String ip, int port) {
+	public void client(final String ip,final int port) {
 
 		InetAddress serverIp;
 		try {
 			serverIp = InetAddress.getByName(ip);
 
 			clientSocket = new Socket(serverIp, port);
+			MySocket.this.sendMessageToUIThread("Connect to" + ip);
 
 			ob = new java.io.ObjectOutputStream(clientSocket.getOutputStream());
 			if (ob != null)
@@ -145,9 +148,9 @@ public class MySocket {
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							disconnect();
-							Log.e("disconnect", "disconnect");
-							e.printStackTrace();
+							MySocket.this.sendMessageToUIThread("Connect Lost");
 							((MyCanvas) (mMySurfaceView.mContext)).finish();
+						//	client(ip,port);
 							break;
 						}
 					}
@@ -164,7 +167,17 @@ public class MySocket {
 		}
 
 	}
-
+    
+    public void sendMessageToUIThread(String str)
+    {
+    	Bundle tempB = new Bundle();
+    	tempB.putString("message", str);
+		Message m = new Message();
+		m.what = MySurfaceView.GET_SHOW_TOAST;
+		m.setData(tempB);
+		mMySurfaceView.handler.sendMessage(m);
+    	
+    }
 	public void disconnect() {
 
 		try {
