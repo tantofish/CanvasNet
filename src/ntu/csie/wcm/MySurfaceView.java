@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Path.Direction;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -40,6 +41,14 @@ public class MySurfaceView extends View {
 	private Paint mBitmapPaint;
 	private int mWidth, mHeight;
 
+	
+	// tantofish : test for multitouch
+	private Bitmap previewBitmap;
+	private Path previewPath;
+	private boolean isMultitouching = false;
+	
+	
+	
     public Handler handler = new Handler() 
     {
 
@@ -149,19 +158,13 @@ public class MySurfaceView extends View {
 
 		mCanvas.drawPath(mPath, mPaint);
 		
-		undoCounter = 0;
-		
 		//save current bitmap
 		mBufferDealer.onTouchStep(Bitmap.createBitmap(mBitmap),mCanvas);
 		
 		mPath.reset();
 	}
 
-	private int undoCounter = 0;
-
-
-
-	// undo function 
+	/* Undo function */ 
 	public void undo() {
 			mBitmap = Bitmap.createBitmap(mBufferDealer.getP());
 			mBufferDealer.undoing();
@@ -174,6 +177,7 @@ public class MySurfaceView extends View {
 
 	}
 
+	/* Redo function */
 	public void redo() {
 		mBitmap = Bitmap.createBitmap(mBufferDealer.getN());
 		mCanvas = new Canvas(mBitmap);
@@ -181,50 +185,35 @@ public class MySurfaceView extends View {
 		invalidate();
 	}
 	
-	public void drawImgOntoCanvas(Bitmap img) {	//tantofish: pass selected image from external storage
+	/* 
+	 * Draw image onto the canvas when user load it from the gallery 
+	 * ( which is stored in external storage)
+	 */
+	public void drawImgOntoCanvas(Bitmap img) {	
 
-		/*float marginX = 0.9f;
-		float marginY = 0.8f;
 		
-		int width  = img.getWidth();
-		int height = img.getHeight();
-        int bm_w   = mBitmap.getWidth()  ;
-        int bm_h   = mBitmap.getHeight() ;
         
-        float scaleX = (float) bm_w * marginX / width;
-        float scaleY = (float) bm_h * marginY / height;
-        
-        float scale = java.lang.Math.min(scaleX, scaleY);
-        Matrix matrix = new Matrix();
-        matrix.postScale(scale, scale);
-        Bitmap scaledImg = Bitmap.createBitmap(img, 0, 0, width, height, matrix, true);
-        img.recycle();*/
-        
-		int bm_w   = mBitmap.getWidth()  ;
-        int bm_h   = mBitmap.getHeight() ;
+		
 		int width  = img.getWidth();
         int height = img.getHeight();
         
-        int xOffset = (bm_w - width)/2;
-        int yOffset = (bm_h - height)/2;
+      
         		
-			for(int j = 0 ; j < height ; j++)
-				for(int i = 0 ; i < width ; i++)
-					mBitmap.setPixel(i+xOffset, j+yOffset, img.getPixel(i, j));
-			mCanvas = new Canvas(mBitmap);
+		for(int j = 0 ; j < height ; j++)
+			for(int i = 0 ; i < width ; i++)
+				mBitmap.setPixel(i, j, img.getPixel(i, j));
+		mCanvas = new Canvas(mBitmap);
 		
-			
-			
-			invalidate();
+		invalidate();
 		
 
 		//Log.d("test", "bit map" + scaledImg.getHeight() + scaledImg.getWidth());
 	}
 	
-	
-
-	public void clearCanvas() { //use ask to decide whether to confirm the move 
-		
+	/*
+	 * use alert dialog to ask whether the user decides to confirm the move or not. 
+	 */
+	public void clearCanvas() { 
 		
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         
@@ -246,9 +235,9 @@ public class MySurfaceView extends View {
         AlertDialog alert = builder.create();
         alert.show();
 		
-
 	}
 	
+	/* Actually clear the canvas */
 	public void DoClearCanvas()
 	{
 		mBufferDealer.clear();
@@ -260,26 +249,65 @@ public class MySurfaceView extends View {
 		invalidate();
 	}
 
+	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		
+		int pointerCount = event.getPointerCount();  // multitouch or single touch 
+		
+		
 		float x = event.getX();
 		float y = event.getY();
-		
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			mMySocket.send(new Commands.SendPointCmd(x, y, 1)); 	
 			touch_start(x, y);
+			
 			invalidate();
 			break;
 		case MotionEvent.ACTION_MOVE:
-			mMySocket.send(new Commands.SendPointCmd(x, y, 2)); 
-			touch_move(x, y);
-			invalidate();
+			
+			pointerCount = event.getPointerCount();	// how many points touch on the screen
+			switch (pointerCount){
+			case 1:	// single point touch
+				mMySocket.send(new Commands.SendPointCmd(x, y, 2)); 
+				touch_move(x, y);
+				invalidate();
+				break;
+			case 2:	// two points touch
+				int x1 = (int) event.getX(0);  // first touch point
+				int y1 = (int) event.getY(0);
+				int x2 = (int) event.getX(1);  // second touch point
+				int y2 = (int) event.getY(1);
+				
+				
+				// tantofish : draw circle for test multitouch
+				int centerX = (int) ((x1 + x2) * 0.5);
+				int centerY = (int) ((y1 + y2) * 0.5);
+				int radius = (int)(Math.sqrt( Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2))/2);
+
+				if(!isMultitouching){
+					isMultitouching = true;
+					previewBitmap = Bitmap.createBitmap(mBitmap);	
+				}else{
+					mBitmap = Bitmap.createBitmap(previewBitmap);	
+				}
+				
+				mCanvas = new Canvas(mBitmap);
+				mCanvas.drawCircle( centerX, centerY, radius, mPaint );
+				
+				invalidate();
+				
+				
+				break;
+			}
 			break;
 		case MotionEvent.ACTION_UP:
 			mMySocket.send(new Commands.SendPointCmd(x, y, 3)); 
 			touch_up();
 			invalidate();
+			
+			if(isMultitouching) isMultitouching = false;
 			
 			((MyCanvas)mContext).enableUndoDisableRedo();
 			
@@ -297,9 +325,15 @@ public class MySurfaceView extends View {
 	public boolean IcanUndo(){
 		return mBufferDealer.isUndoValid();
 	}
+	public Bitmap getBitmap(){
+		return mBitmap;
+	}
+	public void setBitmap(Bitmap bm){
+		mBitmap = bm;
+		mCanvas = new Canvas(mBitmap);
 
-	// tantofish: i need to know the canvas's width and height in MyCanvas to compress bg image
-
+		invalidate();
+	}
 	/* tantofish end */
 	
 	public void errorToast(String str)
