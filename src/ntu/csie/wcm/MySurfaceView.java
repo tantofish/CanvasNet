@@ -204,6 +204,9 @@ public class MySurfaceView extends View {
 	/* 
 	 * Draw image onto the canvas when user load it from the gallery 
 	 * ( which is stored in external storage)
+	 * 
+	 * 
+	 * ChengYan: is this function still need?
 	 */
 	public void drawImgOntoCanvas(Bitmap img) {	
 
@@ -386,7 +389,8 @@ public class MySurfaceView extends View {
 		case 6:
 			Commands.SendBitmapCommit SBC = (Commands.SendBitmapCommit) cmd;
 			Bitmap tempBmp = BitmapFactory.decodeByteArray(SBC.getBytearray(), 0, SBC.getBytearray().length);
-			drawImgOntoCanvas(tempBmp);
+			//drawImgOntoCanvas(tempBmp);
+			setBitmap(tempBmp.copy(Bitmap.Config.ARGB_8888, true));
 			tempBmp.recycle();
 			Log.e("Comamnd", "receive bitmap");
 			break;

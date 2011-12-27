@@ -248,6 +248,12 @@ public class MyCanvas extends Activity{
 			public void onClick(View v) {
 				Bitmap bm = mImageEditingView.ok(mView.getBitmap());
 				mView.setBitmap(bm);
+				
+				//ChengYan: send bitmap to remote
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				bm.compress(Bitmap.CompressFormat.PNG, 100, out);
+				mView.getSocket().send(
+					new Commands.SendBitmapCommit(out.toByteArray()));
 			}
 		});
 		
