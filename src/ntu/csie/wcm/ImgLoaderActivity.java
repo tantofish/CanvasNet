@@ -180,11 +180,11 @@ public class ImgLoaderActivity extends Activity {
 		image.setBackgroundResource(mGalleryItemBackground);
 	}
 	
-	
+	/*
+	 * Load images from external storage
+	 */
 	public void readExternalStoragePublicPicture() {
 		/* Get the folder path: "mnt/sdcard/Pictures" */
-		
-		
 		File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 		
 		/* Two filters that can tell if the file is a directory or a file */

@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Path.Direction;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -41,8 +42,14 @@ public class MySurfaceView extends View {
 	private Path mPath,mRemotePath;
 	private Paint mBitmapPaint;
 	private int mWidth, mHeight;
-   
+
+	// tantofish : test for multitouch
+	private Bitmap previewBitmap;
+	private Path previewPath;
+	private boolean isMultitouching = false;
+	
 	//ChengYan: Hander for receive message from socket thread
+
     public Handler handler = new Handler() 
     {
 
@@ -170,11 +177,10 @@ public class MySurfaceView extends View {
 		p.reset();
 	}
 
+	/* Undo function */ 
 	private int undoCounter = 0;
 
-
-
-	//ChengYan: undo function 
+	/* ChengYan: Undo function */ 
 	public void undo() {
 			mBitmap = Bitmap.createBitmap(mBufferDealer.getP());
 			mBufferDealer.undoing();
@@ -186,7 +192,8 @@ public class MySurfaceView extends View {
 
 
 	}
-	//ChengYan: redo function
+
+	/* ChengYan: Redo function */
 	public void redo() {
 		mBitmap = Bitmap.createBitmap(mBufferDealer.getN());
 		mCanvas = new Canvas(mBitmap);
@@ -194,44 +201,31 @@ public class MySurfaceView extends View {
 		invalidate();
 	}
 	
-	public void drawImgOntoCanvas(Bitmap img) {	//tantofish: pass selected image from external storage
+	/* 
+	 * Draw image onto the canvas when user load it from the gallery 
+	 * ( which is stored in external storage)
+	 */
+	public void drawImgOntoCanvas(Bitmap img) {	
 
-		/*float marginX = 0.9f;
-		float marginY = 0.8f;
 		
-		int width  = img.getWidth();
-		int height = img.getHeight();
-        int bm_w   = mBitmap.getWidth()  ;
-        int bm_h   = mBitmap.getHeight() ;
         
-        float scaleX = (float) bm_w * marginX / width;
-        float scaleY = (float) bm_h * marginY / height;
-        
-        float scale = java.lang.Math.min(scaleX, scaleY);
-        Matrix matrix = new Matrix();
-        matrix.postScale(scale, scale);
-        Bitmap scaledImg = Bitmap.createBitmap(img, 0, 0, width, height, matrix, true);
-        img.recycle();*/
-        
-		int bm_w   = mBitmap.getWidth()  ;
-        int bm_h   = mBitmap.getHeight() ;
+		
 		int width  = img.getWidth();
         int height = img.getHeight();
         
-        int xOffset = (bm_w - width)/2;
-        int yOffset = (bm_h - height)/2;
+      
         		
-			for(int j = 0 ; j < height ; j++)
-				for(int i = 0 ; i < width ; i++)
-					mBitmap.setPixel(i+xOffset, j+yOffset, img.getPixel(i, j));
-			mCanvas = new Canvas(mBitmap);
+		for(int j = 0 ; j < height ; j++)
+			for(int i = 0 ; i < width ; i++)
+				mBitmap.setPixel(i, j, img.getPixel(i, j));
+		mCanvas = new Canvas(mBitmap);
 		
-			
-			
-			invalidate();
+
+		invalidate();
 
 	}
 	
+
 	//ChengYan: pop dialog to confirm the action 
 	public void clearCanvas() {
 		
@@ -256,10 +250,10 @@ public class MySurfaceView extends View {
         AlertDialog alert = builder.create();
         alert.show();
 		
-
 	}
 	
-	
+
+	/* Actually clear the canvas */
 	public void DoClearCanvas()
 	{
 		mBufferDealer.clear();
@@ -271,11 +265,15 @@ public class MySurfaceView extends View {
 		invalidate();
 	}
 
+	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		
+		int pointerCount = event.getPointerCount();  // multitouch or single touch 
+		
+		
 		float x = event.getX();
 		float y = event.getY();
-		
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			mMySocket.send(new Commands.SendPointCmd(x, y, 1)); 	
@@ -291,6 +289,8 @@ public class MySurfaceView extends View {
 			mMySocket.send(new Commands.SendPointCmd(x, y, 3)); 
 			touch_up(mPath,0);
 			invalidate();
+			
+			if(isMultitouching) isMultitouching = false;
 			
 			((MyCanvas)mContext).enableUndoDisableRedo();
 			
@@ -308,9 +308,15 @@ public class MySurfaceView extends View {
 	public boolean IcanUndo(){
 		return mBufferDealer.isUndoValid();
 	}
+	public Bitmap getBitmap(){
+		return mBitmap;
+	}
+	public void setBitmap(Bitmap bm){
+		mBitmap = bm;
+		mCanvas = new Canvas(mBitmap);
 
-	// tantofish: i need to know the canvas's width and height in MyCanvas to compress bg image
-
+		invalidate();
+	}
 	/* tantofish end */
 	
 	public void errorToast(String str)

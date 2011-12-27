@@ -11,10 +11,16 @@ import android.content.Intent;
 import android.graphics.AvoidXfermode.Mode;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,16 +31,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MyCanvas extends Activity{
 
 	private MyCanvas mSelf;
-	private MySurfaceView mView;
+	public MySurfaceView mView;
 	private MySocket mMySocket;
-	
+	private MyImgEditView mImageEditingView; 	// Image Editting vuew
+	private RelativeLayout mRL; 
 	boolean mIsServer;
 	private PorterDuffColorFilter mColorFilter;
 
@@ -43,32 +53,57 @@ public class MyCanvas extends Activity{
 	private ImageButton undoBtn;
 	private ImageButton redoBtn;
 	private ImageButton clearBtn;
+	private Button imgEdtOKBtn;
+	private Button imgEdtCancelBtn;
+	
+	public ImageView loadedImage;
+	// just for now, remember to correct it to private when release
 	
 	
 	private boolean iCanUndo;
 	private boolean iCanRedo;
 	
+	public static final int VIEWMODE_CANVAS			= 2735; 
+	public static final int VIEWMODE_IMAGE_EDITING	= 5512;
 	
+	private void myFindViewByID(){
+		mView				= (MySurfaceView)	findViewById(R.id.mySurfaceView1);
+		mImageEditingView	= (MyImgEditView)	findViewById(R.id.myImgEditView);
+		loadedImage			= (ImageView)		findViewById(R.id.loadedImage);
+		
+		mRL					= (RelativeLayout) 	findViewById(R.id.relativeLayout1);
+		imgEdtOKBtn			= (Button)			findViewById(R.id.bt_imgEdit_OK);
+		imgEdtCancelBtn		= (Button)			findViewById(R.id.bt_imgEdit_Cancel);
+		
+		CcBtn				= (ImageButton)		findViewById(R.id.ChangeColorBt);
+		eraserBtn			= (ImageButton)		findViewById(R.id.EraserBt);
+		undoBtn				= (ImageButton)		findViewById(R.id.undoBt);
+		redoBtn				= (ImageButton)		findViewById(R.id.redoBt);
+		clearBtn			= (ImageButton)		findViewById(R.id.clearBt);
+		
+		loadedImage.setAlpha(225);
+	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.canvaslayout);
+		setRequestedOrientation(1);	//lock rotate
 		
-		//lock rotate
-		setRequestedOrientation(1);
+		myFindViewByID();
+		setCanvasViewMode(VIEWMODE_CANVAS);
 		
 		mSelf = this;
-		mView = (MySurfaceView)findViewById(R.id.mySurfaceView1);
-		
+
 		Log.e("MySocket Construction", "MySocket Construction");
+
 		mMySocket  =new MySocket(mView , 5050, (WifiManager) getSystemService(WIFI_SERVICE));
         
         mView.setSocket(mMySocket);
         
         Bundle bundle = this.getIntent().getExtras(); 
   	    
-        // color filter
+        // tantofish : this is a color filter used for setting the undo/redo buttons to gray
         mColorFilter = new PorterDuffColorFilter(Color.argb(180, 200, 200, 200), PorterDuff.Mode.SRC_ATOP);
         
         mIsServer = bundle.getBoolean("isServer");
@@ -86,8 +121,6 @@ public class MyCanvas extends Activity{
         
 		
 		//change color button
-		CcBtn = (ImageButton) findViewById(R.id.ChangeColorBt);
-		
 		CcBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
@@ -107,19 +140,14 @@ public class MyCanvas extends Activity{
 			}
 		});
 		
-
-		
 		// eraser button
-		eraserBtn = (ImageButton) findViewById(R.id.EraserBt);
 		eraserBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
 				mView.getPaint().setColor(Color.WHITE);
-				
 				mMySocket.send(new Commands.ChangeColorCmd(mView.getPaint().getColor(),mView.getPaint().getStrokeWidth()));
 			}
 		});
-		
 		// tantofish: this will let the button change color when clicked
 		eraserBtn.setOnTouchListener(new View.OnTouchListener() {
 			@Override
@@ -134,11 +162,10 @@ public class MyCanvas extends Activity{
 		});
 		
 		
-		undoBtn = (ImageButton) findViewById(R.id.undoBt);
+		// undo button
 		undoBtn.setColorFilter(mColorFilter);
 		undoBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				
 				// Perform action on click
 				mView.undo();
 	            // send command to remote
@@ -147,7 +174,6 @@ public class MyCanvas extends Activity{
 				checkUnReDoValid();
 			}
 		});
-		
 		// tantofish: this will let the button change color when clicked
 		undoBtn.setOnTouchListener(new View.OnTouchListener() {
 			@Override
@@ -162,7 +188,7 @@ public class MyCanvas extends Activity{
 			}
 		});
 		
-		redoBtn = (ImageButton) findViewById(R.id.redoBt);
+		// redo button
 		redoBtn.setColorFilter(mColorFilter);
 		redoBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -190,7 +216,7 @@ public class MyCanvas extends Activity{
 			}
 		});
 		
-		clearBtn = (ImageButton) findViewById(R.id.clearBt);
+		// clear button
 		clearBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
@@ -211,6 +237,19 @@ public class MyCanvas extends Activity{
 			}
 		});
 		
+		// cancel button should appear when doing image editing 
+		imgEdtCancelBtn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				mImageEditingView.cancel();
+			}
+		});
+		// cancel button should appear when doing image editing 
+		imgEdtOKBtn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Bitmap bm = mImageEditingView.ok(mView.getBitmap());
+				mView.setBitmap(bm);
+			}
+		});
 		
 	}
 	
@@ -281,57 +320,41 @@ public class MyCanvas extends Activity{
 		return super.onOptionsItemSelected(item);
 	}
 	
+	/*
+	 * Tantofish: load image activity has bean dead and thus return to there 
+	 */
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data){
-		Log.d("Debug","onActivityResult: 從 ImageLoader 回來了");
+		Log.d("tantofish","onActivityResult: 從 ImageLoader 回來了");
 		super.onActivityResult(requestCode, resultCode, data);
 		
 		if (requestCode == 1 && resultCode == RESULT_OK){
 			Bundle b = data.getExtras();
 			String path = b.getString("imgPath");
-			
-			Log.d("Debug","Decode Returned Bitmap");
-
-			Bitmap img = BitmapFactory.decodeFile(path);
-			
-			
-			
-			float marginX = 0.9f;
-			float marginY = 0.8f;
-			
-			int width  = img.getWidth();
-			int height = img.getHeight();
-	        int bm_w   = mView.getWidth()  ;
-	        int bm_h   = mView.getHeight() ;
+	        Bitmap background = Bitmap.createBitmap(mView.getBitmap());
+	        mImageEditingView.startEditing(path, background);
 	        
-	        float scaleX = (float) bm_w * marginX / width;
-	        float scaleY = (float) bm_h * marginY / height;
 	        
-	        float scale = java.lang.Math.min(scaleX, scaleY);
-	        Matrix matrix = new Matrix();
-	        matrix.postScale(scale, scale);
-	        Bitmap scaledImg = Bitmap.createBitmap(img, 0, 0, width, height, matrix, true);
-	        img.recycle();
+	        /*
+	         * to Chengyan:
+	         * I annotated the following image transfering code because the
+	         * situation has been changed a little bit.
+	         * You may need to see "imgEdtOKBtn.setOnClickListener"
+	         * in order to fix this out, thanks.
+	         * 										tantofish, the handsome ~
+	         */
 	        
-			
-			
-			
-			mView.drawImgOntoCanvas(scaledImg);
-
-		  
-
 			// Chengyan: transfer bitmap to byte stream then send 
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			/*ByteArrayOutputStream out = new ByteArrayOutputStream();
 			scaledImg.compress(Bitmap.CompressFormat.PNG, 100, out);
 			mView.getSocket().send(
-				new Commands.SendBitmapCommit(out.toByteArray()));
+				new Commands.SendBitmapCommit(out.toByteArray()));*/
 		   
-			scaledImg.recycle();
-			
-	
+			//scaledImg.recycle();
 		}
 	}
 	
+	// IP alert dialog
 	public void checkIP(){
 
 		// tantofish : I use a layout "dialog.xml" because I want to set the text size,
@@ -352,7 +375,6 @@ public class MyCanvas extends Activity{
                 });  
         dialog.show();
 	}
-
 	// tantofish : 
 	public void checkUnReDoValid(){
 
@@ -377,7 +399,73 @@ public class MyCanvas extends Activity{
 		iCanRedo = false;
 		redoBtn.setColorFilter(mColorFilter);
 	}
+	
+	//tantofish: for image view rotate and translate
+    public void transformIV(float angle, RelativeLayout.LayoutParams params, Bitmap img){
+        loadedImage.setLayoutParams(params);
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        Bitmap finalBM = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+        loadedImage.setImageBitmap(finalBM);
+    }
     
+    /* 
+     * tantofish:
+     * The main canvas (Surface)view and the image loading(editing) view share the same activity->MyCanvas,
+     * thus i use this function to switch between canvas mode and image editing mode.
+     * This function simply set the visibility of each unit(eg. button, view...)
+     */
+    public void setCanvasViewMode(int mode){
+    	switch(mode){
+    	case VIEWMODE_IMAGE_EDITING:
+    		eraserBtn.setVisibility(ImageButton.INVISIBLE);
+	        CcBtn.setVisibility(ImageButton.INVISIBLE);
+	        undoBtn.setVisibility(ImageButton.INVISIBLE);
+	        redoBtn.setVisibility(ImageButton.INVISIBLE);
+	        clearBtn.setVisibility(ImageButton.INVISIBLE);
+	        //mView.setVisibility(View.INVISIBLE);
+	        
+	        mImageEditingView.setVisibility(View.VISIBLE);
+	        imgEdtCancelBtn.setVisibility(Button.VISIBLE);
+	        imgEdtOKBtn.setVisibility(Button.VISIBLE);
+    		loadedImage.setVisibility(ImageView.VISIBLE);
+    		break;
+    	case VIEWMODE_CANVAS:
+    		eraserBtn.setVisibility(ImageButton.VISIBLE);
+	        CcBtn.setVisibility(ImageButton.VISIBLE);
+	        undoBtn.setVisibility(ImageButton.VISIBLE);
+	        redoBtn.setVisibility(ImageButton.VISIBLE);
+	        clearBtn.setVisibility(ImageButton.VISIBLE);
+	        //mView.setVisibility(View.VISIBLE);
+	        
+	        mImageEditingView.setVisibility(View.INVISIBLE);
+	        imgEdtCancelBtn.setVisibility(Button.INVISIBLE);
+	        imgEdtOKBtn.setVisibility(Button.INVISIBLE);
+    		loadedImage.setVisibility(ImageView.INVISIBLE);
+    		break;
+    	}
+    }
     
-
+    /*
+     * tantofish: (still in testing phase for now (1226)) 
+     */
+    public void loadedimageToBitmap(){
+    	//Bitmap bmap = Bitmap.createBitmap(loadedImage.getDrawingCache());
+    	//loadedImage.setImageBitmap(bmap);
+    	BitmapDrawable drawable = (BitmapDrawable) loadedImage.getDrawable();
+    	Bitmap bitmap = drawable.getBitmap();
+    	
+    	
+        int width  = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        //mCanvas.drawBitmap(finalBM, 0, 0, paint);
+        
+        Log.e("tantofish", "bitmap: h w = "+width+" "+height);
+        Log.e("tantofish", "mBitmap: h w = "+width+" "+height);
+        for(int j = 0 ; j < height ; j++)
+			for(int i = 0 ; i < width ; i++)
+				mImageEditingView.mBitmap.setPixel(i, j, bitmap.getPixel(i, j));
+		mImageEditingView.mCanvas = new Canvas(mImageEditingView.mBitmap);
+		mImageEditingView.invalidate();
+    }
 }

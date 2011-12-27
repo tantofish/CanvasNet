@@ -10,6 +10,7 @@
    			 android:layout_width="fill_parent"
    	         android:layout_height="fill_parent">
            <ntu.csie.wcm.MySurfaceView android:id="@+id/mySurfaceView1" android:layout_width="wrap_content" android:layout_height="wrap_content"></ntu.csie.wcm.MySurfaceView>
+           <ntu.csie.wcm.MyImgEditView android:id="@+id/myImgEditView" android:layout_width="wrap_content" android:layout_height="wrap_content"></ntu.csie.wcm.MyImgEditView>
            <LinearLayout android:id="@+id/linearLayout1" android:layout_width="match_parent" android:layout_height="wrap_content">
                <ImageButton android:src="@drawable/bt_palette_128" android:text="Bt1" android:layout_width="0pt" android:layout_weight="1" android:background="@android:color/transparent" android:id="@+id/ChangeColorBt" android:layout_height="20pt" android:scaleType="centerInside"></ImageButton>
                <ImageButton android:src="@drawable/bt_eraser_128" android:text="bt2" android:id="@+id/EraserBt" android:layout_width="0pt" android:layout_weight="1"   android:background="@android:color/transparent" android:layout_height="20pt" android:scaleType="fitCenter"></ImageButton>
@@ -17,6 +18,12 @@
                <ImageButton android:src="@drawable/bt_redo_128" android:text="bt4" android:id="@+id/redoBt" android:layout_width="0pt" android:layout_weight="1"  android:background="@android:color/transparent" android:layout_height="20pt" android:scaleType="fitCenter"></ImageButton>
                <ImageButton android:src="@drawable/bt_clear_128" android:text="bt5" android:id="@+id/clearBt"  android:background="@android:color/transparent" android:layout_width="0pt" android:layout_weight="1" android:layout_height="20pt" android:scaleType="fitCenter"></ImageButton>
            </LinearLayout>
+           <RelativeLayout android:layout_width="match_parent" android:layout_height="match_parent" android:id="@+id/relativeLayout1">
+               <ImageView android:layout_marginRight="1000dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="100dp" android:src="@drawable/icon" android:layout_alignParentTop="true" android:layout_marginTop="200dp" android:layout_alignParentLeft="true" android:id="@+id/loadedImage"></ImageView>
+               <Button android:layout_marginRight="16dp" android:layout_alignParentRight="true" android:layout_alignParentTop="true" android:layout_marginTop="18dp" android:layout_width="wrap_content" android:text="Cancel" android:layout_height="wrap_content" android:id="@+id/bt_imgEdit_Cancel" ></Button>
+               <Button android:layout_width="wrap_content" android:text="OK" android:layout_height="wrap_content" android:id="@+id/bt_imgEdit_OK"  android:layout_alignBaseline="@+id/bt_imgEdit_Cancel" android:layout_alignBottom="@+id/bt_imgEdit_Cancel" android:layout_toLeftOf="@+id/bt_imgEdit_Cancel" android:layout_marginRight="25dp"></Button>
+           </RelativeLayout>
+           
            
    </FrameLayout>
    
