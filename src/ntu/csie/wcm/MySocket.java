@@ -3,8 +3,11 @@ package ntu.csie.wcm;
 import java.io.IOException;
 import java.io.OptionalDataException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.security.acl.LastOwnerException;
 import java.util.Iterator;
@@ -35,17 +38,16 @@ public class MySocket {
 	private int listenPort; // for listen port
 
 	private Thread tmp;
-	private Thread LastListen;
+	//private Thread LastListen;
 
-	//
-	// here has to modify the canvas class name
-	//
 	public boolean IsServer(){		return IsServer;	} 
 	
 	public MySocket(MySurfaceView canvas, int listen, WifiManager wifiManager) {
 		mMySurfaceView = canvas;
 		listenPort = listen;
+		//Log.d("proj" , "!!!!"); 
 		list = new Vector<Connection>();
+		//Log.d("proj" , "!!!!");
 		
 		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 		int ipAddress = wifiInfo.getIpAddress();
@@ -54,11 +56,6 @@ public class MySocket {
 		try {
 			localhost = InetAddress.getByName(ip);
 			Log.e("IPpppp", ip);
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
 			serverSocket = new ServerSocket(listenPort);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
@@ -72,22 +69,19 @@ public class MySocket {
 	public void server() {
 
 		Log.d("proj" , "click server");
-		//System.out.println("click server");
 		IsServer = true;
 		tmp = new Thread() {
 			public void run() {
 				while(true){
 
-						try {
-							sleep(SLEEP_TIME/2);
-							Log.d("proj" , "listen!!!");
-							
+						try {						
+							Log.d("proj" , "listen!!!");							
 							Socket socket = serverSocket.accept();
 							Connection c = new Connection(socket);
 							list.add(c);
-							
+							list.elementAt(list.size()-1).setIndex(list.size()-1);
 							Log.d("proj" , "new  a thread for new connection");
-							Log.d("proj" , "add it: " + c.toString());
+							Log.d("proj" , "add it: " + c.sck.toString());
 							list.elementAt(list.size()-1).RunThread = new Thread(){
 								public void run(){
 									Connection tempc = list.elementAt(list.size()-1);
@@ -99,9 +93,10 @@ public class MySocket {
 										
 										// get command from ib then send to UIthread
 											Commands.BaseCmd tempC;
-											Log.d("proj",  "B4 read obj!!");																							
+											Log.d("proj",  "thread["+ tempc.getIndex() +"]B4 read obj!!");
+													
 											tempC = (Commands.BaseCmd) tempc.ib.readObject();											
-											Log.d("proj",  "After read obj!!");
+											Log.d("proj",  "thread["+ tempc.getIndex() +"]After read obj!!");
 											Bundle tempB = new Bundle();
 											tempB.putSerializable("cmd", tempC);
 											Message m = new Message();
@@ -110,12 +105,17 @@ public class MySocket {
 											mMySurfaceView.handler.sendMessage(m);
 												
 											Iterator<Connection> it1 = list.iterator();
+											
+											Log.d("proj" , "["+tempc.getIndex()+"] thread: " );
 											while(it1.hasNext()){
 												Connection tmpcc = (Connection) it1.next();
-												Log.d("proj" , tempc.sck.toString() + "; inner iterator: " + tmpcc.sck.toString());
+												//Log.d("proj" , "\t [" + tmpcc.getIndex()+"] con " );
 												if( !tempc.equals(tmpcc) ){	
 													tmpcc.send(tempC);	
-													Log.d("proj" , "send to :" + tmpcc.toString());
+													Log.d("proj" , "\t [" + tmpcc.getIndex()+"] connection send" );
+												}
+												else{
+													Log.d("proj" , "\t [" + tmpcc.getIndex()+"] con " );
 												}
 												
 											}		
@@ -123,15 +123,27 @@ public class MySocket {
 										} catch (InterruptedException e) {
 											// TODO Auto-generated catch block
 											e.printStackTrace();
-										} catch (OptionalDataException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (ClassNotFoundException e) {
+										}  catch (ClassNotFoundException e) {
 											// TODO Auto-generated catch block
 											e.printStackTrace();
 										} catch (IOException e) {
 											// TODO Auto-generated catch block
+											Log.d("proj" , "in read exception!!!");
+											//here is the exception of readObject
+											//maybe the client has close the socket!!
+											//has to stop the thread and clean the connection
+											if(list.removeElement(tempc)){
+												Log.d("proj" , "delete connection success");
+											}
+											else{
+												Log.d("proj" , "not found connection");
+											}
+										
+											PrintList();
 											e.printStackTrace();
+											
+											//break the loop to stop the thread
+											break;
 										}
 									}
 									
@@ -139,114 +151,71 @@ public class MySocket {
 							};
 							list.elementAt(list.size()-1).RunThread.start();		
 							
-							MySocket.this.sendMessageToUIThread("Connect Constructed!!");
+							MySocket.this.sendMessageToUIThread("Connect Constructed! It has " + list.size() + " connections");
 						
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
+							//Log.d("proj" , "###");
 							e.printStackTrace();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-				}
-			}
-		};
-		tmp.start();
-	}
-					/*
-					Log.e("socket", "server accept!!");
-					ob = new java.io.ObjectOutputStream(
-							socket.getOutputStream());
-					if (ob != null)
-						Log.d("proj", "server ob new");
-					ib = new java.io.ObjectInputStream(socket.getInputStream());
-					if (ib != null)
-						Log.d("proj", "server ib new");
-					*/
-					// mMySurfaceView.errorToast("Connect Constructed!!");
-					
-					// there is no message to display when the connection is
-					// setup
-					// listen to the input stream
-					//
-					// here has to be modify!!!
-					//
-	/*
-					while (!Thread.interrupted()) {
-						try {
-							sleep(SLEEP_TIME);
-
-							// get command from ib then send to UIthread
-							Commands.BaseCmd tempC;
-							
-							
-							Iterator<Connection> it = list.iterator();
-							while(it.hasNext()){
-								Connection tmpc = (Connection) it.next();
-								tempC = (Commands.BaseCmd) tmpc.ib.readObject();
-								Bundle tempB = new Bundle();
-								tempB.putSerializable("cmd", tempC);
-								Message m = new Message();
-								m.what = MySurfaceView.GET_COMMAND;
-								m.setData(tempB);
-								mMySurfaceView.handler.sendMessage(m);
-								
-								Iterator<Connection> it1 = list.iterator();
-								while(it1.hasNext()){
-									Connection tmpcc = (Connection) it1.next();
-									//Log.d("proj" , "tmpc:" + tmpc.sck.toString() + "; tmpcc: " + tmpcc.sck.toString());
-									if( !tmpc.equals(tmpcc) ){
-										tmpcc.send(tempC);
-									}
-								}
-								
-								
-							}
-							
-
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							disconnect();
-							// mMySurfaceView.errorToast("Connect Lost");
-							MySocket.this.sendMessageToUIThread("Connect Lost");
-                       
-							e.printStackTrace();
-							server();
 							break;
-
-						}
-					}
-				} catch (IOException e) {
-					Log.d("proj", "[server] Socket ERROR");
+						} 
 				}
 			}
 		};
 		tmp.start();
-
 	}
-*/
-	public void client(final String ip,final int port) {
+	
+	public int client(final String ip,final int port) {
 
 		IsServer = false;
 		InetAddress serverIp;
+		SocketAddress tmpServerIP;
+		//Log.d("proj", "~~~~");
 		try {
 			serverIp = InetAddress.getByName(ip);
+			 tmpServerIP = new InetSocketAddress(serverIp , port);
+			//Log.d("proj", "AAAA");
+			Thread t = new Thread(){
+				public void run(){
+					try {
+						Log.d("proj", "SLEEEEEEEP");
+						sleep(4000);
+						Log.d("proj", "AFTER SLEEEEEEEEP");
+						if(clientSocket == null){
+							
+						}
+						
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			};
+			//Log.d("proj", "BBBB");
+			//t.start();
+			//Log.d("proj", "CCCC");
+			//clientSocket = new Socket(serverIp, port);
+			clientSocket = new Socket();
+			//Log.d("proj", "ZZZZ");
+			clientSocket.connect(tmpServerIP, 3000);
+			//Log.d("proj", "XXXX");
+			
+			if(clientSocket!=null){
+				MySocket.this.sendMessageToUIThread("Connect to" + ip);
+				//Log.d("proj", "DDDD");
+				ob = new java.io.ObjectOutputStream(clientSocket.getOutputStream());
+				//Log.d("proj", "EEEE");
+				if (ob != null)
+					Log.d("proj", "client ob not null");
+				ib = new java.io.ObjectInputStream(clientSocket.getInputStream());
+				if (ib != null)
+					Log.d("proj", "client ib not null");
 
-			clientSocket = new Socket(serverIp, port);
-			MySocket.this.sendMessageToUIThread("Connect to" + ip);
+				tmp = new Thread() {
+					public void run() {
 
-			ob = new java.io.ObjectOutputStream(clientSocket.getOutputStream());
-			if (ob != null)
-				Log.d("proj", "client ob not null");
-			ib = new java.io.ObjectInputStream(clientSocket.getInputStream());
-			if (ib != null)
-				Log.d("proj", "client ib not null");
-
-			tmp = new Thread() {
-				public void run() {
-
-					while (!Thread.interrupted()) {
-
+					//while (!Thread.interrupted()) {
+					while (true) {
 						try {
 							sleep(SLEEP_TIME);
 
@@ -263,7 +232,8 @@ public class MySocket {
 
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
-							disconnect();
+							Log.d("proj" , "in client thread exception!!");
+							//disconnect();
 							MySocket.this.sendMessageToUIThread("Connect Lost");
 							((MyCanvas) (mMySurfaceView.mContext)).finish();
 						//	client(ip,port);
@@ -272,9 +242,19 @@ public class MySocket {
 					}
 				}
 			};
+				Log.d("proj" , "thread ID: " +tmp.getId());
+				Log.d("proj" , "thread Name: " +tmp.getName());
+				tmp.start();
+				Log.d("proj" , "after!!! ");
+			}			
 
-			tmp.start();
-		} catch (Exception e) {
+			
+		} catch(SocketTimeoutException u){
+			//Log.d("proj" , "timeout!!!!!! ");
+			mMySurfaceView.errorToast("Can not connect to : " + ip);
+			this.disconnect();
+			return -1;
+		}catch (Exception e) {
 			// TODO Auto-generated catch block
 			mMySurfaceView.errorToast("Connect Faild");
 			((MyCanvas) (mMySurfaceView.mContext)).finish();
@@ -282,6 +262,7 @@ public class MySocket {
 			e.printStackTrace();
 		}
 
+		return 0;
 	}
     
     public void sendMessageToUIThread(String str)
@@ -298,6 +279,7 @@ public class MySocket {
 
 		try {
 			// Ãö³¬³s½u
+			Log.d("proj" , "!!!");
 			if (ib != null) {
 				ib.close();
 				ib = null;
@@ -307,8 +289,12 @@ public class MySocket {
 				ib = null;
 			}
 			if (tmp != null) {
-				tmp.interrupt();
+				//tmp.stop();
+				Log.d("proj" , "QQQQQ");
+				//tmp.interrupt();
+				tmp.stop();
 				tmp = null;
+				
 			}
 			if (clientSocket != null) {
 				clientSocket.close();
@@ -322,52 +308,53 @@ public class MySocket {
 				socket.close();
 				socket = null;
 			}
+			Iterator<Connection> it = list.iterator();
+			while(it.hasNext()){
+				Connection tempc = it.next();
+				tempc.close();
+			}
+			list.clear();
 
+			
+			Log.d("proj" , "@@@");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	//
-	// need to modify the the class name of object
-	//
 	public void send(Commands.BaseCmd obj) {
 
-		
-		//Log.d("proj" , "in send");
 		if (ib == null && !IsServer())
 			return;
-
-		//Log.d("proj" , "after send ");
 		
 		try {
-			
 			if(IsServer()){
-				Log.d("proj" , "Is Server() true");
+				Log.d("proj" , "Is Server: send to " + list.size());
 				Iterator<Connection> it = list.iterator();
 				while(it.hasNext()){
-					
 					Connection tmpc = it.next();
-					tmpc.send(obj);
-					
-					Log.d("proj" , "tmpc:" + tmpc.sck.toString());
+					tmpc.send(obj);		
+					//Log.d("proj" , "tmpc:" + tmpc.sck.toString());
 				}
 			}
 			else{
-				
-				//Log.d("proj" , "Is Server() false");
-				
 				ob.writeObject(obj);
 				ob.flush();
-			}
-			
-			
+			}	
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public String getIP() {
-		return this.localhost.toString();
+	public String getIP() {		return this.localhost.toString();	}
+	public void PrintList(){
+		Log.d("proj" , "In PrintList");
+		Iterator<Connection> it = list.iterator();
+		
+		while(it.hasNext()){
+			Connection c = it.next();
+			Log.d("proj" , "\t " + c.sck.toString());
+		}
+		
 	}
 }

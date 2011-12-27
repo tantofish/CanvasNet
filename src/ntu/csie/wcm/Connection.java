@@ -7,7 +7,8 @@ import java.net.Socket;
 import android.util.Log;
 
 public class Connection {
-	
+
+	private int index;
 	Socket sck;
 	public java.io.ObjectInputStream ib;
 	private java.io.ObjectOutputStream ob;
@@ -43,4 +44,22 @@ public class Connection {
 		
 	}
 	
+	public void setIndex(int i){	index = i;		}
+	public int getIndex(){			return index;	}
+	public void close(){
+		
+		try {
+			if(sck!= null)			sck.close();
+			if(ib != null)			ib.close();
+			if(ob != null)			ob.close();
+			if(RunThread != null){
+				RunThread.stop();
+				RunThread = null;
+			}
+		
+		} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+		}
+	}
 }

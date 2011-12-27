@@ -115,7 +115,11 @@ public class MyCanvas extends Activity{
         else
         {
         	String remoteIP = bundle.getString("IP");
-        	mMySocket.client(remoteIP, 5050);
+        	if(mMySocket.client(remoteIP, 5050) == -1){
+        		Toast.makeText(MyCanvas.this, "Can not connect to : " + remoteIP, Toast.LENGTH_SHORT).show();
+        		this.finish();
+        		
+        	}
         }
         
         
@@ -265,9 +269,10 @@ public class MyCanvas extends Activity{
 		super.onBackPressed();
 
 		Log.e("MyCanvas", "onPause");
-		
+		Log.d("proj" , "Mycanvas onbackpressed");
 		mMySocket.disconnect();
 		this.finish();
+		
 	}
 
 	
