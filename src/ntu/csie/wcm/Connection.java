@@ -31,7 +31,7 @@ public class Connection {
 		
 	}
 	
-	public void send(Commands.BaseCmd obj){
+	public synchronized void send(Commands.BaseCmd obj){
 		
 		
 		try {

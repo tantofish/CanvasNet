@@ -233,6 +233,7 @@ public class MySocket {
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							Log.d("proj" , "in client thread exception!!");
+							e.printStackTrace();
 							//disconnect();
 							MySocket.this.sendMessageToUIThread("Connect Lost");
 							((MyCanvas) (mMySurfaceView.mContext)).finish();
