@@ -194,6 +194,8 @@ public class MyCanvas extends Activity{
 		
 		// redo button
 		redoBtn.setColorFilter(mColorFilter);
+		
+		
 		redoBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				

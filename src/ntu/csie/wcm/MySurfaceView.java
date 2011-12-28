@@ -1,5 +1,10 @@
 package ntu.csie.wcm;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -7,10 +12,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Path.Direction;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -47,12 +50,14 @@ public class MySurfaceView extends View {
 	private Bitmap previewBitmap;
 	private Path previewPath;
 	private boolean isMultitouching = false;
-	
+    Map<String , ClientDrawState> clientDrawStateMap = 
+            new HashMap<String , ClientDrawState>();
 	//ChengYan: Hander for receive message from socket thread
 
     public Handler handler = new Handler() 
     {
-
+    	
+      
         public void handleMessage(Message msg) 
         {
    	    switch (msg.what) 
@@ -93,6 +98,11 @@ public class MySurfaceView extends View {
 		//path for receive from remote
 		mRemotePath = new Path();
 		mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+		
+		
+		//clientDrawStateMap.put
+		
+		
 		
 	}
 
@@ -135,7 +145,8 @@ public class MySurfaceView extends View {
 		//ChengYan: draw local path
 		canvas.drawPath(mPath, mPaint);
 		//ChengYan: draw remote path
-		canvas.drawPath(mRemotePath, mPaint);
+		for(Map.Entry<String,ClientDrawState> entry :clientDrawStateMap.entrySet())
+         canvas.drawPath(entry.getValue().getPath(), mPaint);
 
 	
 
@@ -143,29 +154,58 @@ public class MySurfaceView extends View {
 	}
     //ChengYan: temporary initialize, array number should depend on client number
 	private float[] mX = {0,0}, mY = {0,0};
-	private static final float TOUCH_TOLERANCE = 4;// 4;
+	private static final float TOUCH_TOLERANCE = 4;
 
 	//ChengYan: pNumber indicates which mX,mY to use (local or remote#?)
-	private void touch_start(float x, float y, Path p,int pNumber) {
+	private void touch_start(float x, float y, Path p,String key) {
 
 		// mPath.reset();
-		p.moveTo(x, y);
+		/*p.moveTo(x, y);
 		mX[pNumber] = x;
-		mY[pNumber] = y;
+		mY[pNumber] = y;*/
+		
+		p.moveTo(x, y);
+		clientDrawStateMap.get(key).mX = x;
+		clientDrawStateMap.get(key).mY = y;
+		
 	}
 
-	private void touch_move(float x, float y,Path p,int pNumber) {
-		float dx = Math.abs(x - mX[pNumber]);
-		float dy = Math.abs(y - mY[pNumber]);
+	private void touch_move(float x, float y,Path p,String key) {
+		
+		
+		/*
+		float dx = Math.abs(x - mX);
+		float dy = Math.abs(y - mY);
 		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-			p.quadTo(mX[pNumber], mY[pNumber], (x + mX[pNumber]) / 2, (y + mY[pNumber]) / 2);
-			mX[pNumber] = x;
-			mY[pNumber] = y;
+			p.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
+			mX = x;
+			mY = y;
+		}
+		*/
+		
+		
+		float dx = Math.abs(x - clientDrawStateMap.get(key).mX);
+		float dy = Math.abs(y - clientDrawStateMap.get(key).mY);
+		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
+			p.quadTo(clientDrawStateMap.get(key).mX, clientDrawStateMap.get(key).mY, (x + clientDrawStateMap.get(key).mX) / 2, (y + clientDrawStateMap.get(key).mY) / 2);
+			clientDrawStateMap.get(key).mX = x;
+			clientDrawStateMap.get(key).mY = y;
 		}
 	}
 
-	private void touch_up(Path p,int pNumber) {
-		p.lineTo(mX[pNumber], mY[pNumber]);
+	private void touch_up(Path p,String key) {
+		
+		/*p.lineTo(mX[pNumber], mY[pNumber]);
+
+		mCanvas.drawPath(p, mPaint);
+		
+		undoCounter = 0;
+		
+		//ChengYan: save current bitmap
+		mBufferDealer.onTouchStep(Bitmap.createBitmap(mBitmap),mCanvas);
+		
+		p.reset();*/
+		p.lineTo(clientDrawStateMap.get(key).mX, clientDrawStateMap.get(key).mY);
 
 		mCanvas.drawPath(p, mPaint);
 		
@@ -175,6 +215,9 @@ public class MySurfaceView extends View {
 		mBufferDealer.onTouchStep(Bitmap.createBitmap(mBitmap),mCanvas);
 		
 		p.reset();
+		
+		
+		
 	}
 
 	/* Undo function */ 
@@ -280,17 +323,17 @@ public class MySurfaceView extends View {
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			mMySocket.send(new Commands.SendPointCmd(x, y, 1)); 	
-			touch_start(x, y,mPath,0); //ChengYan: pNumber = 0 means use mPath's mX,mY
+			touch_start(x, y,mPath,mMySocket.idFromIP); //ChengYan: pNumber = 0 means use mPath's mX,mY
 			invalidate();
 			break;
 		case MotionEvent.ACTION_MOVE:
 			mMySocket.send(new Commands.SendPointCmd(x, y, 2)); 
-			touch_move(x, y,mPath,0);
+			touch_move(x, y,mPath,mMySocket.idFromIP);
 			invalidate();
 			break;
 		case MotionEvent.ACTION_UP:
 			mMySocket.send(new Commands.SendPointCmd(x, y, 3)); 
-			touch_up(mPath,0);
+			touch_up(mPath,mMySocket.idFromIP);
 			invalidate();
 			
 			if(isMultitouching) isMultitouching = false;
@@ -339,18 +382,24 @@ public class MySurfaceView extends View {
 		case 1:
 			
 			Commands.SendPointCmd Dpc = (Commands.SendPointCmd) cmd;
+			
+			Log.e("CY", clientDrawStateMap.keySet().toString());
+			
+			Path tempPath = clientDrawStateMap.get(cmd.getFrom()).getPath();
+			
+	
 	
 			if(Dpc.getType() == 1)
 			{
-				touch_start(Dpc.getX(),Dpc.getY(),mRemotePath,1); //ChengYan: pNumber = 1 means use remotePath#1's mX,mY 
+				touch_start(Dpc.getX(),Dpc.getY(),tempPath,Dpc.getFrom()); //ChengYan: pNumber = 1 means use remotePath#1's mX,mY 
 			}
 			else if(Dpc.getType() == 2)
 			{
-				touch_move(Dpc.getX(),Dpc.getY(),mRemotePath,1);
+				touch_move(Dpc.getX(),Dpc.getY(),tempPath,Dpc.getFrom());
 			}
 			else if(Dpc.getType() == 3)
 			{
-				touch_up(mRemotePath,1);
+				touch_up(tempPath,Dpc.getFrom());
 			}
 			//mPath.reset();
 			invalidate();
@@ -394,6 +443,28 @@ public class MySurfaceView extends View {
 			tempBmp.recycle();
 			Log.e("Comamnd", "receive bitmap");
 			break;
+		//receive client connect construct command 
+		case 7:
+			Commands.ClientConnectCmd CliCC  = (Commands.ClientConnectCmd) cmd;
+			
+			clientDrawStateMap.put(CliCC.getFrom(), new ClientDrawState());
+		    break;
+		//receive broadcastid from server
+		case 8:
+			Commands.ServerBroadcastClientCmd SBCC = (Commands.ServerBroadcastClientCmd) cmd;
+			
+			for(String s : SBCC.getClientIDS())
+			{
+				
+				//Log.e("CY", "broadcasted key" + s);
+			 if(!clientDrawStateMap.containsKey(s))
+			 {
+				 
+				
+				 clientDrawStateMap.put(s, new ClientDrawState());
+		 	 }
+			}
+			
 			
 
 			

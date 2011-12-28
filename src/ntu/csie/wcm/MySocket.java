@@ -36,9 +36,12 @@ public class MySocket {
 
 	private InetAddress localhost; // for IP
 	private int listenPort; // for listen port
-
+    
 	private Thread tmp;
 	//private Thread LastListen;
+	
+	private String selfIP;
+	public String idFromIP;
 
 	public boolean IsServer(){		return IsServer;	} 
 	
@@ -51,17 +54,24 @@ public class MySocket {
 		
 		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 		int ipAddress = wifiInfo.getIpAddress();
-		String ip = new String(Formatter.formatIpAddress(ipAddress));
+		selfIP = new String(Formatter.formatIpAddress(ipAddress));
 
 		try {
-			localhost = InetAddress.getByName(ip);
-			Log.e("IPpppp", ip);
+			localhost = InetAddress.getByName(selfIP);
+			Log.e("IPpppp", selfIP);
 			serverSocket = new ServerSocket(listenPort);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
+		
+		//ChengYan: get the client IP which is depend on IP
+		String[] temp = selfIP.split("\\.");
+		idFromIP = temp[temp.length-1];
+		
+		Log.e("CY", "idFromIP : "  + idFromIP);
+		mMySurfaceView.clientDrawStateMap.put(idFromIP, new ClientDrawState());
 		
 		
 	}
@@ -82,6 +92,11 @@ public class MySocket {
 							list.elementAt(list.size()-1).setIndex(list.size()-1);
 							Log.d("proj" , "new  a thread for new connection");
 							Log.d("proj" , "add it: " + c.sck.toString());
+							
+							
+							//ChengYan: tell all client exist client
+
+							
 							list.elementAt(list.size()-1).RunThread = new Thread(){
 								public void run(){
 									Connection tempc = list.elementAt(list.size()-1);
@@ -149,7 +164,14 @@ public class MySocket {
 									
 								}
 							};
-							list.elementAt(list.size()-1).RunThread.start();		
+							list.elementAt(list.size()-1).RunThread.start();
+							
+							
+							//ChengYan: send Broadcast command
+							String[] tempStrings =mMySurfaceView.clientDrawStateMap.keySet().toArray(new String[0]);
+						
+							send(new Commands.ServerBroadcastClientCmd(tempStrings));
+							
 							
 							MySocket.this.sendMessageToUIThread("Connect Constructed! It has " + list.size() + " connections");
 						
@@ -171,6 +193,9 @@ public class MySocket {
 		InetAddress serverIp;
 		SocketAddress tmpServerIP;
 		//Log.d("proj", "~~~~");
+		
+
+
 		try {
 			serverIp = InetAddress.getByName(ip);
 			 tmpServerIP = new InetSocketAddress(serverIp , port);
@@ -198,6 +223,7 @@ public class MySocket {
 			clientSocket = new Socket();
 			//Log.d("proj", "ZZZZ");
 			clientSocket.connect(tmpServerIP, 3000);
+			
 			//Log.d("proj", "XXXX");
 			
 			if(clientSocket!=null){
@@ -246,6 +272,9 @@ public class MySocket {
 				Log.d("proj" , "thread ID: " +tmp.getId());
 				Log.d("proj" , "thread Name: " +tmp.getName());
 				tmp.start();
+				
+				//ChengYan: tell all others the new Client
+				send(new Commands.ClientConnectCmd());
 				Log.d("proj" , "after!!! ");
 			}			
 
@@ -330,6 +359,9 @@ public class MySocket {
 		
 		try {
 			if(IsServer()){
+				//ChengYan: annotate the command is send from host
+				obj.setFrom(idFromIP); //ChengYan: 0 means from Host
+				
 				Log.d("proj" , "Is Server: send to " + list.size());
 				Iterator<Connection> it = list.iterator();
 				while(it.hasNext()){
@@ -339,6 +371,9 @@ public class MySocket {
 				}
 			}
 			else{
+				//ChengYan: annotate the command is send from client
+				obj.setFrom(idFromIP);
+				
 				ob.writeObject(obj);
 				ob.flush();
 			}	

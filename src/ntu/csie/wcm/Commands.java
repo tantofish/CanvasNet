@@ -18,12 +18,23 @@ public class Commands  implements java.io.Serializable {
 	
 	public static class BaseCmd implements java.io.Serializable
 	{
-		int ID;
+		public int ID;
+		private String from;
 		private static final long serialVersionUID = 1L;
 		
 		public BaseCmd(int id)
 		{
 			ID = id;
+		}
+		
+		public void setFrom(String i)
+		{
+			from = i ;
+		}
+		
+		public String getFrom()
+		{
+			return from;
 		}
 		
 	}
@@ -158,6 +169,39 @@ public class Commands  implements java.io.Serializable {
 			return array;
 		}
 		
+		
+	}
+	
+	public static class ClientConnectCmd  extends BaseCmd implements java.io.Serializable
+	{
+		private static final long serialVersionUID = 1L;
+
+		
+		public ClientConnectCmd() //true for Undo, false for Redo
+		{
+			super(7);
+			
+		}
+
+		
+	}
+	
+	public static class ServerBroadcastClientCmd  extends BaseCmd implements java.io.Serializable
+	{
+		private static final long serialVersionUID = 1L;
+        private String[] mClientIDs;
+		
+		public ServerBroadcastClientCmd(String[] in) //true for Undo, false for Redo
+		{
+			super(8);
+			mClientIDs = in;
+		}
+		
+		public String[] getClientIDS()
+		{
+			return mClientIDs;
+		}
+
 		
 	}
 
