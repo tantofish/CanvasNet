@@ -145,12 +145,11 @@ public class MySurfaceView extends View {
 		//ChengYan: draw local path
 		canvas.drawPath(mPath, mPaint);
 		//ChengYan: draw remote path
+
 		for(Map.Entry<String,ClientDrawState> entry :clientDrawStateMap.entrySet())
          canvas.drawPath(entry.getValue().getPath(), mPaint);
 
-	
 
-		
 	}
     //ChengYan: temporary initialize, array number should depend on client number
 	private float[] mX = {0,0}, mY = {0,0};
@@ -208,9 +207,7 @@ public class MySurfaceView extends View {
 		p.lineTo(clientDrawStateMap.get(key).mX, clientDrawStateMap.get(key).mY);
 
 		mCanvas.drawPath(p, mPaint);
-		
-		undoCounter = 0;
-		
+				
 		//ChengYan: save current bitmap
 		mBufferDealer.onTouchStep(Bitmap.createBitmap(mBitmap),mCanvas);
 		
@@ -219,9 +216,12 @@ public class MySurfaceView extends View {
 		
 		
 	}
+	
+	public void pushBuffer(Bitmap bm){
+		mBufferDealer.onTouchStep(Bitmap.createBitmap(bm),mCanvas);
+	}
+	
 
-	/* Undo function */ 
-	private int undoCounter = 0;
 
 	/* ChengYan: Undo function */ 
 	public void undo() {
@@ -230,10 +230,7 @@ public class MySurfaceView extends View {
 			//mCanvas = new Canvas(mBitmap);
 			mCanvas = new Canvas(mBitmap);
 
-			
 			invalidate();
-
-
 	}
 
 	/* ChengYan: Redo function */

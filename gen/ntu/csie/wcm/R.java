@@ -32,8 +32,8 @@ public final class R {
     public static final class id {
         public static final int ChangeColorBt=0x7f050003;
         public static final int EraserBt=0x7f050004;
-        public static final int bt_imgEdit_Cancel=0x7f05000a;
-        public static final int bt_imgEdit_OK=0x7f05000b;
+        public static final int bt_imgEdit_Cancel=0x7f05000b;
+        public static final int bt_imgEdit_OK=0x7f05000a;
         public static final int clearBt=0x7f050007;
         public static final int clientBtn=0x7f050010;
         public static final int gallery1=0x7f05000e;

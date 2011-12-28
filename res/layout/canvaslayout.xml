@@ -20,8 +20,8 @@
            </LinearLayout>
            <RelativeLayout android:layout_width="match_parent" android:layout_height="match_parent" android:id="@+id/relativeLayout1">
                <ImageView android:layout_marginRight="1000dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="100dp" android:src="@drawable/icon" android:layout_alignParentTop="true" android:layout_marginTop="200dp" android:layout_alignParentLeft="true" android:id="@+id/loadedImage"></ImageView>
-               <Button android:layout_marginRight="16dp" android:layout_alignParentRight="true" android:layout_alignParentTop="true" android:layout_marginTop="18dp" android:layout_width="wrap_content" android:text="Cancel" android:layout_height="wrap_content" android:id="@+id/bt_imgEdit_Cancel" ></Button>
-               <Button android:layout_width="wrap_content" android:text="OK" android:layout_height="wrap_content" android:id="@+id/bt_imgEdit_OK"  android:layout_alignBaseline="@+id/bt_imgEdit_Cancel" android:layout_alignBottom="@+id/bt_imgEdit_Cancel" android:layout_toLeftOf="@+id/bt_imgEdit_Cancel" android:layout_marginRight="25dp"></Button>
+               <Button android:layout_height="wrap_content" android:text="OK" android:layout_width="wrap_content" android:id="@+id/bt_imgEdit_OK" android:layout_alignParentBottom="true" android:layout_toLeftOf="@+id/bt_imgEdit_Cancel" android:minWidth="65dp"></Button>
+               <Button android:layout_height="wrap_content" android:text="Cancel" android:layout_width="wrap_content" android:id="@+id/bt_imgEdit_Cancel" android:layout_alignParentBottom="true" android:layout_alignParentRight="true" android:minWidth="65dp"></Button>
            </RelativeLayout>
            
            

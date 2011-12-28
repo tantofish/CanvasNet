@@ -30,6 +30,7 @@ public class ImgLoaderActivity extends Activity {
 	
 	
 	Vector<File[]> files;
+	Vector<Vector<Bitmap>> bmFiles;
 	int folderIndex = -1;
 	int imageIndex = -1;
 	int w, h;
@@ -47,6 +48,8 @@ public class ImgLoaderActivity extends Activity {
 		image	 = (ImageView) findViewById(R.id.imageView1);
 		image.setImageBitmap(null);
 		readExternalStoragePublicPicture();
+		peakExternalStoragePublicPicture();
+		
 		
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -68,17 +71,21 @@ public class ImgLoaderActivity extends Activity {
 				imageIndex = position;
 				//image.setImageBitmap(BitmapFactory.decodeFile(files.get(folderIndex)[imageIndex].getPath()));
 				pathString = files.get(folderIndex)[position].getPath();
-				Bitmap bm = BitmapFactory.decodeFile(pathString);
-				
-				//String q = bm.toString();
-				/*ByteArrayOutputStream out = new ByteArrayOutputStream();
-				bm.compress(Bitmap.CompressFormat.PNG, 100, out);
-				byte[] array= out.toByteArray();
-				bm = BitmapFactory.decodeByteArray(array, 0, array.length);*/
-
-
 				
 				
+				BitmapFactory.Options opts = new BitmapFactory.Options();
+				opts.inJustDecodeBounds = true;
+				BitmapFactory.decodeFile(pathString, opts);
+				
+				//Bitmap bm = BitmapFactory.decodeFile(pathString, opts);
+				opts.inSampleSize = computeSampleSize(opts, -1, 512*512);
+				opts.inJustDecodeBounds = false;
+				try {
+					Bitmap bmp = BitmapFactory.decodeFile(pathString, opts);
+					image.setImageBitmap(bmp);
+				} catch (OutOfMemoryError err) {
+				}
+				/*
 				int width = bm.getWidth();
 				if(width > w){
 					//記憶體會爆 所以要縮圖 
@@ -91,7 +98,9 @@ public class ImgLoaderActivity extends Activity {
 	                image.setImageBitmap(img);
 				}else{
 					image.setImageBitmap(bm);
-				}
+				}*/
+				
+				//image.setImageBitmap(bm);
 				backgroundType(image);
 			}
 		});
@@ -141,7 +150,7 @@ public class ImgLoaderActivity extends Activity {
 			if (imageIndex == -1)
 				i.setImageResource(folderImageId);
 			else{
-				Bitmap bm = BitmapFactory.decodeFile(files.get(folderIndex)[position].getPath());
+				/*Bitmap bm = BitmapFactory.decodeFile(files.get(folderIndex)[position].getPath());
 				
 				if (bm != null){
 					//記憶體會爆 所以要縮圖 這裡會導致滾動lag
@@ -156,7 +165,30 @@ public class ImgLoaderActivity extends Activity {
 					i.setImageBitmap(img);
 				}else{
 					return i;
+				}*/
+				
+				/*String path = files.get(folderIndex)[position].getPath();
+				BitmapFactory.Options opts = new BitmapFactory.Options();
+				opts.inSampleSize = 20;
+				Bitmap bm = BitmapFactory.decodeFile(path, opts);
+				*/
+				try{
+					Bitmap bm = bmFiles.get(folderIndex).get(position);
+					i.setImageBitmap(bm);
+				}catch(Exception e){
+					i.setImageBitmap(null);
 				}
+				
+				
+				//Bitmap bm = BitmapFactory.decodeFile(pathString, opts);
+				/*opts.inSampleSize = computeSampleSize(opts, -1, 128*128);
+				opts.inJustDecodeBounds = false;
+				try {
+					Bitmap bmp = BitmapFactory.decodeFile(pathString, opts);
+					if(bmp == null)	return i;
+					i.setImageBitmap(bmp);
+				    } catch (OutOfMemoryError err) {
+				}*/
 			}
 			
 			i.setScaleType(ImageView.ScaleType.FIT_XY);
@@ -180,8 +212,10 @@ public class ImgLoaderActivity extends Activity {
 		image.setBackgroundResource(mGalleryItemBackground);
 	}
 	
+	
 	/*
-	 * Load images from external storage
+	 * Tantofish: this function is like a spider
+	 * climb and track all the paths of exist files 
 	 */
 	public void readExternalStoragePublicPicture() {
 		/* Get the folder path: "mnt/sdcard/Pictures" */
@@ -199,27 +233,107 @@ public class ImgLoaderActivity extends Activity {
 		File[] f;
 		files = new Vector<File[]>();
 		
+		Vector<Bitmap> bmV;
+		bmFiles = new Vector<Vector<Bitmap>>();
+		
 		if(path.exists()){
 			/* Get all the directorys in the path */
 			dirs = path.listFiles(dirFilter);
 			
 			/* Get all files in those directorys above */
 			f = path.listFiles(fileFilter);
-			
-			if(f.length>0 && f != null) files.add(f);	// block those directory who has no files inside from being shown
+			 
+			if(f.length>0 && f != null){
+				files.add(f);	// block those directory who has no files inside from being shown
+			}
 			
 			for(int i = 0 ; i < dirs.length ; i++){
 				File newpath = new File(path.toString(), dirs[i].getName());
 				f = newpath.listFiles(fileFilter);
-				if(f.length>0) files.add(f);
+				if(f.length>0){
+					files.add(f);
+				}
 			}
 		}
 		File DCIM = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
 		File newpath = new File(DCIM.toString(), "Camera");
 		if(newpath.exists()){
 			f = newpath.listFiles(fileFilter);
-			if(f.length>0) files.add(f);
+			if(f.length>0) {
+				files.add(f);
+			}
 		}
+	}
+	
+	/*
+	 * Tantofish : This funciton actually Load images from external storage
+	 */
+	public void peakExternalStoragePublicPicture() {
+		new Thread(){
+			public void run(){
+				for(int i = 0 ; i < files.size() ; i++){
+					Vector<Bitmap> bmV = new Vector<Bitmap>();
+					for(int j = 0 ; j < files.get(i).length ; j++){
+						String p = files.get(i)[j].getPath();
+						
+						BitmapFactory.Options opts = new BitmapFactory.Options();
+						opts.inJustDecodeBounds = true;
+						BitmapFactory.decodeFile(p, opts);
+
+						opts.inSampleSize = computeSampleSize(opts, -1, 100*100);
+						opts.inJustDecodeBounds = false;
+						try {
+							Bitmap bmp = BitmapFactory.decodeFile(p, opts);
+							bmV.add(bmp);
+						    } catch (OutOfMemoryError err) {
+						}
+					}
+					bmFiles.add(bmV);
+				}
+			}
+		}.start();
+	}
+	
+	public static int computeSampleSize(BitmapFactory.Options options,
+	        int minSideLength, int maxNumOfPixels) {
+	    int initialSize = computeInitialSampleSize(options, minSideLength,maxNumOfPixels);
+
+	    int roundedSize;
+	    if (initialSize <= 8 ) {
+	        roundedSize = 1;
+	        while (roundedSize < initialSize) {
+	            roundedSize <<= 1;
+	        }
+	    } else {
+	        roundedSize = (initialSize + 7) / 8 * 8;
+	    }
+
+	    return roundedSize;
+	}
+
+	private static int computeInitialSampleSize(BitmapFactory.Options options,int minSideLength, int maxNumOfPixels) {
+	    double w = options.outWidth;
+	    double h = options.outHeight;
+
+	    int lowerBound = (maxNumOfPixels == -1) ? 1 :
+	            (int) Math.ceil(Math.sqrt(w * h / maxNumOfPixels));
+	    int upperBound = (minSideLength == -1) ? 128 :
+	            (int) Math.min(Math.floor(w / minSideLength),
+	            Math.floor(h / minSideLength));
+
+	    if (upperBound < lowerBound) {
+	        // return the larger one when there is no overlapping zone.
+	        return lowerBound;
+	    }
+
+	    if ((maxNumOfPixels == -1) &&
+	            (minSideLength == -1)) {
+	        return 1;
+	    } else if (minSideLength == -1) {
+	        return lowerBound;
+	    } else {
+	        return upperBound;
+	    }
 	}
 	/*public void createExternalStoragePublicPicture() {
 	    
