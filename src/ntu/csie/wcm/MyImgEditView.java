@@ -62,6 +62,14 @@ public class MyImgEditView extends View {
 	private RelativeLayout.LayoutParams params;
 
 	
+	// tantofish: these are for a strange exception that rapidly consecutive click 
+    //            at the OK button will cause consecutive pushBuffer() called.
+	/*private boolean isON = false; 
+	public boolean isOKBtnEnabled(){return isON;}
+	public void setOKBtnEnable(boolean b){isON = b;}*/
+	// bug fixed
+	
+	
 	/* Constructor */
 	public MyImgEditView(Context c, AttributeSet attrs) {
 		super(c, attrs);
@@ -106,8 +114,6 @@ public class MyImgEditView extends View {
         Matrix matrix = new Matrix();
         matrix.postScale(scale, scale);
         srcImg = Bitmap.createBitmap(img, 0, 0, width, height, matrix, true);
-        Log.e("tantofish", "img(w,h) = ("+width+","+height+")");
-        Log.e("tantofish", "scaleImage(w,h) = ("+srcImg.getWidth()+","+srcImg.getHeight()+")");
         img.recycle();
         
         params = new RelativeLayout.LayoutParams(srcImg.getWidth(),srcImg.getHeight());
@@ -116,9 +122,18 @@ public class MyImgEditView extends View {
 		params.bottomMargin = 2000;
 		lmParams.rightMargin = 2000;
 		lmParams.bottomMargin = 2000;
+		lmCenterX = 0;
+		lmCenterY = 0;
+		lmAngle = 0.f;
+		lmScale = 1.f;
+		
 		
 		((MyCanvas)mContext).setCanvasViewMode(MyCanvas.VIEWMODE_IMAGE_EDITING);
         ((MyCanvas)mContext).transformIV(lmAngle, lmParams, srcImg);
+        
+        mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+		mCanvas = new Canvas(mBitmap);
+		invalidate();
 	}
 
 	
@@ -184,12 +199,8 @@ public class MyImgEditView extends View {
 					params.width      = newW;
 					
 					((MyCanvas)mContext).transformIV(dAngle + lmAngle, params, srcImg);
-					
-					
-					
 
-			        
-			       
+			        			       
 				}
 
 				break;
@@ -236,6 +247,7 @@ public class MyImgEditView extends View {
         matrix.postRotate(lmAngle);
        
         
+        
         Bitmap rotatedBM = Bitmap.createBitmap(srcImg, 0, 0, srcImg.getWidth(), srcImg.getHeight(), matrix, true);
         
         int srcW = rotatedBM.getWidth();
@@ -263,8 +275,8 @@ public class MyImgEditView extends View {
         mCanvas.drawBitmap(rotatedBM, null, rect, mBitmapPaint);
 		invalidate();
         
-        
-		((MyCanvas)mContext).setCanvasViewMode(MyCanvas.VIEWMODE_CANVAS);
+		//((MyCanvas)mContext).setCanvasViewMode(MyCanvas.VIEWMODE_CANVAS);
+		((MyCanvas)mContext).enableUndoDisableRedo();
 		
 		return mBitmap;
 	}
@@ -278,6 +290,8 @@ public class MyImgEditView extends View {
 	{
 		Toast.makeText(mContext, str, Toast.LENGTH_SHORT).show();
 	}
+
+
 	
 
 }

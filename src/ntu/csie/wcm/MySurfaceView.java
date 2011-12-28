@@ -136,9 +136,6 @@ public class MySurfaceView extends View {
 		canvas.drawPath(mPath, mPaint);
 		//ChengYan: draw remote path
 		canvas.drawPath(mRemotePath, mPaint);
-
-	
-
 		
 	}
     //ChengYan: temporary initialize, array number should depend on client number
@@ -168,17 +165,18 @@ public class MySurfaceView extends View {
 		p.lineTo(mX[pNumber], mY[pNumber]);
 
 		mCanvas.drawPath(p, mPaint);
-		
-		undoCounter = 0;
-		
+				
 		//ChengYan: save current bitmap
 		mBufferDealer.onTouchStep(Bitmap.createBitmap(mBitmap),mCanvas);
 		
 		p.reset();
 	}
+	
+	public void pushBuffer(Bitmap bm){
+		mBufferDealer.onTouchStep(Bitmap.createBitmap(bm),mCanvas);
+	}
+	
 
-	/* Undo function */ 
-	private int undoCounter = 0;
 
 	/* ChengYan: Undo function */ 
 	public void undo() {
@@ -187,10 +185,7 @@ public class MySurfaceView extends View {
 			//mCanvas = new Canvas(mBitmap);
 			mCanvas = new Canvas(mBitmap);
 
-			
 			invalidate();
-
-
 	}
 
 	/* ChengYan: Redo function */

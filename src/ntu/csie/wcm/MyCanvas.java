@@ -250,17 +250,27 @@ public class MyCanvas extends Activity{
 		// cancel button should appear when doing image editing 
 		imgEdtOKBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+				Log.e("tantofish", "OK clicked");
 				Bitmap bm = mImageEditingView.ok(mView.getBitmap());
+				
 				mView.setBitmap(bm);
 				
-				//ChengYan: send bitmap to remote
-				ByteArrayOutputStream out = new ByteArrayOutputStream();
-				bm.compress(Bitmap.CompressFormat.PNG, 100, out);
-				mView.getSocket().send(
-					new Commands.SendBitmapCommit(out.toByteArray()));
+				mImageEditingView.cancel();
+				new Thread(){
+					public void run(){
+						Bitmap bm = mImageEditingView.ok(mView.getBitmap());
+						//ChengYan: send bitmap to remote
+						ByteArrayOutputStream out = new ByteArrayOutputStream();
+						bm.compress(Bitmap.CompressFormat.JPEG, 80, out);
+						mView.getSocket().send(
+							new Commands.SendBitmapCommit(out.toByteArray()));
+						mView.pushBuffer(bm);
+
+					}
+				}.run();
+
 			}
 		});
-		
 	}
 	
 	@Override
@@ -436,9 +446,13 @@ public class MyCanvas extends Activity{
 	        clearBtn.setVisibility(ImageButton.INVISIBLE);
 	        //mView.setVisibility(View.INVISIBLE);
 	        
+	        
 	        mImageEditingView.setVisibility(View.VISIBLE);
 	        imgEdtCancelBtn.setVisibility(Button.VISIBLE);
+	        
 	        imgEdtOKBtn.setVisibility(Button.VISIBLE);
+	        imgEdtOKBtn.setVisibility(Button.VISIBLE);
+	        
     		loadedImage.setVisibility(ImageView.VISIBLE);
     		break;
     	case VIEWMODE_CANVAS:
@@ -449,34 +463,12 @@ public class MyCanvas extends Activity{
 	        clearBtn.setVisibility(ImageButton.VISIBLE);
 	        //mView.setVisibility(View.VISIBLE);
 	        
+	        
 	        mImageEditingView.setVisibility(View.INVISIBLE);
 	        imgEdtCancelBtn.setVisibility(Button.INVISIBLE);
 	        imgEdtOKBtn.setVisibility(Button.INVISIBLE);
     		loadedImage.setVisibility(ImageView.INVISIBLE);
     		break;
     	}
-    }
-    
-    /*
-     * tantofish: (still in testing phase for now (1226)) 
-     */
-    public void loadedimageToBitmap(){
-    	//Bitmap bmap = Bitmap.createBitmap(loadedImage.getDrawingCache());
-    	//loadedImage.setImageBitmap(bmap);
-    	BitmapDrawable drawable = (BitmapDrawable) loadedImage.getDrawable();
-    	Bitmap bitmap = drawable.getBitmap();
-    	
-    	
-        int width  = bitmap.getWidth();
-        int height = bitmap.getHeight();
-        //mCanvas.drawBitmap(finalBM, 0, 0, paint);
-        
-        Log.e("tantofish", "bitmap: h w = "+width+" "+height);
-        Log.e("tantofish", "mBitmap: h w = "+width+" "+height);
-        for(int j = 0 ; j < height ; j++)
-			for(int i = 0 ; i < width ; i++)
-				mImageEditingView.mBitmap.setPixel(i, j, bitmap.getPixel(i, j));
-		mImageEditingView.mCanvas = new Canvas(mImageEditingView.mBitmap);
-		mImageEditingView.invalidate();
     }
 }
