@@ -295,7 +295,9 @@ public class MyCanvas extends Activity{
 	
 	private void useColorPicker()
 	{
-		new ColorPickDialog(this , mView.getPaint() , mView.getPaint().getColor()).show();
+		//new ColorPickDialog(this , mView.getPaint() , mView.getPaint().getColor()).show();
+		new ColorPickDialog(this , mView.clientDrawStateMap.get(mMySocket.idFromIP).getPaint() , mView.getPaint().getColor()).show();
+		
 	}
 	
 	

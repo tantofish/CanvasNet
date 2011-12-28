@@ -77,6 +77,7 @@ public class MySocket {
 		
 	}
 
+
 	public void server() {
 
 		Log.d("proj" , "click server");

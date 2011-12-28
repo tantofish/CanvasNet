@@ -138,6 +138,8 @@ public class MySurfaceView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		// canvas.drawColor(0xFFAAAAAA);
+	
+		/*
 		canvas.drawColor(Color.WHITE);
 
 		canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
@@ -148,6 +150,18 @@ public class MySurfaceView extends View {
 
 		for(Map.Entry<String,ClientDrawState> entry :clientDrawStateMap.entrySet())
          canvas.drawPath(entry.getValue().getPath(), mPaint);
+         */
+		canvas.drawColor(Color.WHITE);
+
+		canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+		
+		//ChengYan: draw local path
+		canvas.drawPath(mPath, clientDrawStateMap.get(mMySocket.idFromIP).getPaint());
+		//ChengYan: draw remote path
+
+		for(Map.Entry<String,ClientDrawState> entry :clientDrawStateMap.entrySet())
+         canvas.drawPath(entry.getValue().getPath(), entry.getValue().getPaint());
+		
 
 
 	}
@@ -207,7 +221,7 @@ public class MySurfaceView extends View {
 		p.reset();*/
 		p.lineTo(clientDrawStateMap.get(key).mX, clientDrawStateMap.get(key).mY);
 
-		mCanvas.drawPath(p, mPaint);
+		mCanvas.drawPath(p, clientDrawStateMap.get(key).getPaint());
 				
 		//ChengYan: save current bitmap
 		mBufferDealer.onTouchStep(Bitmap.createBitmap(mBitmap),mCanvas);
@@ -412,9 +426,16 @@ public class MySurfaceView extends View {
 			
 		//ChengYan: Receive change color and brush width command 
 		case 3:
+			/*
 			Commands.ChangeColorCmd CCC = (Commands.ChangeColorCmd) cmd;
 			mPaint.setColor(CCC.getColor());
 			mPaint.setStrokeWidth(CCC.getWidth());
+			*/
+			
+			Commands.ChangeColorCmd CCC = (Commands.ChangeColorCmd) cmd;
+			clientDrawStateMap.get(cmd.getFrom()).getPaint().setColor(CCC.getColor());
+			clientDrawStateMap.get(cmd.getFrom()).getPaint().setStrokeWidth(CCC.getWidth());
+			
 
 			break;
 		
