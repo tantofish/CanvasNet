@@ -41,7 +41,8 @@ public class MySocket {
 	//private Thread LastListen;
 	
 	private String selfIP;
-	public String idFromIP;
+	public
+	String idFromIP;
 
 	public boolean IsServer(){		return IsServer;	} 
 	

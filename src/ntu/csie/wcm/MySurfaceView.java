@@ -35,7 +35,7 @@ public class MySurfaceView extends View {
 	
 	
 	//private variable
-	private BufferDealer mBufferDealer;
+	public BufferDealer mBufferDealer;
 	private MySocket mMySocket;
 	private Paint mPaint;
 
@@ -166,6 +166,7 @@ public class MySurfaceView extends View {
 		p.moveTo(x, y);
 		clientDrawStateMap.get(key).mX = x;
 		clientDrawStateMap.get(key).mY = y;
+		
 		
 	}
 

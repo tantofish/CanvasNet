@@ -280,8 +280,8 @@ public class MyCanvas extends Activity{
 		// TODO Auto-generated method stub
 		super.onBackPressed();
 
-		Log.e("MyCanvas", "onPause");
-		Log.d("proj" , "Mycanvas onbackpressed");
+        mView.mBufferDealer.clear();
+
 		mMySocket.disconnect();
 		this.finish();
 		

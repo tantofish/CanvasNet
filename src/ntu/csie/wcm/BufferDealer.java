@@ -80,6 +80,11 @@ public class BufferDealer {
 	
 		
 		undoCounter = 0;
+		
+		if(mBitmaps != null)
+		for(int i = 0;i< mBitmaps.size(); i++)
+			mBitmaps.get(i).recycle();
+		
 		mBitmaps = new ArrayList<Bitmap>();
 		isUndoing = false;
 	}
