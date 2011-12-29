@@ -32,10 +32,10 @@ public class MyImgEditView extends View {
 	private Paint mPaint;
 	private Path  mPath;
 	
-	private int mWidth, mHeight;
+	private int mWidth, mHeight;	// window width and window height
+	private int fWidth, fHeight;	// fitted width and fitted height 
 
 	private Bitmap srcImg;
-	
 	// Starting values of each finger "move" 
 	private float stCenterX;
 	private float stCenterY;
@@ -74,7 +74,8 @@ public class MyImgEditView extends View {
 	public MyImgEditView(Context c, AttributeSet attrs) {
 		super(c, attrs);
 		mContext = c;	
-		mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+		//mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+		mBitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 	}
 
 	@Override
@@ -94,34 +95,40 @@ public class MyImgEditView extends View {
 	}
 
 	public void startEditing(String path, Bitmap background){
-		
-		//mBitmap = background;
-		
-		Bitmap img = BitmapFactory.decodeFile(path);
-
-		/* tantofish : Resize the image start here*/
-		float marginX = 0.9f;
-		float marginY = 0.8f;
-		
-		int width  = img.getWidth();
-		int height = img.getHeight();
-        int bm_w   = this.getWidth()  ;
-        int bm_h   = this.getHeight() ;
         
-        float scaleX = (float) bm_w * marginX / width;
-        float scaleY = (float) bm_h * marginY / height;
-        float scale = java.lang.Math.min(scaleX, scaleY);
-        Matrix matrix = new Matrix();
-        matrix.postScale(scale, scale);
-        srcImg = Bitmap.createBitmap(img, 0, 0, width, height, matrix, true);
-        img.recycle();
-        
-        params = new RelativeLayout.LayoutParams(srcImg.getWidth(),srcImg.getHeight());
-        lmParams = new RelativeLayout.LayoutParams(srcImg.getWidth(),srcImg.getHeight());
-        params.rightMargin = 2000;
-		params.bottomMargin = 2000;
-		lmParams.rightMargin = 2000;
-		lmParams.bottomMargin = 2000;
+		BitmapFactory.Options opts = new BitmapFactory.Options();
+		opts.inJustDecodeBounds = true;
+		BitmapFactory.decodeFile(path, opts);
+		opts.inSampleSize = ImgLoaderActivity.computeSampleSize(opts, -1, mWidth*mHeight);
+		opts.inJustDecodeBounds = false;
+		try {
+			srcImg = BitmapFactory.decodeFile(path, opts);
+		} catch (OutOfMemoryError err) {
+		}
+		
+		int w = srcImg.getWidth();
+		int h = srcImg.getHeight();
+		if( (w > mWidth) || (h > mHeight) ){
+			if( (w/h) > (mWidth/mHeight) ){
+				fWidth = mWidth;
+				fHeight = mWidth * h / w;
+			}else{
+				fWidth = mHeight * w / h;
+				fHeight = mHeight;
+			}
+		}else{
+			fWidth  = w;
+			fHeight = h;
+		}
+		
+		
+		
+        params = new RelativeLayout.LayoutParams(fWidth,fHeight);
+        lmParams = new RelativeLayout.LayoutParams(fWidth,fHeight);
+        params.rightMargin = 5000;
+		params.bottomMargin =5000;
+		lmParams.rightMargin = 5000;
+		lmParams.bottomMargin = 5000;
 		lmCenterX = 0;
 		lmCenterY = 0;
 		lmAngle = 0.f;
@@ -130,6 +137,7 @@ public class MyImgEditView extends View {
 		
 		((MyCanvas)mContext).setCanvasViewMode(MyCanvas.VIEWMODE_IMAGE_EDITING);
         ((MyCanvas)mContext).transformIV(lmAngle, lmParams, srcImg);
+        
         
         mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
 		mCanvas = new Canvas(mBitmap);
@@ -199,19 +207,15 @@ public class MyImgEditView extends View {
 					params.width      = newW;
 					
 					((MyCanvas)mContext).transformIV(dAngle + lmAngle, params, srcImg);
-
-			        			       
+			       
 				}
 
 				break;
-				
 			}
 			break;
 		case MotionEvent.ACTION_UP:
 			if(isMultitouching){
 				lmAngle += dAngle;
-				//lmCenterX += centerX-stCenterX;
-				//lmCenterY += centerY-stCenterY;
 				lmScale *= scale;
 				lmParams.topMargin = params.topMargin;
 				lmParams.leftMargin = params.leftMargin; 
@@ -245,12 +249,11 @@ public class MyImgEditView extends View {
 		
 		Matrix matrix = new Matrix();
         matrix.postRotate(lmAngle);
-       
+        
+        Bitmap rotatedBM = createBitmapCarefully(srcImg, matrix);
         
         
-        Bitmap rotatedBM = Bitmap.createBitmap(srcImg, 0, 0, srcImg.getWidth(), srcImg.getHeight(), matrix, true);
-        
-        int srcW = rotatedBM.getWidth();
+        int srcW = rotatedBM.getWidth() ;
         int srcH = rotatedBM.getHeight();
         int adjW, adjH, offsetW, offsetH;
         if( lmParams.width > lmParams.height ){
@@ -270,12 +273,14 @@ public class MyImgEditView extends View {
         rect.top    = lmParams.topMargin  + offsetH;
         rect.bottom = rect.top + adjH;
         
+        
         mBitmap = bm;
         mCanvas = new Canvas(mBitmap);
+        
         mCanvas.drawBitmap(rotatedBM, null, rect, mBitmapPaint);
 		invalidate();
         
-		//((MyCanvas)mContext).setCanvasViewMode(MyCanvas.VIEWMODE_CANVAS);
+		((MyCanvas)mContext).setCanvasViewMode(MyCanvas.VIEWMODE_CANVAS);
 		((MyCanvas)mContext).enableUndoDisableRedo();
 		
 		return mBitmap;
@@ -291,7 +296,28 @@ public class MyImgEditView extends View {
 		Toast.makeText(mContext, str, Toast.LENGTH_SHORT).show();
 	}
 
-
-	
-
+	public static Bitmap createBitmapCarefully(Bitmap srcImg, Matrix matrix) {
+		Bitmap bmOK = null;
+		try{
+			bmOK = Bitmap.createBitmap(srcImg, 0, 0, srcImg.getWidth(), srcImg.getHeight(), matrix, true);
+        }catch(OutOfMemoryError err){
+        	matrix.postScale(0.8f, 0.8f);
+        	try{
+        		bmOK = Bitmap.createBitmap(srcImg, 0, 0, srcImg.getWidth(), srcImg.getHeight(), matrix, true);
+            }catch(OutOfMemoryError err2){
+            	matrix.postScale(0.8f, 0.8f);
+            	try{
+            		bmOK = Bitmap.createBitmap(srcImg, 0, 0, srcImg.getWidth(), srcImg.getHeight(), matrix, true);
+                }catch(OutOfMemoryError err3){
+                	matrix.postScale(0.8f, 0.8f);
+                	try{
+                		bmOK = Bitmap.createBitmap(srcImg, 0, 0, srcImg.getWidth(), srcImg.getHeight(), matrix, true);
+                    }catch(OutOfMemoryError err4){
+                    	
+                    }
+                }
+            }
+        }
+	    return bmOK;
+	}
 }
