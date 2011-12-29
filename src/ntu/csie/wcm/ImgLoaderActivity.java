@@ -69,7 +69,7 @@ public class ImgLoaderActivity extends Activity {
 		g_photo.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView parent, View v, int position, long id) {
 				imageIndex = position;
-				//image.setImageBitmap(BitmapFactory.decodeFile(files.get(folderIndex)[imageIndex].getPath()));
+
 				pathString = files.get(folderIndex)[position].getPath();
 				
 				
@@ -77,7 +77,6 @@ public class ImgLoaderActivity extends Activity {
 				opts.inJustDecodeBounds = true;
 				BitmapFactory.decodeFile(pathString, opts);
 				
-				//Bitmap bm = BitmapFactory.decodeFile(pathString, opts);
 				opts.inSampleSize = computeSampleSize(opts, -1, 512*512);
 				opts.inJustDecodeBounds = false;
 				try {
@@ -85,22 +84,7 @@ public class ImgLoaderActivity extends Activity {
 					image.setImageBitmap(bmp);
 				} catch (OutOfMemoryError err) {
 				}
-				/*
-				int width = bm.getWidth();
-				if(width > w){
-					//記憶體會爆 所以要縮圖 
-					int height = bm.getHeight();
-		            float scale = (float) w / width;
-	                Matrix matrix = new Matrix();
-	                matrix.postScale(scale, scale);
-	                Bitmap img = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
-	                bm.recycle();
-	                image.setImageBitmap(img);
-				}else{
-					image.setImageBitmap(bm);
-				}*/
 				
-				//image.setImageBitmap(bm);
 				backgroundType(image);
 			}
 		});
@@ -126,6 +110,12 @@ public class ImgLoaderActivity extends Activity {
 		});
 	}
 
+	@Override
+	public void finish(){
+		super.finish();
+		clear();
+	}
+	
 	public class ImageAdapter extends BaseAdapter {
 		int mGalleryItemBackground;
 		private Context mContext;
@@ -150,45 +140,12 @@ public class ImgLoaderActivity extends Activity {
 			if (imageIndex == -1)
 				i.setImageResource(folderImageId);
 			else{
-				/*Bitmap bm = BitmapFactory.decodeFile(files.get(folderIndex)[position].getPath());
-				
-				if (bm != null){
-					//記憶體會爆 所以要縮圖 這裡會導致滾動lag
-					int width = bm.getWidth();
-					int height = bm.getHeight();
-		            int newWidth = w/5;
-		            float scale = (float) newWidth / width;
-	                Matrix matrix = new Matrix();
-	                matrix.postScale(scale, scale);
-	                Bitmap img = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
-	                bm.recycle();
-					i.setImageBitmap(img);
-				}else{
-					return i;
-				}*/
-				
-				/*String path = files.get(folderIndex)[position].getPath();
-				BitmapFactory.Options opts = new BitmapFactory.Options();
-				opts.inSampleSize = 20;
-				Bitmap bm = BitmapFactory.decodeFile(path, opts);
-				*/
 				try{
 					Bitmap bm = bmFiles.get(folderIndex).get(position);
 					i.setImageBitmap(bm);
 				}catch(Exception e){
 					i.setImageBitmap(null);
 				}
-				
-				
-				//Bitmap bm = BitmapFactory.decodeFile(pathString, opts);
-				/*opts.inSampleSize = computeSampleSize(opts, -1, 128*128);
-				opts.inJustDecodeBounds = false;
-				try {
-					Bitmap bmp = BitmapFactory.decodeFile(pathString, opts);
-					if(bmp == null)	return i;
-					i.setImageBitmap(bmp);
-				    } catch (OutOfMemoryError err) {
-				}*/
 			}
 			
 			i.setScaleType(ImageView.ScaleType.FIT_XY);
@@ -233,8 +190,6 @@ public class ImgLoaderActivity extends Activity {
 		File[] f;
 		files = new Vector<File[]>();
 		
-		Vector<Bitmap> bmV;
-		bmFiles = new Vector<Vector<Bitmap>>();
 		
 		if(path.exists()){
 			/* Get all the directorys in the path */
@@ -269,6 +224,7 @@ public class ImgLoaderActivity extends Activity {
 	 * Tantofish : This funciton actually Load images from external storage
 	 */
 	public void peakExternalStoragePublicPicture() {
+		bmFiles = new Vector<Vector<Bitmap>>();
 		new Thread(){
 			public void run(){
 				for(int i = 0 ; i < files.size() ; i++){
@@ -335,6 +291,12 @@ public class ImgLoaderActivity extends Activity {
 	        return upperBound;
 	    }
 	}
+	
+	public void clear(){
+		files.clear();
+		bmFiles.clear();
+	}
+	
 	/*public void createExternalStoragePublicPicture() {
 	    
 	    File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);

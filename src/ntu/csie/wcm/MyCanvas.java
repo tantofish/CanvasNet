@@ -252,25 +252,26 @@ public class MyCanvas extends Activity{
 		// cancel button should appear when doing image editing 
 		imgEdtOKBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Log.e("tantofish", "OK clicked");
 				Bitmap bm = mImageEditingView.ok(mView.getBitmap());
-				
 				mView.setBitmap(bm);
+				mView.pushBuffer(bm);
 				
-				mImageEditingView.cancel();
+				/*
+				 * tantofish: compress takes a lot of time
+				 * use a thread to "start" this action as background execution.
+				 */
 				new Thread(){
 					public void run(){
 						Bitmap bm = mImageEditingView.ok(mView.getBitmap());
 						//ChengYan: send bitmap to remote
 						ByteArrayOutputStream out = new ByteArrayOutputStream();
-						bm.compress(Bitmap.CompressFormat.JPEG, 80, out);
+						bm.compress(Bitmap.CompressFormat.PNG, 80, out);
 						mView.getSocket().send(
 							new Commands.SendBitmapCommit(out.toByteArray()));
 						mView.pushBuffer(bm);
-
+						
 					}
-				}.run();
-
+				}.start();
 			}
 		});
 	}
@@ -362,20 +363,13 @@ public class MyCanvas extends Activity{
 	        
 	        /*
 	         * to Chengyan:
-	         * I annotated the following image transfering code because the
+	         * I removed the original image transfering code because the
 	         * situation has been changed a little bit.
 	         * You may need to see "imgEdtOKBtn.setOnClickListener"
 	         * in order to fix this out, thanks.
-	         * 										tantofish, the handsome ~
+	         * 												tantofish
 	         */
 	        
-			// Chengyan: transfer bitmap to byte stream then send 
-			/*ByteArrayOutputStream out = new ByteArrayOutputStream();
-			scaledImg.compress(Bitmap.CompressFormat.PNG, 100, out);
-			mView.getSocket().send(
-				new Commands.SendBitmapCommit(out.toByteArray()));*/
-		   
-			//scaledImg.recycle();
 		}
 	}
 	
@@ -430,7 +424,7 @@ public class MyCanvas extends Activity{
         loadedImage.setLayoutParams(params);
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
-        Bitmap finalBM = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+        Bitmap finalBM = MyImgEditView.createBitmapCarefully(img, matrix);
         loadedImage.setImageBitmap(finalBM);
     }
     
@@ -449,7 +443,7 @@ public class MyCanvas extends Activity{
 	        redoBtn.setVisibility(ImageButton.INVISIBLE);
 	        clearBtn.setVisibility(ImageButton.INVISIBLE);
 	        //mView.setVisibility(View.INVISIBLE);
-	        
+	        mView.setEnabled(false);
 	        
 	        mImageEditingView.setVisibility(View.VISIBLE);
 	        imgEdtCancelBtn.setVisibility(Button.VISIBLE);
@@ -466,7 +460,7 @@ public class MyCanvas extends Activity{
 	        redoBtn.setVisibility(ImageButton.VISIBLE);
 	        clearBtn.setVisibility(ImageButton.VISIBLE);
 	        //mView.setVisibility(View.VISIBLE);
-	        
+	        mView.setEnabled(true);
 	        
 	        mImageEditingView.setVisibility(View.INVISIBLE);
 	        imgEdtCancelBtn.setVisibility(Button.INVISIBLE);
