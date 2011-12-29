@@ -50,7 +50,7 @@ public class MySurfaceView extends View {
 	private Bitmap previewBitmap;
 	private Path previewPath;
 	private boolean isMultitouching = false;
-    Map<String , ClientDrawState> clientDrawStateMap = 
+    Map<String , ClientDrawState> drawStateMap = 
             new HashMap<String , ClientDrawState>();
 	//ChengYan: Hander for receive message from socket thread
 
@@ -100,7 +100,7 @@ public class MySurfaceView extends View {
 		mBitmapPaint = new Paint(Paint.DITHER_FLAG);
 		
 		
-		//clientDrawStateMap.put
+		//drawStateMap.put
 		
 		
 		
@@ -109,11 +109,16 @@ public class MySurfaceView extends View {
 	public void setSocket(MySocket ms)
 	{
 		mMySocket = ms;
+		
+		mPaint = drawStateMap.get(mMySocket.idFromIP).getPaint();
 	}
 	
 	public MySocket getSocket()
 	{
 		return mMySocket;
+		
+		
+		
 	}
 	
 	public Paint getPaint() {
@@ -139,27 +144,15 @@ public class MySurfaceView extends View {
 	protected void onDraw(Canvas canvas) {
 		// canvas.drawColor(0xFFAAAAAA);
 	
-		/*
 		canvas.drawColor(Color.WHITE);
 
 		canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
 		
 		//ChengYan: draw local path
-		canvas.drawPath(mPath, mPaint);
+		canvas.drawPath(mPath,mPaint);
 		//ChengYan: draw remote path
 
-		for(Map.Entry<String,ClientDrawState> entry :clientDrawStateMap.entrySet())
-         canvas.drawPath(entry.getValue().getPath(), mPaint);
-         */
-		canvas.drawColor(Color.WHITE);
-
-		canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
-		
-		//ChengYan: draw local path
-		canvas.drawPath(mPath, clientDrawStateMap.get(mMySocket.idFromIP).getPaint());
-		//ChengYan: draw remote path
-
-		for(Map.Entry<String,ClientDrawState> entry :clientDrawStateMap.entrySet())
+		for(Map.Entry<String,ClientDrawState> entry :drawStateMap.entrySet())
          canvas.drawPath(entry.getValue().getPath(), entry.getValue().getPaint());
 		
 
@@ -178,8 +171,8 @@ public class MySurfaceView extends View {
 		mY[pNumber] = y;*/
 		
 		p.moveTo(x, y);
-		clientDrawStateMap.get(key).mX = x;
-		clientDrawStateMap.get(key).mY = y;
+		drawStateMap.get(key).mX = x;
+		drawStateMap.get(key).mY = y;
 		
 		
 	}
@@ -198,12 +191,12 @@ public class MySurfaceView extends View {
 		*/
 		
 		
-		float dx = Math.abs(x - clientDrawStateMap.get(key).mX);
-		float dy = Math.abs(y - clientDrawStateMap.get(key).mY);
+		float dx = Math.abs(x - drawStateMap.get(key).mX);
+		float dy = Math.abs(y - drawStateMap.get(key).mY);
 		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-			p.quadTo(clientDrawStateMap.get(key).mX, clientDrawStateMap.get(key).mY, (x + clientDrawStateMap.get(key).mX) / 2, (y + clientDrawStateMap.get(key).mY) / 2);
-			clientDrawStateMap.get(key).mX = x;
-			clientDrawStateMap.get(key).mY = y;
+			p.quadTo(drawStateMap.get(key).mX, drawStateMap.get(key).mY, (x + drawStateMap.get(key).mX) / 2, (y + drawStateMap.get(key).mY) / 2);
+			drawStateMap.get(key).mX = x;
+			drawStateMap.get(key).mY = y;
 		}
 	}
 
@@ -219,9 +212,9 @@ public class MySurfaceView extends View {
 		mBufferDealer.onTouchStep(Bitmap.createBitmap(mBitmap),mCanvas);
 		
 		p.reset();*/
-		p.lineTo(clientDrawStateMap.get(key).mX, clientDrawStateMap.get(key).mY);
+		p.lineTo(drawStateMap.get(key).mX, drawStateMap.get(key).mY);
 
-		mCanvas.drawPath(p, clientDrawStateMap.get(key).getPaint());
+		mCanvas.drawPath(p, drawStateMap.get(key).getPaint());
 				
 		//ChengYan: save current bitmap
 		mBufferDealer.onTouchStep(Bitmap.createBitmap(mBitmap),mCanvas);
@@ -395,9 +388,9 @@ public class MySurfaceView extends View {
 			
 			Commands.SendPointCmd Dpc = (Commands.SendPointCmd) cmd;
 			
-			Log.e("CY", clientDrawStateMap.keySet().toString());
+			Log.e("CY", drawStateMap.keySet().toString());
 			
-			Path tempPath = clientDrawStateMap.get(cmd.getFrom()).getPath();
+			Path tempPath = drawStateMap.get(cmd.getFrom()).getPath();
 			
 	
 	
@@ -433,8 +426,8 @@ public class MySurfaceView extends View {
 			*/
 			
 			Commands.ChangeColorCmd CCC = (Commands.ChangeColorCmd) cmd;
-			clientDrawStateMap.get(cmd.getFrom()).getPaint().setColor(CCC.getColor());
-			clientDrawStateMap.get(cmd.getFrom()).getPaint().setStrokeWidth(CCC.getWidth());
+			drawStateMap.get(cmd.getFrom()).getPaint().setColor(CCC.getColor());
+			drawStateMap.get(cmd.getFrom()).getPaint().setStrokeWidth(CCC.getWidth());
 			
 
 			break;
@@ -466,7 +459,7 @@ public class MySurfaceView extends View {
 		case 7:
 			Commands.ClientConnectCmd CliCC  = (Commands.ClientConnectCmd) cmd;
 			
-			clientDrawStateMap.put(CliCC.getFrom(), new ClientDrawState());
+			drawStateMap.put(CliCC.getFrom(), new ClientDrawState());
 		    break;
 		//receive broadcastid from server
 		case 8:
@@ -476,11 +469,11 @@ public class MySurfaceView extends View {
 			{
 				
 				//Log.e("CY", "broadcasted key" + s);
-			 if(!clientDrawStateMap.containsKey(s))
+			 if(!drawStateMap.containsKey(s))
 			 {
 				 
 				
-				 clientDrawStateMap.put(s, new ClientDrawState());
+				 drawStateMap.put(s, new ClientDrawState());
 		 	 }
 			}
 			

@@ -114,7 +114,17 @@ public class MyCanvas extends Activity{
         }
         else
         {
+        	
+        	//ChengYan: parse back the six-number to IP
         	String remoteIP = bundle.getString("IP");
+        	String part1 = remoteIP.substring(0, 3);
+        	part1 = Integer.toString(Integer.parseInt(part1));
+        	String part2 = remoteIP.substring(3);
+        	part2 = Integer.toString(Integer.parseInt(part2));
+        	remoteIP = "192.168." + part1 + "." + part2;
+        	
+        	
+        	
         	if(mMySocket.client(remoteIP, 5050) == -1){
         		Toast.makeText(MyCanvas.this, "Can not connect to : " + remoteIP, Toast.LENGTH_SHORT).show();
         		this.finish();
@@ -297,7 +307,7 @@ public class MyCanvas extends Activity{
 	private void useColorPicker()
 	{
 		//new ColorPickDialog(this , mView.getPaint() , mView.getPaint().getColor()).show();
-		new ColorPickDialog(this , mView.clientDrawStateMap.get(mMySocket.idFromIP).getPaint() , mView.getPaint().getColor()).show();
+		new ColorPickDialog(this , mView.getPaint() , mView.getPaint().getColor()).show();
 		
 	}
 	
@@ -381,11 +391,25 @@ public class MyCanvas extends Activity{
 		LayoutInflater inflater = LayoutInflater.from(MyCanvas.this);  
         final View textEntryView = inflater.inflate(R.layout.dialog, null);  
         final TextView ipTextView=(TextView)textEntryView.findViewById(R.id.ipTextView);
+
+        //ChengYan: cheng ip to Six number
+        
         String ip = mMySocket.getIP();
-        ipTextView.setText(ip.subSequence(1, ip.length()));
+        String[] tempp = ip.split("\\.");
+
+        tempp[2] = ("00" + tempp[2]);
+        tempp[2] = tempp[2].substring(tempp[2].length()-3);
+        tempp[3] = "00" + tempp[3];
+        tempp[3] = tempp[3].substring(tempp[3].length()-3);
+        ip = tempp[2] + tempp[3];
+        
+        
+        
+        ipTextView.setText(ip);
         final ProgressDialog.Builder dialog = new ProgressDialog.Builder(MyCanvas.this); 
         dialog.setCancelable(false);  
-        dialog.setTitle("Your IP is");  
+        dialog.setTitle("Your MAGIC NUMBER is:");  
+        
         dialog.setView(textEntryView);
         dialog.setNegativeButton("OK",  
                 new DialogInterface.OnClickListener() {  
