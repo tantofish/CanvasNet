@@ -42,6 +42,31 @@ public class MyImgEditView extends View {
 	private float stAngle;
 	private float stDistance;
 	
+	private float lastX;
+	private float lastY;
+	private float lastSVX;	// slope vector
+	private float lastSVY;	// slope vector
+	private float lastDistance;
+	
+	private float lastH; //!!
+	private float lastW;
+	
+	
+	private float thisX;
+	private float thisY;
+	private float thisSVX;	// slope vector
+	private float thisSVY;	// slope vector
+	private float thisDistance;
+	
+	
+	
+	
+	private float stackX = 0.f;
+	private float stackY = 0.f;
+	private float stackAngle = 0.f;
+	private float stackScale = 1.f;
+	private RelativeLayout.LayoutParams stackParams;
+	
 	// the values tracked last move
 	private float lmCenterX = 0;
 	private float lmCenterY = 0;
@@ -125,14 +150,24 @@ public class MyImgEditView extends View {
 		
         params = new RelativeLayout.LayoutParams(fWidth,fHeight);
         lmParams = new RelativeLayout.LayoutParams(fWidth,fHeight);
+        stackParams = new RelativeLayout.LayoutParams(fWidth,fHeight);
         params.rightMargin = 5000;
 		params.bottomMargin =5000;
+		
 		lmParams.rightMargin = 5000;
 		lmParams.bottomMargin = 5000;
-		lmCenterX = 0;
-		lmCenterY = 0;
+		
+		stackParams.rightMargin = 5000;
+		stackParams.bottomMargin = 5000;
+
 		lmAngle = 0.f;
 		lmScale = 1.f;
+		
+		stackX = 0.f;
+		stackY = 0.f;
+		stackAngle = 0.f;
+		stackScale = 1.f;
+				
 		
 		
 		((MyCanvas)mContext).setCanvasViewMode(MyCanvas.VIEWMODE_IMAGE_EDITING);
@@ -149,64 +184,73 @@ public class MyImgEditView extends View {
 	public boolean onTouchEvent(MotionEvent event) {
 		
 		int pointerCount = event.getPointerCount();  // multitouch or single touch 
-		Point offset = new Point();
+		/*Point offset = new Point();*/
 		
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
-			
-			stCenterX = event.getX();
-			stCenterY = event.getY();
-
+		
+			lastX = event.getX();
+			lastY = event.getY();
+		
 			break;
 		case MotionEvent.ACTION_MOVE:
 			
 			pointerCount = event.getPointerCount();	// how many points touch on the screen
 			switch (pointerCount){
 			case 1:	// single point touch
-				
-				if(isMultitouching) break;
-				
-				centerX = event.getX();
-				centerY = event.getY();
-				
-				offset.set((int)(centerX-stCenterX), (int)(centerY-stCenterY));
-
-				params.topMargin  = lmParams.topMargin + offset.y;
-				params.leftMargin = lmParams.leftMargin + offset.x;
-				((MyCanvas)mContext).transformIV(lmAngle, params, srcImg);
-				
+				if(!isMultitouching){
+					thisX = event.getX();
+					thisY = event.getY();
+					stackParams.leftMargin += thisX - lastX;
+					stackParams.topMargin  += thisY - lastY;
+					lastX = thisX;
+					lastY = thisY;
+					((MyCanvas)mContext).transformIV(stackAngle, stackParams, srcImg);
+				}
 				break;
 			case 2:	// two points touch
 				
-				x1 = event.getX(0);
-				y1 = event.getY(0);
-				x2 = event.getX(1);
-				y2 = event.getY(1);
-				centerX  = (float) ((x1 + x2) * 0.5);
-				centerY  = (float) ((y1 + y2) * 0.5);
-				angle    = (float) Math.toDegrees(Math.atan((y2-y1)/(x2-x1)));
-				if(angle<0) angle+=180;
-				distance = (float) (Math.sqrt( Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2))/2);
+				float x1 = event.getX(0);
+				float y1 = event.getY(0);
+				float x2 = event.getX(1);
+				float y2 = event.getY(1);
+				
+				
+				/*angle    = (float) Math.toDegrees(Math.atan((y2-y1)/(x2-x1)));
+				if(angle<0) angle+=180;*/
+				distance = (float) (Math.sqrt( Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2)));
 				
 				if(!isMultitouching){
 					isMultitouching = true;
-					stCenterX = centerX;
-					stCenterY = centerY;
-					stAngle = angle;
-					stDistance = distance;
 					
+					lastSVX = x2 - x1;
+					lastSVY = y2 - y1;
+					
+					
+					lastDistance = distance;
+					lastH = stackParams.height;
+					lastW = stackParams.width;
+					lastX = stackParams.leftMargin;
+					lastY = stackParams.topMargin;
 				}else{
 					
-					scale = distance/stDistance;
-					dAngle = angle-stAngle;
-					int newH = (int) (lmParams.height * scale);
-					int newW = (int) (lmParams.width * scale);
-					params.topMargin  = lmParams.topMargin - ( newH - lmParams.height)/2;
-					params.leftMargin = lmParams.leftMargin - (newW - lmParams.width)/2;
-					params.height 	  = newH;
-					params.width      = newW;
+					stackScale = distance/lastDistance;
+					stackParams.topMargin  = (int) (lastY + lastH * (1.f-stackScale)/2);
+					stackParams.leftMargin = (int) (lastX + lastW * (1.f-stackScale)/2);
+					stackParams.height = ((int) (lastH * stackScale));
+					stackParams.width  = ((int) (lastW * stackScale));
 					
-					((MyCanvas)mContext).transformIV(dAngle + lmAngle, params, srcImg);
+					thisSVX = x2 - x1;
+					thisSVY = y2 - y1;
+					double cosTheta = (lastSVX*thisSVX+lastSVY*thisSVY) / 
+							          (Math.sqrt( lastSVX*lastSVX + lastSVY*lastSVY) * 
+							           Math.sqrt( thisSVX*thisSVX + thisSVY*thisSVY));
+					angle = (float) Math.toDegrees(Math.acos(cosTheta));
+					
+					Log.e("tantofish","("+x1+","+y1+")("+x2+","+y2+") angle = " + angle);
+					stackAngle = angle;
+					
+					((MyCanvas)mContext).transformIV(stackAngle, stackParams, srcImg);
 			       
 				}
 
@@ -223,13 +267,7 @@ public class MyImgEditView extends View {
 				lmParams.width  = params.width;
 				isMultitouching = false;
 
-			}else{
-				lmCenterX += centerX-stCenterX;
-				lmCenterY += centerY-stCenterY;
-				lmParams.topMargin = params.topMargin;
-				lmParams.leftMargin = params.leftMargin; 
 			}
-
 			
 			break;
 		}
