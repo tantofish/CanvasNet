@@ -293,8 +293,8 @@ public class ImgLoaderActivity extends Activity {
 	}
 	
 	public void clear(){
-		files.clear();
-		bmFiles.clear();
+		//files.clear();
+		//bmFiles.clear();
 	}
 	
 	/*public void createExternalStoragePublicPicture() {

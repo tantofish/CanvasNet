@@ -36,55 +36,32 @@ public class MyImgEditView extends View {
 	private int fWidth, fHeight;	// fitted width and fitted height 
 
 	private Bitmap srcImg;
-	// Starting values of each finger "move" 
-	private float stCenterX;
-	private float stCenterY;
-	private float stAngle;
-	private float stDistance;
-	
+
+	// the values tracked last move
 	private float lastX;
 	private float lastY;
 	private float lastSVX;	// slope vector
 	private float lastSVY;	// slope vector
 	private float lastDistance;
-	
 	private float lastH; //!!
 	private float lastW;
 	
-	
+	// variables used in the current onTouch event
 	private float thisX;
 	private float thisY;
 	private float thisSVX;	// slope vector
 	private float thisSVY;	// slope vector
-	private float thisDistance;
-	
-	
-	
-	
-	private float stackX = 0.f;
-	private float stackY = 0.f;
+
+	// 
 	private float stackAngle = 0.f;
 	private float stackScale = 1.f;
 	private RelativeLayout.LayoutParams stackParams;
 	
-	// the values tracked last move
-	private float lmCenterX = 0;
-	private float lmCenterY = 0;
-	private float lmAngle = 0.f;
-	private float lmScale = 1.f;
-	private RelativeLayout.LayoutParams lmParams;
-	
-	// variables used in the current onTouch event
-	private float x1, x2; 	// on multi touch x
-	private float y1, y2;
 	private boolean isMultitouching = false;
-	private float centerX;
-	private float centerY;
 	private float angle;
 	private float distance;
-	private float scale;
-	private float dAngle;
-	private RelativeLayout.LayoutParams params;
+
+	
 
 	
 	// tantofish: these are for a strange exception that rapidly consecutive click 
@@ -148,30 +125,19 @@ public class MyImgEditView extends View {
 		
 		
 		
-        params = new RelativeLayout.LayoutParams(fWidth,fHeight);
-        lmParams = new RelativeLayout.LayoutParams(fWidth,fHeight);
+        
         stackParams = new RelativeLayout.LayoutParams(fWidth,fHeight);
-        params.rightMargin = 5000;
-		params.bottomMargin =5000;
-		
-		lmParams.rightMargin = 5000;
-		lmParams.bottomMargin = 5000;
 		
 		stackParams.rightMargin = 5000;
 		stackParams.bottomMargin = 5000;
 
-		lmAngle = 0.f;
-		lmScale = 1.f;
-		
-		stackX = 0.f;
-		stackY = 0.f;
 		stackAngle = 0.f;
 		stackScale = 1.f;
 				
 		
 		
 		((MyCanvas)mContext).setCanvasViewMode(MyCanvas.VIEWMODE_IMAGE_EDITING);
-        ((MyCanvas)mContext).transformIV(lmAngle, lmParams, srcImg);
+        ((MyCanvas)mContext).transformIV(stackAngle, stackParams, srcImg);
         
         
         mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
@@ -184,7 +150,6 @@ public class MyImgEditView extends View {
 	public boolean onTouchEvent(MotionEvent event) {
 		
 		int pointerCount = event.getPointerCount();  // multitouch or single touch 
-		/*Point offset = new Point();*/
 		
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
@@ -206,6 +171,10 @@ public class MyImgEditView extends View {
 					lastX = thisX;
 					lastY = thisY;
 					((MyCanvas)mContext).transformIV(stackAngle, stackParams, srcImg);
+				}else{
+					isMultitouching=false;
+					lastX = event.getX();
+					lastY = event.getY();
 				}
 				break;
 			case 2:	// two points touch
@@ -216,8 +185,6 @@ public class MyImgEditView extends View {
 				float y2 = event.getY(1);
 				
 				
-				/*angle    = (float) Math.toDegrees(Math.atan((y2-y1)/(x2-x1)));
-				if(angle<0) angle+=180;*/
 				distance = (float) (Math.sqrt( Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2)));
 				
 				if(!isMultitouching){
@@ -226,30 +193,42 @@ public class MyImgEditView extends View {
 					lastSVX = x2 - x1;
 					lastSVY = y2 - y1;
 					
-					
 					lastDistance = distance;
 					lastH = stackParams.height;
 					lastW = stackParams.width;
 					lastX = stackParams.leftMargin;
 					lastY = stackParams.topMargin;
 				}else{
-					
-					stackScale = distance/lastDistance;
-					stackParams.topMargin  = (int) (lastY + lastH * (1.f-stackScale)/2);
-					stackParams.leftMargin = (int) (lastX + lastW * (1.f-stackScale)/2);
-					stackParams.height = ((int) (lastH * stackScale));
-					stackParams.width  = ((int) (lastW * stackScale));
-					
+
+					// rotate angle
 					thisSVX = x2 - x1;
 					thisSVY = y2 - y1;
 					double cosTheta = (lastSVX*thisSVX+lastSVY*thisSVY) / 
 							          (Math.sqrt( lastSVX*lastSVX + lastSVY*lastSVY) * 
 							           Math.sqrt( thisSVX*thisSVX + thisSVY*thisSVY));
 					angle = (float) Math.toDegrees(Math.acos(cosTheta));
+					if(!(angle>0 && angle<360))	angle = 0.f;
 					
-					Log.e("tantofish","("+x1+","+y1+")("+x2+","+y2+") angle = " + angle);
-					stackAngle = angle;
+					float sA = thisSVY/thisSVX;
+					float sB = lastSVY/lastSVX;
 					
+					if((sA>=0 && sB>=0 && (thisSVY/thisSVX < lastSVY/lastSVX)) ||	
+				       (sA<=0 && sB<=0 && (thisSVY/thisSVX < lastSVY/lastSVX)) ||
+				       (sA<=0 && sB>=0)  ){
+						angle *= -1.f;
+					}
+					lastSVX = thisSVX;
+					lastSVY = thisSVY;
+					stackAngle += angle;
+					
+					// scale
+					stackScale = distance/lastDistance;
+					stackParams.topMargin  = (int) (lastY + lastH * (1.f-stackScale)/2);
+					stackParams.leftMargin = (int) (lastX + lastW * (1.f-stackScale)/2);
+					stackParams.height = ((int) (lastH * stackScale));
+					stackParams.width  = ((int) (lastW * stackScale));
+					
+					// transform
 					((MyCanvas)mContext).transformIV(stackAngle, stackParams, srcImg);
 			       
 				}
@@ -259,12 +238,7 @@ public class MyImgEditView extends View {
 			break;
 		case MotionEvent.ACTION_UP:
 			if(isMultitouching){
-				lmAngle += dAngle;
-				lmScale *= scale;
-				lmParams.topMargin = params.topMargin;
-				lmParams.leftMargin = params.leftMargin; 
-				lmParams.height = params.height; 
-				lmParams.width  = params.width;
+				
 				isMultitouching = false;
 
 			}
@@ -286,7 +260,7 @@ public class MyImgEditView extends View {
 	public Bitmap ok(Bitmap bm){
 		
 		Matrix matrix = new Matrix();
-        matrix.postRotate(lmAngle);
+        matrix.postRotate(stackAngle);
         
         Bitmap rotatedBM = createBitmapCarefully(srcImg, matrix);
         
@@ -294,21 +268,21 @@ public class MyImgEditView extends View {
         int srcW = rotatedBM.getWidth() ;
         int srcH = rotatedBM.getHeight();
         int adjW, adjH, offsetW, offsetH;
-        if( lmParams.width > lmParams.height ){
-        	adjH = lmParams.height;
+        if( stackParams.width > stackParams.height ){
+        	adjH = stackParams.height;
         	adjW = (int)( adjH * srcW / srcH );
         }else{
-        	adjW = lmParams.width;
+        	adjW = stackParams.width;
         	adjH = (int)( adjW * srcH / srcW );
         }
         
-        offsetW = (lmParams.width  - adjW) / 2;
-        offsetH = (lmParams.height - adjH) / 2;
+        offsetW = (stackParams.width  - adjW) / 2;
+        offsetH = (stackParams.height - adjH) / 2;
         
         Rect rect   = new Rect();
-        rect.left   = lmParams.leftMargin + offsetW;			        
+        rect.left   = stackParams.leftMargin + offsetW;			        
         rect.right  = rect.left + adjW;
-        rect.top    = lmParams.topMargin  + offsetH;
+        rect.top    = stackParams.topMargin  + offsetH;
         rect.bottom = rect.top + adjH;
         
         

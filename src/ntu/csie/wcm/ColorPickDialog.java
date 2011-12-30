@@ -1,3 +1,4 @@
+
 /*
  * ChengYan: this class creates a ColorPickDialog when color pick button in MyCanvas is
  * touched.
