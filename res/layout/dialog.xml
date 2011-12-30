@@ -8,9 +8,10 @@
     <TextView android:id="@+id/ipTextView"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		
+		android:textColor="#ff0000"
 		android:layout_marginLeft="20dip"
 		android:layout_marginRight="20dip"
 		android:text = "xxx.xx"
 		android:textAppearance="?android:attr/textAppearanceMedium" android:layout_gravity="center_horizontal" android:gravity="center_horizontal" android:textStyle="bold" android:textSize="30sp"/>
+    <TextView android:id="@+id/textView1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tell your friends this number!!" android:layout_marginLeft="5pt" android:layout_marginTop="10pt"></TextView>
 </LinearLayout> 

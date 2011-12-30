@@ -51,7 +51,7 @@ public class CanvasNetActivity extends Activity {
 
 		ClientStartBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				openDialog(new ClientPositiveListener(),"Using client, please input IP",false);
+				openDialog(new ClientPositiveListener(),"Using client, please input the MAGIC NUMBER",false);
 			}
 		});
 		ClientStartBtn.setOnTouchListener(new View.OnTouchListener() {

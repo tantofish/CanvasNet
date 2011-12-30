@@ -12,7 +12,7 @@ import android.util.Log;
 
 
 public class BufferDealer {
-	private final int BITMAP_CACHE_SIZE = 5;
+	private final int BITMAP_CACHE_SIZE = 3;
 	private ArrayList<Bitmap> mBitmaps;
 	private boolean isUndoing;
 	private int undoCounter;
@@ -80,6 +80,11 @@ public class BufferDealer {
 	
 		
 		undoCounter = 0;
+		
+		if(mBitmaps != null)
+		for(int i = 0;i< mBitmaps.size(); i++)
+			mBitmaps.get(i).recycle();
+		
 		mBitmaps = new ArrayList<Bitmap>();
 		isUndoing = false;
 	}

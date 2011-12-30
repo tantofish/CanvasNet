@@ -41,7 +41,8 @@ public class MySocket {
 	//private Thread LastListen;
 	
 	private String selfIP;
-	public String idFromIP;
+	public
+	String idFromIP;
 
 	public boolean IsServer(){		return IsServer;	} 
 	
@@ -71,10 +72,11 @@ public class MySocket {
 		idFromIP = temp[temp.length-1];
 		
 		Log.e("CY", "idFromIP : "  + idFromIP);
-		mMySurfaceView.clientDrawStateMap.put(idFromIP, new ClientDrawState());
+		mMySurfaceView.drawStateMap.put(idFromIP, new ClientDrawState());
 		
 		
 	}
+
 
 	public void server() {
 
@@ -168,7 +170,7 @@ public class MySocket {
 							
 							
 							//ChengYan: send Broadcast command
-							String[] tempStrings =mMySurfaceView.clientDrawStateMap.keySet().toArray(new String[0]);
+							String[] tempStrings =mMySurfaceView.drawStateMap.keySet().toArray(new String[0]);
 						
 							send(new Commands.ServerBroadcastClientCmd(tempStrings));
 							
