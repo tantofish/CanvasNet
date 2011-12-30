@@ -436,7 +436,9 @@ public class MySurfaceView extends View {
 			Commands.SendBitmapCommit SBC = (Commands.SendBitmapCommit) cmd;
 			Bitmap tempBmp = BitmapFactory.decodeByteArray(SBC.getBytearray(), 0, SBC.getBytearray().length);
 			//drawImgOntoCanvas(tempBmp);
-			setBitmap(tempBmp.copy(Bitmap.Config.ARGB_8888, true));
+			Bitmap bmp = tempBmp.copy(Bitmap.Config.ARGB_8888, true);
+			setBitmap(bmp);
+			pushBuffer(bmp);
 			tempBmp.recycle();
 			Log.e("Comamnd", "receive bitmap");
 			break;
