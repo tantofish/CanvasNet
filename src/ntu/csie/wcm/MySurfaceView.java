@@ -7,6 +7,7 @@ import java.util.Map;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -54,6 +55,13 @@ public class MySurfaceView extends View {
             new HashMap<String , ClientDrawState>();
 	//ChengYan: Hander for receive message from socket thread
 
+    
+    public Canvas getCanvas(){
+    	return mCanvas;
+ 
+    } 
+    
+    
     public Handler handler = new Handler() 
     {
     	
@@ -79,7 +87,6 @@ public class MySurfaceView extends View {
 
     };
     
-	
 	public MySurfaceView(Context c, AttributeSet attrs) {
 		super(c, attrs);
 		mContext = c;
@@ -372,7 +379,7 @@ public class MySurfaceView extends View {
 	
 	public void errorToast(String str)
 	{
-		Toast.makeText(mContext, str, Toast.LENGTH_SHORT).show();
+		Toast.makeText( mContext.getApplicationContext(), str, Toast.LENGTH_SHORT).show();
 	}
 	
 	public void process(Commands.BaseCmd cmd)

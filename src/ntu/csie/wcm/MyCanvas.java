@@ -126,10 +126,11 @@ public class MyCanvas extends Activity{
         	
         	
         	if(mMySocket.client(remoteIP, 5050) == -1){
-        		Toast.makeText(MyCanvas.this, "Can not connect to : " + remoteIP, Toast.LENGTH_SHORT).show();
+        		Toast.makeText(getApplicationContext(), "Can not connect to : " + remoteIP, Toast.LENGTH_SHORT).show();
         		this.finish();
         		
         	}
+        	//Toast.makeText(this.getApplicationContext(), "Connect to : " + remoteIP, Toast.LENGTH_SHORT).show();
         }
         
         
