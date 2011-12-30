@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.Message;
 import android.text.format.Formatter;
 import android.util.Log;
+import android.widget.Toast;
 
 public class MySocket {
 
@@ -38,20 +39,19 @@ public class MySocket {
 	private int listenPort; // for listen port
     
 	private Thread tmp;
-	//private Thread LastListen;
 	
 	private String selfIP;
 	public
 	String idFromIP;
 
 	public boolean IsServer(){		return IsServer;	} 
+	public MySurfaceView getSurfaceView(){	return mMySurfaceView;	}
+	
 	
 	public MySocket(MySurfaceView canvas, int listen, WifiManager wifiManager) {
 		mMySurfaceView = canvas;
-		listenPort = listen;
-		//Log.d("proj" , "!!!!"); 
+		listenPort = listen; 
 		list = new Vector<Connection>();
-		//Log.d("proj" , "!!!!");
 		
 		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 		int ipAddress = wifiInfo.getIpAddress();
@@ -179,7 +179,6 @@ public class MySocket {
 						
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
-							//Log.d("proj" , "###");
 							e.printStackTrace();
 							break;
 						} 
@@ -194,56 +193,24 @@ public class MySocket {
 		IsServer = false;
 		InetAddress serverIp;
 		SocketAddress tmpServerIP;
-		//Log.d("proj", "~~~~");
-		
-
-
 		try {
 			serverIp = InetAddress.getByName(ip);
 			 tmpServerIP = new InetSocketAddress(serverIp , port);
-			//Log.d("proj", "AAAA");
-			Thread t = new Thread(){
-				public void run(){
-					try {
-						Log.d("proj", "SLEEEEEEEP");
-						sleep(4000);
-						Log.d("proj", "AFTER SLEEEEEEEEP");
-						if(clientSocket == null){
-							
-						}
-						
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			};
-			//Log.d("proj", "BBBB");
-			//t.start();
-			//Log.d("proj", "CCCC");
-			//clientSocket = new Socket(serverIp, port);
-			clientSocket = new Socket();
-			//Log.d("proj", "ZZZZ");
-			clientSocket.connect(tmpServerIP, 3000);
 			
-			//Log.d("proj", "XXXX");
+			clientSocket = new Socket();
+			clientSocket.connect(tmpServerIP, 3000);
 			
 			if(clientSocket!=null){
 				MySocket.this.sendMessageToUIThread("Connect to" + ip);
-				//Log.d("proj", "DDDD");
+				
 				ob = new java.io.ObjectOutputStream(clientSocket.getOutputStream());
-				//Log.d("proj", "EEEE");
-				if (ob != null)
-					Log.d("proj", "client ob not null");
+				if (ob != null)		Log.d("proj", "client ob not null");
 				ib = new java.io.ObjectInputStream(clientSocket.getInputStream());
-				if (ib != null)
-					Log.d("proj", "client ib not null");
-
+				if (ib != null)		Log.d("proj", "client ib not null");
 				tmp = new Thread() {
 					public void run() {
 
-					//while (!Thread.interrupted()) {
-					while (true) {
+					while (!Thread.interrupted()) {
 						try {
 							sleep(SLEEP_TIME);
 
@@ -262,10 +229,9 @@ public class MySocket {
 							// TODO Auto-generated catch block
 							Log.d("proj" , "in client thread exception!!");
 							e.printStackTrace();
-							//disconnect();
+							disconnect();
 							MySocket.this.sendMessageToUIThread("Connect Lost");
 							((MyCanvas) (mMySurfaceView.mContext)).finish();
-						//	client(ip,port);
 							break;
 						}
 					}
@@ -311,7 +277,6 @@ public class MySocket {
 
 		try {
 			// Ãö³¬³s½u
-			Log.d("proj" , "!!!");
 			if (ib != null) {
 				ib.close();
 				ib = null;
@@ -321,10 +286,7 @@ public class MySocket {
 				ib = null;
 			}
 			if (tmp != null) {
-				//tmp.stop();
-				Log.d("proj" , "QQQQQ");
-				//tmp.interrupt();
-				tmp.stop();
+				tmp.interrupt();
 				tmp = null;
 				
 			}
