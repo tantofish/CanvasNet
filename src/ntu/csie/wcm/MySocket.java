@@ -248,16 +248,21 @@ public class MySocket {
 
 			
 		} catch(SocketTimeoutException u){
-			//Log.d("proj" , "timeout!!!!!! ");
-			mMySurfaceView.errorToast("Can not connect to : " + ip);
+			//Log.e("CYY" , "timeout!!!!!! ");
+			//mMySurfaceView.errorToast("Can not connect to : " + ip);
+			sendMessageToUIThread("Connect Timeout!!");
 			this.disconnect();
 			return -1;
 		}catch (Exception e) {
 			// TODO Auto-generated catch block
-			mMySurfaceView.errorToast("Connect Faild");
-			((MyCanvas) (mMySurfaceView.mContext)).finish();
+			//Log.e("CYY" , "timeout2222222222 ");
+			sendMessageToUIThread("Connect Faild");
+			//mMySurfaceView.errorToast("Connect Faild");
+			//((MyCanvas) (mMySurfaceView.mContext)).finish();
+			this.disconnect();
 
 			e.printStackTrace();
+			return -1;
 		}
 
 		return 0;

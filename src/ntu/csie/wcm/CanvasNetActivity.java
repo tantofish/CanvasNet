@@ -2,15 +2,15 @@ package ntu.csie.wcm;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 public class CanvasNetActivity extends Activity {
 	/** Called when the activity is first created. */
@@ -24,6 +24,8 @@ public class CanvasNetActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		
+		setRequestedOrientation(1);	//lock rotate
 
 
 		HostStartBtn = (ImageButton) findViewById(R.id.hostBtn);
@@ -122,12 +124,25 @@ public class CanvasNetActivity extends Activity {
 
 	private EditText input;
 	 private String IpCache;
+	 
+	 ProgressDialog connectngDialog;
 	class ClientPositiveListener extends BasePositiveListener{
 		@Override
 		public void onClick(DialogInterface dialog, int id) {
 			// TODO Auto-generated method stub
 			super.onClick(dialog, id);
+			
+		//	connectngDialog = ProgressDialog.show(CanvasNetActivity.this, "", "Loading. Please wait...", true);
+        	
+			
 			IpCache = input.getText().toString();
+			
+			if(IpCache.length() != 6)
+			{
+				Toast.makeText(getApplicationContext(), "Magic Number should be six numbers!", Toast.LENGTH_SHORT).show();
+				return;
+			}
+			
 			Intent intent = new Intent();
 			intent.setClass(CanvasNetActivity.this, MyCanvas.class);
 			Bundle bundle = new Bundle();
