@@ -212,9 +212,10 @@ public class MyImgEditView extends View {
 					float sA = thisSVY/thisSVX;
 					float sB = lastSVY/lastSVX;
 					
-					if((sA>=0 && sB>=0 && (thisSVY/thisSVX < lastSVY/lastSVX)) ||	
-				       (sA<=0 && sB<=0 && (thisSVY/thisSVX < lastSVY/lastSVX)) ||
-				       (sA<=0 && sB>=0)  ){
+					if((sA>=0 && sB>=0 && (sA < sB)) ||	
+				       (sA<=0 && sB<=0 && (sA < sB)) ||
+				       (sA<=0 && sB>=0 && sA>-1 && sB<1) ||
+				       (sA>=0 && sB<=0 && sA>1 && sB<-1) ){
 						angle *= -1.f;
 					}
 					lastSVX = thisSVX;

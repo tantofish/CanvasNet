@@ -31,10 +31,14 @@ public class ImgLoaderActivity extends Activity {
 	
 	Vector<File[]> files;
 	Vector<Vector<Bitmap>> bmFiles;
+	
+	
+	
 	int folderIndex = -1;
 	int imageIndex = -1;
 	int w, h;
 	String pathString;
+	
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -48,7 +52,7 @@ public class ImgLoaderActivity extends Activity {
 		image	 = (ImageView) findViewById(R.id.imageView1);
 		image.setImageBitmap(null);
 		readExternalStoragePublicPicture();
-		peakExternalStoragePublicPicture();
+		//peakExternalStoragePublicPicture();
 		
 		
 		DisplayMetrics dm = new DisplayMetrics();
@@ -73,6 +77,13 @@ public class ImgLoaderActivity extends Activity {
 				pathString = files.get(folderIndex)[position].getPath();
 				
 				
+				ImageView iv = (ImageView) g_photo.getChildAt(position);
+				Log.d("tantofish", "Position = "+position);
+				//ImageView iv = (ImageView) g_photo.getSelectedView();
+				//if(iv == null) iv = new ImageView(context); 
+				
+				iv.setImageResource(R.drawable.folder);
+				
 				BitmapFactory.Options opts = new BitmapFactory.Options();
 				opts.inJustDecodeBounds = true;
 				BitmapFactory.decodeFile(pathString, opts);
@@ -82,6 +93,7 @@ public class ImgLoaderActivity extends Activity {
 				try {
 					Bitmap bmp = BitmapFactory.decodeFile(pathString, opts);
 					image.setImageBitmap(bmp);
+					
 				} catch (OutOfMemoryError err) {
 				}
 				
@@ -120,6 +132,8 @@ public class ImgLoaderActivity extends Activity {
 		int mGalleryItemBackground;
 		private Context mContext;
 
+		
+		
 		public ImageAdapter(Context c) {
 			mContext = c;
 		}
@@ -135,17 +149,38 @@ public class ImgLoaderActivity extends Activity {
 
 		public long getItemId(int position) {	return position;	}
 
-		public View getView(int position, View convertView, ViewGroup parent) {
-			ImageView i = new ImageView(mContext);
+		
+		public View getView(final int position, View convertView, ViewGroup parent) {
+			//Log.d("tantofish","Folder Index: "+folderIndex+"Position"+position);
+			final ImageView i = new ImageView(mContext);
 			if (imageIndex == -1)
 				i.setImageResource(folderImageId);
 			else{
-				try{
+				/*i.setImageBitmap(null);
+				new Thread(){
+					public void run(){
+						String p = files.get(folderIndex)[position].getPath();
+						
+						BitmapFactory.Options opts = new BitmapFactory.Options();
+						opts.inJustDecodeBounds = true;
+						BitmapFactory.decodeFile(p, opts);
+
+						opts.inSampleSize = computeSampleSize(opts, -1, 100*100);
+						opts.inJustDecodeBounds = false;
+						opts.inSampleSize = 100;
+						try {
+							Bitmap bmp = BitmapFactory.decodeFile(p, opts);
+							i.setImageBitmap(bmp);
+						    } catch (OutOfMemoryError err) {
+						}
+					}
+				}.run();*/
+				/*try{
 					Bitmap bm = bmFiles.get(folderIndex).get(position);
 					i.setImageBitmap(bm);
 				}catch(Exception e){
 					i.setImageBitmap(null);
-				}
+				}*/
 			}
 			
 			i.setScaleType(ImageView.ScaleType.FIT_XY);
@@ -236,7 +271,7 @@ public class ImgLoaderActivity extends Activity {
 						opts.inJustDecodeBounds = true;
 						BitmapFactory.decodeFile(p, opts);
 
-						opts.inSampleSize = computeSampleSize(opts, -1, 100*100);
+						opts.inSampleSize = computeSampleSize(opts, -1, 80*80);
 						opts.inJustDecodeBounds = false;
 						try {
 							Bitmap bmp = BitmapFactory.decodeFile(p, opts);
@@ -293,7 +328,8 @@ public class ImgLoaderActivity extends Activity {
 	}
 	
 	public void clear(){
-		//files.clear();
+		//
+		files.clear();
 		//bmFiles.clear();
 	}
 	
