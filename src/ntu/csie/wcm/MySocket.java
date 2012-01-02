@@ -71,7 +71,7 @@ public class MySocket {
 		String[] temp = selfIP.split("\\.");
 		idFromIP = temp[temp.length-1];
 		
-		Log.e("CY", "idFromIP : "  + idFromIP);
+	
 		mMySurfaceView.drawStateMap.put(idFromIP, new ClientDrawState());
 		
 		
@@ -346,7 +346,10 @@ public class MySocket {
 		}
 	}
 
-	public String getIP() {		return this.localhost.toString();	}
+	public String getIP() {		//return this.localhost.toString();
+	                    	return this.selfIP;
+	                       }
+	
 	public void PrintList(){
 		Log.d("proj" , "In PrintList");
 		Iterator<Connection> it = list.iterator();

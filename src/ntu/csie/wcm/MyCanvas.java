@@ -2,29 +2,18 @@ package ntu.csie.wcm;
 
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.AvoidXfermode.Mode;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -121,7 +110,14 @@ public class MyCanvas extends Activity{
         	part1 = Integer.toString(Integer.parseInt(part1));
         	String part2 = remoteIP.substring(3);
         	part2 = Integer.toString(Integer.parseInt(part2));
-        	remoteIP = "192.168." + part1 + "." + part2;
+        	Log.e("CYY myIP",mMySocket.getIP());
+        	String[] tt  = mMySocket.getIP().split("\\.");
+        	if(tt[0].equals("0"))
+        		tt[0] = "192";
+        	if(tt[1].equals("0"))
+        		tt[1] = "168";
+        	//Log.e("CYY",mMySocket.getIP().substring(0, 8));
+        	remoteIP = tt[0]+ "." + tt[1] + "." + part1 + "." + part2;
         	
         	
         	
