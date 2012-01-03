@@ -26,8 +26,23 @@ public final class R {
         public static final int bt_redo_down_128=0x7f02000c;
         public static final int bt_undo_128=0x7f02000d;
         public static final int bt_undo_down_128=0x7f02000e;
-        public static final int folder=0x7f02000f;
-        public static final int icon=0x7f020010;
+        public static final int cover=0x7f02000f;
+        public static final int cover_post=0x7f020010;
+        public static final int cover_post2=0x7f020011;
+        public static final int cover_pre=0x7f020012;
+        public static final int cover_transition=0x7f020013;
+        public static final int cover_transition_post=0x7f020014;
+        public static final int dot_p1=0x7f020015;
+        public static final int dot_p2=0x7f020016;
+        public static final int dot_p3=0x7f020017;
+        public static final int dot_p4=0x7f020018;
+        public static final int dot_p5=0x7f020019;
+        public static final int dot_p6=0x7f02001a;
+        public static final int dot_p7=0x7f02001b;
+        public static final int dot_p8=0x7f02001c;
+        public static final int dot_p9=0x7f02001d;
+        public static final int folder=0x7f02001e;
+        public static final int icon=0x7f02001f;
     }
     public static final class id {
         public static final int ChangeColorBt=0x7f050003;
@@ -36,6 +51,7 @@ public final class R {
         public static final int bt_imgEdit_OK=0x7f05000a;
         public static final int clearBt=0x7f050007;
         public static final int clientBtn=0x7f050011;
+        public static final int cover=0x7f050013;
         public static final int gallery1=0x7f05000f;
         public static final int gallery_folder=0x7f05000e;
         public static final int hostBtn=0x7f050012;

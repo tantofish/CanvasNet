@@ -1,22 +1,30 @@
 package ntu.csie.wcm;
 
+
+
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 public class CanvasNetActivity extends Activity {
 	/** Called when the activity is first created. */
 
 
 	ImageButton HostStartBtn,ClientStartBtn; 
+	ImageView mCover;
+	TransitionDrawable transition;
+	
 	//Button imgLoaderActivityJumper; // tantofish:temporary use.
 
 	
@@ -24,7 +32,31 @@ public class CanvasNetActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		setRequestedOrientation(1);	//lock rotate
+		
+		//ChengYan: show cover in transition animation
+		 Resources res = getResources();
+        transition = (TransitionDrawable) res.getDrawable(R.drawable.cover_transition);
+        mCover = (ImageView)findViewById(R.id.cover);
+        mCover.setImageDrawable(transition);
+        transition.startTransition(2000);
 
+       
+        startCoverThread(res);
+       
+		// ChengYan: thread for cover animation
+
+        
+        
+		//ChengYan cover click listener
+        mCover.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				transition = null;
+				mCover.setVisibility(View.INVISIBLE);
+			}
+		});
+        
+        
 
 		HostStartBtn = (ImageButton) findViewById(R.id.hostBtn);
 		
@@ -88,6 +120,50 @@ public class CanvasNetActivity extends Activity {
 	}
 	
 	
+	private void startCoverThread(final Resources res)
+	{
+		
+		Thread tmp = new Thread() {
+        
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					sleep(2100);
+					
+					runOnUiThread(new Runnable() {
+						public void run() {
+					transition = (TransitionDrawable) res.getDrawable(R.drawable.cover_transition_post);
+					mCover.setImageDrawable(transition);
+
+							transition.startTransition(1000);
+						}
+					});
+							
+							
+
+					while (transition != null) {
+						
+						
+						sleep(1200);
+
+						runOnUiThread(new Runnable() {
+							public void run() {
+								if(transition != null)
+								transition.reverseTransition((1000));
+							}
+						});
+						
+					}
+
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		};
+		tmp.start();
+	}
+	
 	
 	@Override
 	public void onBackPressed() {
@@ -122,12 +198,25 @@ public class CanvasNetActivity extends Activity {
 
 	private EditText input;
 	 private String IpCache;
+	 
+	 ProgressDialog connectngDialog;
 	class ClientPositiveListener extends BasePositiveListener{
 		@Override
 		public void onClick(DialogInterface dialog, int id) {
 			// TODO Auto-generated method stub
 			super.onClick(dialog, id);
+			
+		//	connectngDialog = ProgressDialog.show(CanvasNetActivity.this, "", "Loading. Please wait...", true);
+        	
+			
 			IpCache = input.getText().toString();
+			
+			if(IpCache.length() != 6)
+			{
+				Toast.makeText(getApplicationContext(), "Magic Number should be six numbers!", Toast.LENGTH_SHORT).show();
+				return;
+			}
+			
 			Intent intent = new Intent();
 			intent.setClass(CanvasNetActivity.this, MyCanvas.class);
 			Bundle bundle = new Bundle();

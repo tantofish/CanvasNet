@@ -2,29 +2,18 @@ package ntu.csie.wcm;
 
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.AvoidXfermode.Mode;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -83,6 +72,10 @@ public class MyCanvas extends Activity{
 		
 		loadedImage.setAlpha(225);
 	}
+
+	private String remoteIP;
+	private ProgressDialog connectingDialog;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -115,22 +108,41 @@ public class MyCanvas extends Activity{
         else
         {
         	
+            //ChengYan: show progressDialog when client connecting to host
+        	connectingDialog = ProgressDialog.show(MyCanvas.this, "", "Connecting. Please wait...", true);
+        	
+        	
         	//ChengYan: parse back the six-number to IP
-        	String remoteIP = bundle.getString("IP");
+            remoteIP = bundle.getString("IP");
         	String part1 = remoteIP.substring(0, 3);
         	part1 = Integer.toString(Integer.parseInt(part1));
         	String part2 = remoteIP.substring(3);
         	part2 = Integer.toString(Integer.parseInt(part2));
-        	remoteIP = "192.168." + part1 + "." + part2;
+        	Log.e("CYY myIP",mMySocket.getIP());
+        	String[] tt  = mMySocket.getIP().split("\\.");
+        	if(tt[0].equals("0"))
+        		tt[0] = "192";
+        	if(tt[1].equals("0"))
+        		tt[1] = "168";
+        	//Log.e("CYY",mMySocket.getIP().substring(0, 8));
+        	remoteIP = tt[0]+ "." + tt[1] + "." + part1 + "." + part2;
         	
         	
-        	
-        	if(mMySocket.client(remoteIP, 5050) == -1){
-        		Toast.makeText(getApplicationContext(), "Can not connect to : " + remoteIP, Toast.LENGTH_SHORT).show();
-        		this.finish();
-        		
-        	}
-        	//Toast.makeText(this.getApplicationContext(), "Connect to : " + remoteIP, Toast.LENGTH_SHORT).show();
+        	//ChengYan: open a thread for Client connecting to avoid stall.
+			Thread tmp = new Thread() {
+				public void run() {
+					
+					if(mMySocket.client(remoteIP, 5050) == -1){	
+					MyCanvas.this.clientTimeOut();
+					}
+					else
+						connectingDialog.dismiss();
+
+				}
+			};
+			tmp.start();
+			
+
         }
         
         
@@ -293,6 +305,16 @@ public class MyCanvas extends Activity{
 		});
 	}
 	
+	//ChengYan: called when client connect fail
+	private void clientTimeOut()
+	{
+		//Toast.makeText(getApplicationContext(), "Can not connect to : " + remoteIP, Toast.LENGTH_SHORT).show();
+		
+		connectingDialog.dismiss();
+		this.finish();
+		
+	}
+	
 	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
@@ -338,10 +360,10 @@ public class MyCanvas extends Activity{
 		// 依據itemId來判斷使用者點選哪一個item
 		switch (item.getItemId()) {
 		case 0:
-			Toast.makeText(MyCanvas.this, "施工中...", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), "施工中...", Toast.LENGTH_SHORT).show();
 			break;
 		case 1:
-			Toast.makeText(MyCanvas.this, "施工中...", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), "施工中...", Toast.LENGTH_SHORT).show();
 			break;
 		case 2:
 			Intent intent = new Intent();
