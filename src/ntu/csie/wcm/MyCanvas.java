@@ -298,8 +298,7 @@ public class MyCanvas extends Activity{
 						ByteArrayOutputStream out = new ByteArrayOutputStream();
 						bg.compress(Bitmap.CompressFormat.JPEG, 80, out);
 						mView.getSocket().send(
-							new Commands.SendBitmapCommit(out.toByteArray()));
-						
+						new Commands.SendBitmapCmd(out.toByteArray()));
 					}
 				}.start();
 			}

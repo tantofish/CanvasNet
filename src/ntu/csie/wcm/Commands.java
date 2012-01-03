@@ -149,14 +149,14 @@ public class Commands  implements java.io.Serializable {
 	}
 	
 	
-	public static class SendBitmapCommit  extends BaseCmd implements java.io.Serializable
+	public static class SendBitmapCmd  extends BaseCmd implements java.io.Serializable
 	{
 		private static final long serialVersionUID = 1L;
 
 		private byte[] array;
 		
 		
-		public SendBitmapCommit(byte[] bmp) //true for Undo, false for Redo
+		public SendBitmapCmd(byte[] bmp) //true for Undo, false for Redo
 		{
 			super(6);
 			
