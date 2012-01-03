@@ -96,7 +96,7 @@ public class MySocket {
 							Log.d("proj" , "add it: " + c.sck.toString());
 							
 							
-							//ChengYan: tell all client exist client
+							//ChengYan: tell host all exist client
 
 							
 							list.elementAt(list.size()-1).RunThread = new Thread(){

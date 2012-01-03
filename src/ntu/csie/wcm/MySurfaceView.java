@@ -1,5 +1,6 @@
 package ntu.csie.wcm;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -455,7 +456,7 @@ public class MySurfaceView extends View {
 			break;
 		//ChengYan: Receive BitMap	
 		case 6:
-			Commands.SendBitmapCommit SBC = (Commands.SendBitmapCommit) cmd;
+			Commands.SendBitmapCmd SBC = (Commands.SendBitmapCmd) cmd;
 			Bitmap tempBmp = BitmapFactory.decodeByteArray(SBC.getBytearray(), 0, SBC.getBytearray().length);
 			//drawImgOntoCanvas(tempBmp);
 			Bitmap bmp = tempBmp.copy(Bitmap.Config.ARGB_8888, true);
@@ -469,6 +470,23 @@ public class MySurfaceView extends View {
 			Commands.ClientConnectCmd CliCC  = (Commands.ClientConnectCmd) cmd;
 			
 			drawStateMap.put(CliCC.getFrom(), new ClientDrawState());
+			
+			
+			//ChengYan: send current state to all client
+			//ChangYan TODO:should only send to the one just connect in, instead of all client
+			new Thread(){
+				public void run(){
+					//mBitmap
+					//ChengYan: send bitmap to remote
+					ByteArrayOutputStream out = new ByteArrayOutputStream();
+					mBitmap.compress(Bitmap.CompressFormat.PNG, 80, out);
+					getSocket().send(
+						new Commands.SendBitmapCmd(out.toByteArray()));
+					
+					
+				}
+			}.start();
+			
 		    break;
 		//receive broadcastid from server
 		case 8:

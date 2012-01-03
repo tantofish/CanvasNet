@@ -8,6 +8,8 @@
         <ImageButton android:id="@+id/clientBtn" android:src="@drawable/bt_client" android:layout_width="60pt" android:layout_height="80dp" android:background="@android:color/transparent" android:scaleType="fitCenter" android:layout_alignParentBottom="true" android:layout_alignParentRight="true" android:layout_marginRight="18dp" android:layout_marginBottom="24dp"></ImageButton>
         <ImageButton android:id="@+id/hostBtn" android:src="@drawable/bt_host" android:layout_width="100pt" android:layout_height="wrap_content" android:background="@android:color/transparent" android:scaleType="fitCenter" android:layout_alignParentTop="true" android:layout_alignParentLeft="true" android:layout_marginLeft="20dp" android:layout_marginTop="60dp"></ImageButton>
         <ImageView android:layout_height="fill_parent" android:scaleType="fitXY" android:src="@drawable/cover" android:id="@+id/cover" android:layout_width="wrap_content" android:clickable="true"></ImageView>
+
+    
     </RelativeLayout>
 
 

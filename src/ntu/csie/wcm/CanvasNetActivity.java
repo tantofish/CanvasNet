@@ -39,12 +39,12 @@ public class CanvasNetActivity extends Activity {
         transition = (TransitionDrawable) res.getDrawable(R.drawable.cover_transition);
         mCover = (ImageView)findViewById(R.id.cover);
         mCover.setImageDrawable(transition);
-        transition.startTransition(2000);
+        transition.startTransition(1500);
 
        
         startCoverThread(res);
        
-		// ChengYan: thread for cover animation
+		
 
         
         
@@ -100,26 +100,11 @@ public class CanvasNetActivity extends Activity {
 		});
 
 		
-		
-		/*
-		imgLoaderActivityJumper
-		     = (Button) findViewById(R.id.button2);
-		imgLoaderActivityJumper.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-
-				Intent intent = new Intent();
-				intent.setClass(CanvasNetActivity.this, ImgLoaderActivity.class);
-				Bundle bundle = new Bundle();
-				intent.putExtras(bundle);
-				
-				startActivity(intent);
-			}
-
-		});*/
 
 	}
 	
 	
+	// ChengYan: thread for cover animation
 	private void startCoverThread(final Resources res)
 	{
 		
@@ -128,7 +113,7 @@ public class CanvasNetActivity extends Activity {
 			public void run() {
 				// TODO Auto-generated method stub
 				try {
-					sleep(2100);
+					sleep(1600);
 					
 					runOnUiThread(new Runnable() {
 						public void run() {
