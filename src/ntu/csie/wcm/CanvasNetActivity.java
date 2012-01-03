@@ -54,7 +54,10 @@ public class CanvasNetActivity extends Activity {
         mCover.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 			//	transition = null;
+				
+				mCover.setClickable(false);
 				mCover.setVisibility(View.INVISIBLE);
+			
 			}
 		});
         
@@ -123,15 +126,18 @@ public class CanvasNetActivity extends Activity {
 
 						}
 					});
-					sleep(2000);
+					sleep(1800);
+				    if(!mCover.isClickable())
+				    	return;
 					
 					runOnUiThread(new Runnable() {
 						public void run() {
 
 							Animation fadeout = AnimationUtils.loadAnimation(CanvasNetActivity.this, R.anim.cover_fadeout);
 							mCover.startAnimation(fadeout);
-							
+							mCover.setClickable(false);
 							mCover.setVisibility(View.INVISIBLE);
+							
 							
 							
 
