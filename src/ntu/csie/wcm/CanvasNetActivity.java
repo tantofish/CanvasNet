@@ -78,7 +78,8 @@ public class CanvasNetActivity extends Activity {
 				if(event.getAction() == MotionEvent.ACTION_DOWN){
 					HostStartBtn.setImageResource(R.drawable.bt_host_down);
 				}else if(event.getAction() == MotionEvent.ACTION_UP){
-					HostStartBtn.setImageResource(R.drawable.bt_host);
+					//HostStartBtn.setImageResource(R.drawable.bt_host);
+					HostStartBtn.setImageDrawable(null);
 				}
 				return false;
 			}
@@ -98,7 +99,8 @@ public class CanvasNetActivity extends Activity {
 				if(event.getAction() == MotionEvent.ACTION_DOWN){
 					ClientStartBtn.setImageResource(R.drawable.bt_client_down);
 				}else if(event.getAction() == MotionEvent.ACTION_UP){
-					ClientStartBtn.setImageResource(R.drawable.bt_client);
+					//ClientStartBtn.setImageResource(R.drawable.bt_client);
+					ClientStartBtn.setImageDrawable(null);
 				}
 				return false;
 			}
