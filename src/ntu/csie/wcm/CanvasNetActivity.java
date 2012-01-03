@@ -12,6 +12,8 @@ import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -51,7 +53,7 @@ public class CanvasNetActivity extends Activity {
 		//ChengYan cover click listener
         mCover.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				transition = null;
+			//	transition = null;
 				mCover.setVisibility(View.INVISIBLE);
 			}
 		});
@@ -105,40 +107,39 @@ public class CanvasNetActivity extends Activity {
 	
 	
 	// ChengYan: thread for cover animation
-	private void startCoverThread(final Resources res)
-	{
-		
+	private void startCoverThread(final Resources res) {
+
 		Thread tmp = new Thread() {
-        
+
 			public void run() {
 				// TODO Auto-generated method stub
 				try {
 					sleep(1600);
+
+					runOnUiThread(new Runnable() {
+						public void run() {
+
+							transition.reverseTransition((1500));
+
+						}
+					});
+					sleep(2000);
 					
 					runOnUiThread(new Runnable() {
 						public void run() {
-					transition = (TransitionDrawable) res.getDrawable(R.drawable.cover_transition_post);
-					mCover.setImageDrawable(transition);
 
-							transition.startTransition(1000);
+							Animation fadeout = AnimationUtils.loadAnimation(CanvasNetActivity.this, R.anim.cover_fadeout);
+							mCover.startAnimation(fadeout);
+							
+							mCover.setVisibility(View.INVISIBLE);
+							
+							
+
 						}
 					});
-							
-							
-
-					while (transition != null) {
-						
-						
-						sleep(1200);
-
-						runOnUiThread(new Runnable() {
-							public void run() {
-								if(transition != null)
-								transition.reverseTransition((1000));
-							}
-						});
-						
-					}
+					
+					
+				
 
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -148,7 +149,6 @@ public class CanvasNetActivity extends Activity {
 		};
 		tmp.start();
 	}
-	
 	
 	@Override
 	public void onBackPressed() {
