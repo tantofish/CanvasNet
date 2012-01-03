@@ -274,12 +274,18 @@ public class MyCanvas extends Activity{
 				new Thread(){
 					public void run(){
 						Bitmap bm = mImageEditingView.ok(mView.getBitmap());
+						
+						Bitmap bg = Bitmap.createBitmap(bm.getWidth(), bm.getHeight(), Bitmap.Config.ARGB_8888);
+						Canvas tmpCan = new Canvas(bg);
+						tmpCan.drawColor(Color.WHITE);
+						tmpCan.drawBitmap(bm, 0, 0, null);
+						
+					
 						//ChengYan: send bitmap to remote
 						ByteArrayOutputStream out = new ByteArrayOutputStream();
-						bm.compress(Bitmap.CompressFormat.PNG, 80, out);
+						bg.compress(Bitmap.CompressFormat.JPEG, 80, out);
 						mView.getSocket().send(
 							new Commands.SendBitmapCommit(out.toByteArray()));
-						mView.pushBuffer(bm);
 						
 					}
 				}.start();
@@ -368,8 +374,7 @@ public class MyCanvas extends Activity{
 		if (requestCode == 1 && resultCode == RESULT_OK){
 			Bundle b = data.getExtras();
 			String path = b.getString("imgPath");
-	        Bitmap background = Bitmap.createBitmap(mView.getBitmap());
-	        mImageEditingView.startEditing(path, background);
+	        mImageEditingView.startEditing(path);
 	        
 	        
 	        /*

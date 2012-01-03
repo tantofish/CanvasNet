@@ -39,6 +39,10 @@ public class ImgLoaderActivity extends Activity {
 	int w, h;
 	String pathString;
 	
+	ImageView iv[];
+	
+	Bitmap bmPt;
+	Bitmap bmBuffer;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -67,6 +71,11 @@ public class ImgLoaderActivity extends Activity {
 				folderIndex = position;
 				imageIndex = 0;
 				g_photo.setAdapter((SpinnerAdapter) new ImageAdapter(context));
+				
+				iv = new ImageView[7];
+				for(int i = 0 ; i < 7 ; i++){
+					iv[i] = (ImageView) g_photo.getChildAt(i);
+				}
 			}
 		});
 
@@ -76,24 +85,27 @@ public class ImgLoaderActivity extends Activity {
 
 				pathString = files.get(folderIndex)[position].getPath();
 				
+				/*for(int i = 0 ; i < 7 ; i++){
+					iv[i] = (ImageView) g_photo.getChildAt(i);
+					iv[i].setImageResource(R.drawable.folder);
+				}*/
 				
-				ImageView iv = (ImageView) g_photo.getChildAt(position);
-				Log.d("tantofish", "Position = "+position);
+				
+				//Log.d("tantofish", "Position = "+position);
 				//ImageView iv = (ImageView) g_photo.getSelectedView();
 				//if(iv == null) iv = new ImageView(context); 
 				
-				iv.setImageResource(R.drawable.folder);
+				
 				
 				BitmapFactory.Options opts = new BitmapFactory.Options();
 				opts.inJustDecodeBounds = true;
 				BitmapFactory.decodeFile(pathString, opts);
 				
-				opts.inSampleSize = computeSampleSize(opts, -1, 512*512);
+				opts.inSampleSize = computeSampleSize(opts, -1, 480*480);
 				opts.inJustDecodeBounds = false;
-				try {
-					Bitmap bmp = BitmapFactory.decodeFile(pathString, opts);
-					image.setImageBitmap(bmp);
-					
+				try {	
+					bmBuffer = BitmapFactory.decodeFile(pathString, opts);
+					image.setImageBitmap(bmBuffer);
 				} catch (OutOfMemoryError err) {
 				}
 				
@@ -151,12 +163,12 @@ public class ImgLoaderActivity extends Activity {
 
 		
 		public View getView(final int position, View convertView, ViewGroup parent) {
-			//Log.d("tantofish","Folder Index: "+folderIndex+"Position"+position);
+			Log.d("tantofish","Folder Index: "+folderIndex+"Position"+position);
 			final ImageView i = new ImageView(mContext);
 			if (imageIndex == -1)
 				i.setImageResource(folderImageId);
 			else{
-				/*i.setImageBitmap(null);
+				i.setImageBitmap(null);
 				new Thread(){
 					public void run(){
 						String p = files.get(folderIndex)[position].getPath();
@@ -167,14 +179,16 @@ public class ImgLoaderActivity extends Activity {
 
 						opts.inSampleSize = computeSampleSize(opts, -1, 100*100);
 						opts.inJustDecodeBounds = false;
-						opts.inSampleSize = 100;
+						//opts.inSampleSize = 100;
 						try {
-							Bitmap bmp = BitmapFactory.decodeFile(p, opts);
-							i.setImageBitmap(bmp);
+							bmBuffer = BitmapFactory.decodeFile(p, opts);
+							i.setImageBitmap(bmBuffer);
 						    } catch (OutOfMemoryError err) {
 						}
 					}
-				}.run();*/
+				}.run();
+				
+				
 				/*try{
 					Bitmap bm = bmFiles.get(folderIndex).get(position);
 					i.setImageBitmap(bm);
@@ -185,6 +199,7 @@ public class ImgLoaderActivity extends Activity {
 			
 			i.setScaleType(ImageView.ScaleType.FIT_XY);
 			i.setLayoutParams(new Gallery.LayoutParams(120, 120));
+		
 			backgroundType(i);
 			return i;
 		}
@@ -271,7 +286,7 @@ public class ImgLoaderActivity extends Activity {
 						opts.inJustDecodeBounds = true;
 						BitmapFactory.decodeFile(p, opts);
 
-						opts.inSampleSize = computeSampleSize(opts, -1, 80*80);
+						opts.inSampleSize = computeSampleSize(opts, -1, 100*100);
 						opts.inJustDecodeBounds = false;
 						try {
 							Bitmap bmp = BitmapFactory.decodeFile(p, opts);

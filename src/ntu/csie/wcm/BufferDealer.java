@@ -47,9 +47,10 @@ public class BufferDealer {
 		if (mBitmaps.size() > BITMAP_CACHE_SIZE)
 			mBitmaps.remove(0).recycle();
 		
+		
 
 		
-		mBitmaps.add(bmap);
+		mBitmaps.add(Bitmap.createBitmap(bmap));
 
 	}
 	

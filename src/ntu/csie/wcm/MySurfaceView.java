@@ -141,7 +141,7 @@ public class MySurfaceView extends View {
 		mWidth = w;
 		mHeight = h;
 		mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
-		mBufferDealer.saveBitmap(Bitmap.createBitmap(mBitmap));
+		mBufferDealer.saveBitmap(mBitmap);
 	
 		mCanvas = new Canvas(mBitmap);
 
@@ -149,8 +149,8 @@ public class MySurfaceView extends View {
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		// canvas.drawColor(0xFFAAAAAA);
-	
+		//canvas.drawColor(0xFFFEFEFE);
+		
 		canvas.drawColor(Color.WHITE);
 
 		canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
@@ -224,7 +224,7 @@ public class MySurfaceView extends View {
 		mCanvas.drawPath(p, drawStateMap.get(key).getPaint());
 				
 		//ChengYan: save current bitmap
-		mBufferDealer.onTouchStep(Bitmap.createBitmap(mBitmap),mCanvas);
+		mBufferDealer.onTouchStep(mBitmap, mCanvas);
 		
 		p.reset();
 		
@@ -233,23 +233,29 @@ public class MySurfaceView extends View {
 	}
 	
 	public void pushBuffer(Bitmap bm){
-		mBufferDealer.onTouchStep(Bitmap.createBitmap(bm),mCanvas);
+		try{
+		mBufferDealer.onTouchStep(bm, mCanvas);
+		}catch(Error e){
+			e.printStackTrace();
+		}
 	}
 	
 
 
 	/* ChengYan: Undo function */ 
 	public void undo() {
-			mBitmap = Bitmap.createBitmap(mBufferDealer.getP());
-			mBufferDealer.undoing();
-			//mCanvas = new Canvas(mBitmap);
-			mCanvas = new Canvas(mBitmap);
+		mBitmap.recycle();
+		mBitmap = Bitmap.createBitmap(mBufferDealer.getP());
+		mBufferDealer.undoing();
+		//mCanvas = new Canvas(mBitmap);
+		mCanvas = new Canvas(mBitmap);
 
-			invalidate();
+		invalidate();
 	}
 
 	/* ChengYan: Redo function */
 	public void redo() {
+		mBitmap.recycle();
 		mBitmap = Bitmap.createBitmap(mBufferDealer.getN());
 		mCanvas = new Canvas(mBitmap);
 
@@ -260,28 +266,11 @@ public class MySurfaceView extends View {
 	 * Draw image onto the canvas when user load it from the gallery 
 	 * ( which is stored in external storage)
 	 * 
-	 * 
 	 * ChengYan: is this function still need?
+	 * 
+	 * Tantofish: no, i delete it ha.
 	 */
-	public void drawImgOntoCanvas(Bitmap img) {	
-
-		
-        
-		
-		int width  = img.getWidth();
-        int height = img.getHeight();
-        
-      
-        		
-		for(int j = 0 ; j < height ; j++)
-			for(int i = 0 ; i < width ; i++)
-				mBitmap.setPixel(i, j, img.getPixel(i, j));
-		mCanvas = new Canvas(mBitmap);
-		
-
-		invalidate();
-
-	}
+	
 	
 
 	//ChengYan: pop dialog to confirm the action 
@@ -315,8 +304,9 @@ public class MySurfaceView extends View {
 	public void DoClearCanvas()
 	{
 		mBufferDealer.clear();
+		mBitmap.recycle();
 		mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
-		mBufferDealer.saveBitmap(Bitmap.createBitmap(mBitmap));
+		mBufferDealer.saveBitmap(mBitmap);
 		
 		mCanvas = new Canvas(mBitmap);
 		
@@ -372,7 +362,7 @@ public class MySurfaceView extends View {
 	public void setBitmap(Bitmap bm){
 		mBitmap = bm;
 		mCanvas = new Canvas(mBitmap);
-
+		
 		invalidate();
 	}
 	/* tantofish end */
@@ -458,6 +448,7 @@ public class MySurfaceView extends View {
 			Commands.SendBitmapCommit SBC = (Commands.SendBitmapCommit) cmd;
 			Bitmap tempBmp = BitmapFactory.decodeByteArray(SBC.getBytearray(), 0, SBC.getBytearray().length);
 			//drawImgOntoCanvas(tempBmp);
+			
 			Bitmap bmp = tempBmp.copy(Bitmap.Config.ARGB_8888, true);
 			setBitmap(bmp);
 			pushBuffer(bmp);
@@ -473,22 +464,15 @@ public class MySurfaceView extends View {
 		//receive broadcastid from server
 		case 8:
 			Commands.ServerBroadcastClientCmd SBCC = (Commands.ServerBroadcastClientCmd) cmd;
-			
-			for(String s : SBCC.getClientIDS())
-			{
-				
-				//Log.e("CY", "broadcasted key" + s);
-			 if(!drawStateMap.containsKey(s))
-			 {
-				 
-				
-				 drawStateMap.put(s, new ClientDrawState());
-		 	 }
-			}
-			
-			
 
-			
+			for (String s : SBCC.getClientIDS()) {
+
+				// Log.e("CY", "broadcasted key" + s);
+				if (!drawStateMap.containsKey(s)) {
+
+					drawStateMap.put(s, new ClientDrawState());
+				}
+			}
 		}
 	}
 }

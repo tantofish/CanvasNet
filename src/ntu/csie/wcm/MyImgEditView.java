@@ -96,7 +96,7 @@ public class MyImgEditView extends View {
 		canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
 	}
 
-	public void startEditing(String path, Bitmap background){
+	public void startEditing(String path){
         
 		BitmapFactory.Options opts = new BitmapFactory.Options();
 		opts.inJustDecodeBounds = true;
@@ -260,6 +260,7 @@ public class MyImgEditView extends View {
 	 */
 	public Bitmap ok(Bitmap bm){
 		
+		
 		Matrix matrix = new Matrix();
         matrix.postRotate(stackAngle);
         
@@ -291,6 +292,7 @@ public class MyImgEditView extends View {
         mCanvas = new Canvas(mBitmap);
         
         mCanvas.drawBitmap(rotatedBM, null, rect, mBitmapPaint);
+        
 		invalidate();
         
 		((MyCanvas)mContext).setCanvasViewMode(MyCanvas.VIEWMODE_CANVAS);
@@ -313,24 +315,27 @@ public class MyImgEditView extends View {
 		Bitmap bmOK = null;
 		try{
 			bmOK = Bitmap.createBitmap(srcImg, 0, 0, srcImg.getWidth(), srcImg.getHeight(), matrix, true);
+			return bmOK;
         }catch(OutOfMemoryError err){
-        	matrix.postScale(0.8f, 0.8f);
-        	try{
-        		bmOK = Bitmap.createBitmap(srcImg, 0, 0, srcImg.getWidth(), srcImg.getHeight(), matrix, true);
-            }catch(OutOfMemoryError err2){
-            	matrix.postScale(0.8f, 0.8f);
-            	try{
-            		bmOK = Bitmap.createBitmap(srcImg, 0, 0, srcImg.getWidth(), srcImg.getHeight(), matrix, true);
-                }catch(OutOfMemoryError err3){
-                	matrix.postScale(0.8f, 0.8f);
-                	try{
-                		bmOK = Bitmap.createBitmap(srcImg, 0, 0, srcImg.getWidth(), srcImg.getHeight(), matrix, true);
-                    }catch(OutOfMemoryError err4){
-                    	
-                    }
-                }
-            }
+        	return carefully( srcImg,  matrix, 0.8f);
         }
-	    return bmOK;
+	    
+	}
+	private static Bitmap carefully(Bitmap srcImg, Matrix matrix, float factor){
+		Bitmap bmOK = null;
+		matrix.postScale(factor, factor);
+		Log.e("TantofishException", "createBitmapCarefully scale factor = " + factor);
+    	try{
+    		bmOK = Bitmap.createBitmap(srcImg, 0, 0, srcImg.getWidth(), srcImg.getHeight(), matrix, true);
+    		return bmOK;
+        }catch(OutOfMemoryError err2){
+        	return carefully( srcImg,  matrix, factor*0.8f);
+        }
+    	 
+	}
+	
+	public void clear(){
+		srcImg.recycle();
+		mBitmap.recycle();
 	}
 }
