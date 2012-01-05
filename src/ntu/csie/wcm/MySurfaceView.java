@@ -45,7 +45,7 @@ public class MySurfaceView extends View {
 	private Canvas mCanvas;
 	//ChengYan: mRemotePath for remote drawing action
 	private Path mPath,mRemotePath;
-	private Paint mBitmapPaint;
+	public Paint mBitmapPaint;
 	private int mWidth, mHeight;
 
 	// tantofish : test for multitouch
@@ -152,12 +152,12 @@ public class MySurfaceView extends View {
 	protected void onDraw(Canvas canvas) {
 		//canvas.drawColor(0xFFFEFEFE);
 		
-		canvas.drawColor(Color.WHITE);
+		//canvas.drawColor(Color.WHITE);
       //  Log.e("CYY", Integer.toString(mBitmap.getPixel(5, 5)));
 		canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
 		
 		//ChengYan: draw local path
-		canvas.drawPath(mPath,mPaint);
+	//	canvas.drawPath(mPath,mPaint);
 		//ChengYan: draw remote path
 
 		for(Map.Entry<String,ClientDrawState> entry :drawStateMap.entrySet())
@@ -326,17 +326,17 @@ public class MySurfaceView extends View {
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			mMySocket.send(new Commands.SendPointCmd(x, y, 1)); 	
-			touch_start(x, y,mPath,mMySocket.idFromIP); //ChengYan: pNumber = 0 means use mPath's mX,mY
+			touch_start(x, y,drawStateMap.get(mMySocket.idFromIP).getPath(),mMySocket.idFromIP); 
 			invalidate();
 			break;
 		case MotionEvent.ACTION_MOVE:
 			mMySocket.send(new Commands.SendPointCmd(x, y, 2)); 
-			touch_move(x, y,mPath,mMySocket.idFromIP);
+			touch_move(x, y,drawStateMap.get(mMySocket.idFromIP).getPath(),mMySocket.idFromIP);
 			invalidate();
 			break;
 		case MotionEvent.ACTION_UP:
 			mMySocket.send(new Commands.SendPointCmd(x, y, 3)); 
-			touch_up(mPath,mMySocket.idFromIP);
+			touch_up(drawStateMap.get(mMySocket.idFromIP).getPath(),mMySocket.idFromIP);
 			invalidate();
 			
 			if(isMultitouching) isMultitouching = false;
@@ -450,7 +450,22 @@ public class MySurfaceView extends View {
 			Bitmap tempBmp = BitmapFactory.decodeByteArray(SBC.getBytearray(), 0, SBC.getBytearray().length);
 			//drawImgOntoCanvas(tempBmp);
 			
-			Bitmap bmp = tempBmp.copy(Bitmap.Config.ARGB_8888, true);
+			//Bitmap bmp = tempBmp.copy(Bitmap.Config.ARGB_8888, true);
+			
+			//temp
+			Bitmap bmp =  Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+			
+			int [] pixels = new int[mWidth * mHeight];
+			tempBmp.getPixels(pixels, 0, mWidth, 0, 0, tempBmp.getWidth(), tempBmp.getHeight());
+			bmp.setPixels(pixels, 0, mWidth, 0, 0, tempBmp.getWidth(), tempBmp.getHeight());
+			/*for(int j = 0 ; j < mHeight ; j++)
+				for(int i = 0 ; i < mWidth ; i++){
+					
+					bmp.setPixel(i, j, tempBmp.getPixel(i, j));
+				}*/
+			
+			
+			
 			setBitmap(bmp);
 			pushBuffer(bmp);
 			tempBmp.recycle();
@@ -491,6 +506,24 @@ public class MySurfaceView extends View {
 					drawStateMap.put(s, new ClientDrawState());
 				}
 			}
+			break;
+			
+		case 9:
+			
+			Commands.UseEraserCmd UEC = (Commands.UseEraserCmd) cmd;
+			
+			if(UEC.getIsUsing())
+			drawStateMap.get(UEC.getFrom()).useEraser();
+			else
+				drawStateMap.get(UEC.getFrom()).stopUseEraser() ;
+			break;
+			
+			
+			
+			
+			
+			
+			
 		}
 	}
 }

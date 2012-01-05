@@ -2,10 +2,13 @@ package ntu.csie.wcm;
 
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 
 public class ClientDrawState {
 	private Path mPath;
-	private Paint mPaint;
+	private Paint mPaint,mCurrentPaint;
+	static private Paint mEraser;
 	public float mX,mY;
 	
 	public ClientDrawState()
@@ -18,6 +21,19 @@ public class ClientDrawState {
 		mPaint.setStrokeJoin(Paint.Join.ROUND);
 		mPaint.setStrokeCap(Paint.Cap.ROUND);
 		mPaint.setStrokeWidth(12);
+		
+		mEraser = new Paint();
+		mEraser.setAntiAlias(true);
+		mEraser.setDither(true);
+		mEraser.setARGB(0, 0, 0, 0);
+		mEraser.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
+		mEraser.setStyle(Paint.Style.STROKE);
+		mEraser.setStrokeJoin(Paint.Join.ROUND);
+		mEraser.setStrokeCap(Paint.Cap.ROUND);
+		mEraser.setStrokeWidth(15);
+		
+		mCurrentPaint = mPaint;
+		
 		mPath = new Path();
 	}
 	
@@ -30,9 +46,18 @@ public class ClientDrawState {
     
     public Paint getPaint()
     {
-    	return mPaint;
+    	return mCurrentPaint;
     		
     }
 
+    public void useEraser()
+    {
+    	mCurrentPaint = mEraser;
+    }
+    
+    public void stopUseEraser()
+    {
+    	mCurrentPaint = mPaint;
+    }
 
 }

@@ -300,8 +300,9 @@ public class MySocket {
 				socket = null;
 			}
 			Iterator<Connection> it = list.iterator();
-			while(it.hasNext()){
-				Connection tempc = it.next();
+			while(list.size()!=0){
+				
+				Connection tempc = list.lastElement();
 				tempc.close();
 			}
 			list.clear();

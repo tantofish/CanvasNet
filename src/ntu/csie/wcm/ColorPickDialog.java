@@ -52,7 +52,7 @@ public class ColorPickDialog extends Dialog {
             mPaintToChange = paint;
             
             mColors = new int[] {
-                0xFFFF0000, 0xFFFF00FF, 0xFF0000FF, Color.BLACK,0xFF00FFFF, 0xFF00FF00,
+                0xFFFF0000, 0xFFFF00FF, 0xFF0000FF,  Color.WHITE,Color.BLACK,0xFF00FFFF, 0xFF00FF00,
                 0xFFFFFF00, 0xFFFF0000
             };
             Shader s = new SweepGradient(0, 0, mColors, null);

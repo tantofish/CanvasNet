@@ -7,13 +7,15 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
-import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -153,6 +155,8 @@ public class MyCanvas extends Activity{
 		CcBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
+				mView.drawStateMap.get(mMySocket.idFromIP).stopUseEraser();
+				mMySocket.send(new Commands.UseEraserCmd(false));
 				useColorPicker();
 							
 			}
@@ -175,8 +179,9 @@ public class MyCanvas extends Activity{
 				// Perform action on click
 				//mView.getPaint().setAlpha(0);
 				//mView.getPaint().setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
-		     	mView.getPaint().setColor(Color.WHITE);
-				mMySocket.send(new Commands.ChangeColorCmd(mView.getPaint().getColor(),mView.getPaint().getStrokeWidth()));
+		     	mView.drawStateMap.get(mMySocket.idFromIP).useEraser();
+		     	//mView.getPaint().setColor(Color.WHITE);
+				mMySocket.send(new Commands.UseEraserCmd(true));
 			}
 		});
 		// tantofish: this will let the button change color when clicked
@@ -293,8 +298,26 @@ public class MyCanvas extends Activity{
 						
 						Bitmap bg = Bitmap.createBitmap(bm.getWidth(), bm.getHeight(), Bitmap.Config.ARGB_8888);
 						Canvas tmpCan = new Canvas(bg);
-						tmpCan.drawColor(Color.WHITE);
-						tmpCan.drawBitmap(bm, 0, 0, null);
+						
+						
+						//tmpCan.drawColor(Color.TRANSPARENT);
+					
+						Resources res = getResources();
+						
+					
+						
+						Rect rect   = new Rect();
+				        rect.left   = 0;    
+				        rect.right  = mView.getWidth();
+				        rect.top    = 0;
+				        rect.bottom = mView.getHeight();
+				        
+				        Bitmap bgpaper = BitmapFactory.decodeResource(res, R.drawable.background_paper);
+						
+						tmpCan.drawBitmap(bgpaper, null, rect, mView.mBitmapPaint);
+						
+						
+						tmpCan.drawBitmap(bm, 0, 0, mView.mBitmapPaint);
 						
 					
 						//ChengYan: send bitmap to remote
@@ -303,8 +326,10 @@ public class MyCanvas extends Activity{
 						mView.getSocket().send(
 						new Commands.SendBitmapCmd(out.toByteArray()));
 						
+
 						bg.recycle();
 						System.gc();
+
 					}
 				}.start();
 			}

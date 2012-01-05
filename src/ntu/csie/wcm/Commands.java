@@ -205,4 +205,24 @@ public class Commands  implements java.io.Serializable {
 		
 	}
 
+	
+	public static class UseEraserCmd  extends BaseCmd implements java.io.Serializable
+	{
+		private static final long serialVersionUID = 1L;
+
+		private boolean isUsing;
+		public UseEraserCmd(boolean b) //true for Undo, false for Redo
+		{
+			super(9);
+			isUsing = b;
+		}
+		
+		public boolean getIsUsing()
+		{
+			return isUsing;
+		}
+
+		
+	}
+	
 }
