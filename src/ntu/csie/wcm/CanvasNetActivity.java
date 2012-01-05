@@ -4,6 +4,7 @@ package ntu.csie.wcm;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,14 +24,15 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class CanvasNetActivity extends Activity {
 	/** Called when the activity is first created. */
-
-
-	ImageButton HostStartBtn,ClientStartBtn; 
+ 
 	Button aboutus;
+	ImageButton HostStartBtn,ClientStartBtn,mQRcodeBtn; 
+
 	ImageView mCover;
 	TransitionDrawable transition;
 	ScrollView sview;
@@ -69,6 +71,22 @@ public class CanvasNetActivity extends Activity {
 				mCover.setClickable(false);
 				mCover.setVisibility(View.INVISIBLE);
 			
+			}
+		});
+        
+        
+        //ChengYan: title animation
+        ImageView title = (ImageView) findViewById(R.id.title);
+        Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(this, R.anim.title_canvasnet_animation);
+        title.startAnimation(hyperspaceJumpAnimation);
+        
+        
+        //ChengYan: QR code button
+        mQRcodeBtn = (ImageButton)findViewById(R.id.QRcodeBtn);
+        mQRcodeBtn.setAlpha(180);
+        mQRcodeBtn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				 openQRCodeDialog();
 			}
 		});
         
@@ -129,7 +147,8 @@ public class CanvasNetActivity extends Activity {
 		HostStartBtn.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-				openDialog(new HostPositiveListener(),"Using Host",true);
+				//openDialog(new HostPositiveListener(),"Using Host",true);
+				onClickHost();
 			}
 		});
 		// tantofish : chenge button image when click
@@ -139,8 +158,8 @@ public class CanvasNetActivity extends Activity {
 				if(event.getAction() == MotionEvent.ACTION_DOWN){
 					HostStartBtn.setImageResource(R.drawable.bt_host_down);
 				}else if(event.getAction() == MotionEvent.ACTION_UP){
-					//HostStartBtn.setImageResource(R.drawable.bt_host);
-					HostStartBtn.setImageDrawable(null);
+					HostStartBtn.setImageResource(R.drawable.bt_host);
+					//HostStartBtn.setImageDrawable(null);
 				}
 				return false;
 			}
@@ -160,8 +179,8 @@ public class CanvasNetActivity extends Activity {
 				if(event.getAction() == MotionEvent.ACTION_DOWN){
 					ClientStartBtn.setImageResource(R.drawable.bt_client_down);
 				}else if(event.getAction() == MotionEvent.ACTION_UP){
-					//ClientStartBtn.setImageResource(R.drawable.bt_client);
-					ClientStartBtn.setImageDrawable(null);
+					ClientStartBtn.setImageResource(R.drawable.bt_client);
+					//ClientStartBtn.setImageDrawable(null);
 				}
 				return false;
 			}
@@ -239,15 +258,20 @@ public class CanvasNetActivity extends Activity {
 			// TODO Auto-generated method stub
 			super.onClick(dialog, id);
 			
-			
-			Intent intent = new Intent();
-			intent.setClass(CanvasNetActivity.this, MyCanvas.class);
-			Bundle bundle = new Bundle();
-			bundle.putBoolean("isServer", true);
-			intent.putExtras(bundle);
-			
-			startActivity(intent);
+			 onClickHost();
+
 		}
+	}
+	
+	private void onClickHost()
+	{
+		Intent intent = new Intent();
+		intent.setClass(CanvasNetActivity.this, MyCanvas.class);
+		Bundle bundle = new Bundle();
+		bundle.putBoolean("isServer", true);
+		intent.putExtras(bundle);
+		
+		startActivity(intent);
 	}
 
 	private EditText input;
@@ -291,7 +315,7 @@ public class CanvasNetActivity extends Activity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
        
         builder.setMessage(message);
-        builder.setCancelable(false);
+       // builder.setCancelable(false);
         if(!isHost)
         {
         	// Set an EditText view to get user input 
@@ -314,6 +338,19 @@ public class CanvasNetActivity extends Activity {
        AlertDialog alert = builder.create();
      
         alert.show();
+		
+	}
+	
+	private void openQRCodeDialog()
+	{
+		
+		LayoutInflater inflater = LayoutInflater.from(CanvasNetActivity.this);  
+        final View textEntryView = inflater.inflate(R.layout.qrcode_dialog, null);  
+        final ProgressDialog.Builder dialog = new ProgressDialog.Builder(CanvasNetActivity.this); 
+      //  dialog.setCancelable(false);  
+        dialog.setTitle("Get Canvas.NET from Android Market!!");  
+        dialog.setView(textEntryView);
+        dialog.show();
 		
 	}
 	
