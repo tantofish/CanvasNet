@@ -15,11 +15,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,16 +31,20 @@ public class CanvasNetActivity extends Activity {
 	/** Called when the activity is first created. */
 
 
+
 	ImageButton HostStartBtn;
 	ImageButton ClientStartBtn;
 	ImageButton mQRcodeBtn; 
 	ImageButton mAboutBtn;
-	
 	ImageView mCover;
 	TransitionDrawable transition;
-	
+	ScrollView sview;
+	LinearLayout llayout;
+	Thread tmp;
+	int counter;
+	int bottom;
 	//Button imgLoaderActivityJumper; // tantofish:temporary use.
-
+	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -50,8 +58,8 @@ public class CanvasNetActivity extends Activity {
         mCover = (ImageView)findViewById(R.id.cover);
         mCover.setImageDrawable(transition);
         transition.startTransition(1500);
-
-       
+        
+        if(sview == null) Log.d("proj", "null!!!");
         startCoverThread(res);
        
 		
@@ -70,6 +78,12 @@ public class CanvasNetActivity extends Activity {
 		});
         
         
+        //ChengYan: title animation
+        ImageView title = (ImageView) findViewById(R.id.title);
+        Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(this, R.anim.title_canvasnet_animation);
+        title.startAnimation(hyperspaceJumpAnimation);
+        
+        
         //ChengYan: QR code button
         mQRcodeBtn = (ImageButton)findViewById(R.id.QRcodeBtn);
         mQRcodeBtn.setAlpha(180);
@@ -82,12 +96,6 @@ public class CanvasNetActivity extends Activity {
         //Tantpfish: about us button (image is a tag)
         mAboutBtn = (ImageButton)findViewById(R.id.aboutBtn);
         
-        mAboutBtn.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				 gotoAboutUsActivity();
-				 
-			}
-		});
         mAboutBtn.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -96,22 +104,64 @@ public class CanvasNetActivity extends Activity {
 				}else if(event.getAction() == MotionEvent.ACTION_UP){
 					
 				}else if(event.getAction() == MotionEvent.ACTION_MOVE){
-					/*float x = event.getX();
-					float y = event.getY();
-					Log.e("tantofish", "event touch(x,y):" + "("+ x +", " + y + ")");
-					int t = mAboutBtn.getTop() + 1;
-					int l = mAboutBtn.getLeft();
-					int r = mAboutBtn.getRight();
-					int b = mAboutBtn.getBottom()+1;
-					 
-					mAboutBtn.layout(l, t, r, b);*/
+					
 				}
 				return false;
 			}
 		});
         
 
-
+        //About us functionality
+        mAboutBtn.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				LayoutInflater inflater = LayoutInflater.from(CanvasNetActivity.this);
+				View login_view = inflater.inflate(R.layout.aboutus,null);
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(CanvasNetActivity.this);
+				builder.setView(login_view);
+				AlertDialog dialog = builder.create();
+				dialog.show();
+		
+				
+				sview = (ScrollView)login_view.findViewById(R.id.aboutusview);
+				if(sview == null) Log.d("proj", "null!!!");
+				llayout = (LinearLayout)login_view.findViewById(R.id.lLayout1);
+				
+				tmp = new Thread(){
+					public void run(){
+						while(!interrupted()){
+							try {								
+								sleep(100);
+								runOnUiThread(new Runnable() {
+									
+									@Override
+									public void run() {
+										// TODO Auto-generated method stub
+										bottom = llayout.getHeight() - sview.getHeight();
+										if(sview.getScrollY() >= bottom){
+											counter = 0;
+											sview.scrollTo(0, 0);
+											return;
+										}
+										sview.smoothScrollBy(0, 5);	
+									}
+								});
+								
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}						
+					}
+				};
+				tmp.start();
+			}
+		});
+        /////////////////////////
+        
 		HostStartBtn = (ImageButton) findViewById(R.id.hostBtn);
 		
 		HostStartBtn.setOnClickListener(new View.OnClickListener() {

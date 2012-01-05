@@ -5,13 +5,15 @@
     android:layout_height="fill_parent"
     android:background="@drawable/background_800_480" android:clickable="true" android:weightSum="1">
     <RelativeLayout android:id="@+id/relativeLayout1" android:layout_height="fill_parent" android:layout_width="fill_parent">
+
     
     <ImageButton android:id="@+id/clientBtn" android:src="@drawable/bt_client" android:scaleType="fitCenter" 			android:background="@android:color/transparent" android:layout_above="@+id/hostBtn" android:layout_alignParentRight="true" android:layout_width="100dp" android:layout_height="100dp" android:layout_marginRight="40dp" android:layout_marginBottom="-130dp"></ImageButton>
     <ImageButton android:id="@+id/QRcodeBtn" android:src="@drawable/qrcode"    android:layout_alignParentBottom="true"  android:background="@android:color/transparent" android:layout_alignParentLeft="true" android:layout_marginLeft="16dp" android:layout_height="30dp" android:layout_width="30dp" android:scaleType="fitXY" android:layout_marginBottom="16dp"></ImageButton>
     <ImageButton android:id="@+id/hostBtn"   android:src="@drawable/bt_host"   android:scaleType="fitCenter" 			android:background="@android:color/transparent" android:layout_width="140dp" android:layout_height="160dp" android:layout_above="@+id/QRcodeBtn" android:layout_alignLeft="@+id/QRcodeBtn" android:layout_marginBottom="80dp"></ImageButton>
     <ImageButton android:id="@+id/aboutBtn"  android:src="@drawable/bt_about"  android:scaleType="fitCenter" 			android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="150dp" android:layout_alignParentTop="true" android:layout_alignParentRight="true" android:layout_marginTop="-30dp"></ImageButton>
-    <ImageView android:id="@+id/cover" android:layout_height="fill_parent" android:clickable="true" android:layout_width="wrap_content" android:scaleType="fitXY" android:src="@drawable/cover"></ImageView>
-        
+ 	<ImageView android:id="@+id/title" android:layout_width="250dp" android:scaleType="fitXY" android:layout_height="150dp" android:src="@drawable/title_canvasnet" android:layout_alignParentTop="true" android:layout_alignLeft="@+id/hostBtn" android:layout_marginTop="17dp"></ImageView>
+ 	<ImageView android:id="@+id/cover" android:layout_width="wrap_content" android:clickable="true" android:scaleType="fitXY" android:layout_height="fill_parent" android:src="@drawable/cover"></ImageView>
+
     </RelativeLayout>
 
 

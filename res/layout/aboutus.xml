@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="#88000000"
+  android:padding="0dp">
+    <ScrollView android:layout_width="match_parent" android:id="@+id/aboutusview" android:layout_height="250px" android:scrollbarAlwaysDrawVerticalTrack="false" android:scrollbars="none" >
+        <LinearLayout android:id="@+id/lLayout1" android:layout_width="match_parent" android:orientation="vertical" android:layout_height="110dp" android:scrollbarAlwaysDrawVerticalTrack="false" android:scrollbars="none">
+            <RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" android:layout_height="fill_parent">
+                
+                <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:id="@+id/textView1"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentTop="true" android:layout_centerHorizontal="true" android:text="\n[Application Design]"></TextView>
+				<TextView android:textAppearance="?android:attr/textAppearanceLarge" android:id="@+id/textView2"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/textView1" android:layout_centerHorizontal="true" android:layout_marginTop="10dp" android:text="西岸馬達ＷＣＭ"></TextView>
+                <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:id="@+id/textView3"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/textView2" android:layout_centerHorizontal="true" android:layout_marginTop="20dp" android:text="[Developer]"></TextView>
+                <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:id="@+id/textView4"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/textView3" android:layout_centerHorizontal="true" android:layout_marginTop="10dp" android:text="Yu Tu, Cheng-Yan Yang"></TextView>
+                <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:id="@+id/textView5"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/textView4" android:layout_centerHorizontal="true" android:text="Shi-Chen Wang"></TextView>
+                <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:id="@+id/textView6"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/textView5" android:layout_centerHorizontal="true" android:layout_marginTop="20dp" android:text="[Graphic Programming]"></TextView>
+                <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:id="@+id/textView7"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/textView6" android:layout_centerHorizontal="true" android:layout_marginTop="10dp" android:text="Yu Tu, Cheng-Yan Yang"></TextView>
+                <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:id="@+id/textView8"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/textView7" android:layout_centerHorizontal="true" android:layout_marginTop="20dp" android:text="[Server &amp; Client Programming]"></TextView>
+                <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:id="@+id/textView9"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/textView8" android:layout_centerHorizontal="true" android:layout_marginTop="10dp" android:text="Shi-Chen Wang"></TextView>
+                <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:id="@+id/textView10"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/textView9" android:layout_centerHorizontal="true" android:layout_marginTop="20dp" android:text="[Special Thanks]"></TextView>
+                <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:id="@+id/textView11" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/textView10" android:layout_centerHorizontal="true" android:layout_marginTop="10dp" android:text="Prof. Mike Chen"></TextView>
+                <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:id="@+id/textView12" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/textView11" android:layout_centerHorizontal="true" android:text="NTU Mobile Lab\n\n\n\n\n"></TextView>
+                
+            </RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
+    
+</LinearLayout>

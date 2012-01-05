@@ -299,6 +299,9 @@ public class MyCanvas extends Activity{
 						bg.compress(Bitmap.CompressFormat.JPEG, 80, out);
 						mView.getSocket().send(
 						new Commands.SendBitmapCmd(out.toByteArray()));
+						
+						bg.recycle();
+						System.gc();
 					}
 				}.start();
 			}
