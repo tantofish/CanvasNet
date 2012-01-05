@@ -53,7 +53,7 @@ public class Connection {
 			if(ib != null)			ib.close();
 			if(ob != null)			ob.close();
 			if(RunThread != null){
-				RunThread.stop();
+				RunThread.interrupt();
 				RunThread = null;
 			}
 		

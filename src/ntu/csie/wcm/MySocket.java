@@ -1,15 +1,12 @@
 package ntu.csie.wcm;
 
 import java.io.IOException;
-import java.io.OptionalDataException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-import java.security.acl.LastOwnerException;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -19,7 +16,6 @@ import android.os.Bundle;
 import android.os.Message;
 import android.text.format.Formatter;
 import android.util.Log;
-import android.widget.Toast;
 
 public class MySocket {
 
@@ -35,7 +31,6 @@ public class MySocket {
 	private ServerSocket serverSocket;
 	private Socket clientSocket, socket;
 
-	private InetAddress localhost; // for IP
 	private int listenPort; // for listen port
     
 	private Thread tmp;
@@ -47,7 +42,6 @@ public class MySocket {
 	public boolean IsServer(){		return IsServer;	} 
 	public MySurfaceView getSurfaceView(){	return mMySurfaceView;	}
 	
-	
 	public MySocket(MySurfaceView canvas, int listen, WifiManager wifiManager) {
 		mMySurfaceView = canvas;
 		listenPort = listen; 
@@ -58,7 +52,7 @@ public class MySocket {
 		selfIP = new String(Formatter.formatIpAddress(ipAddress));
 
 		try {
-			localhost = InetAddress.getByName(selfIP);
+			InetAddress.getByName(selfIP);
 			Log.e("IPpppp", selfIP);
 			serverSocket = new ServerSocket(listenPort);
 		} catch (IOException e1) {
@@ -76,7 +70,6 @@ public class MySocket {
 		
 		
 	}
-
 
 	public void server() {
 
@@ -292,8 +285,7 @@ public class MySocket {
 			}
 			if (tmp != null) {
 				tmp.interrupt();
-				tmp = null;
-				
+				tmp = null;	
 			}
 			if (clientSocket != null) {
 				clientSocket.close();
@@ -351,9 +343,7 @@ public class MySocket {
 		}
 	}
 
-	public String getIP() {		//return this.localhost.toString();
-	                    	return this.selfIP;
-	                       }
+	public String getIP() {	return this.selfIP;  }
 	
 	public void PrintList(){
 		Log.d("proj" , "In PrintList");
