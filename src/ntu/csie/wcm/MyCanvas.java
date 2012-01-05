@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.PorterDuffXfermode;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -172,7 +173,9 @@ public class MyCanvas extends Activity{
 		eraserBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
-				mView.getPaint().setColor(Color.WHITE);
+				//mView.getPaint().setAlpha(0);
+				//mView.getPaint().setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
+		     	mView.getPaint().setColor(Color.WHITE);
 				mMySocket.send(new Commands.ChangeColorCmd(mView.getPaint().getColor(),mView.getPaint().getStrokeWidth()));
 			}
 		});
@@ -343,10 +346,6 @@ public class MyCanvas extends Activity{
 		
 	}
 	
-	
-
-	
-	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// 把计1:竤舱id, 把计2:itemId, 把计3:item抖, 把计4:item嘿
@@ -400,16 +399,6 @@ public class MyCanvas extends Activity{
 			Bundle b = data.getExtras();
 			String path = b.getString("imgPath");
 	        mImageEditingView.startEditing(path);
-	        
-	        
-	        /*
-	         * to Chengyan:
-	         * I removed the original image transfering code because the
-	         * situation has been changed a little bit.
-	         * You may need to see "imgEdtOKBtn.setOnClickListener"
-	         * in order to fix this out, thanks.
-	         * 												tantofish
-	         */
 	        
 		}
 	}

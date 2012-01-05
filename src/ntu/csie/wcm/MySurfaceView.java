@@ -153,7 +153,7 @@ public class MySurfaceView extends View {
 		//canvas.drawColor(0xFFFEFEFE);
 		
 		canvas.drawColor(Color.WHITE);
-
+      //  Log.e("CYY", Integer.toString(mBitmap.getPixel(5, 5)));
 		canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
 		
 		//ChengYan: draw local path

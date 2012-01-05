@@ -4,7 +4,6 @@ package ntu.csie.wcm;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,15 +15,21 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+
+import android.view.View.OnTouchListener;
+
 import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
 import android.widget.Toast;
 
 public class CanvasNetActivity extends Activity {
@@ -36,7 +41,8 @@ public class CanvasNetActivity extends Activity {
 	ImageButton ClientStartBtn;
 	ImageButton mQRcodeBtn; 
 	ImageButton mAboutBtn;
-	ImageView mCover;
+	ImageView mCover,mTitle;
+
 	TransitionDrawable transition;
 	ScrollView sview;
 	LinearLayout llayout;
@@ -79,14 +85,75 @@ public class CanvasNetActivity extends Activity {
         
         
         //ChengYan: title animation
-        ImageView title = (ImageView) findViewById(R.id.title);
-        Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(this, R.anim.title_canvasnet_animation);
-        title.startAnimation(hyperspaceJumpAnimation);
+
+        
+        mTitle = (ImageView) findViewById(R.id.title);
+        final Animation ani1 = AnimationUtils.loadAnimation(this, R.anim.title_canvasnet_animation);
+        mTitle.startAnimation(ani1);
+        mTitle.setOnTouchListener(new OnTouchListener() {
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				// TODO Auto-generated method stub
+		        Animation ani2 = AnimationUtils.loadAnimation(CanvasNetActivity.this, R.anim.title_canvasnet_anim_onclick);
+				mTitle.clearAnimation();
+				ani2.setAnimationListener(new AnimationListener() {
+					@Override
+					public void onAnimationStart(Animation animation) {
+						// TODO Auto-generated method stub
+					}
+					@Override
+					public void onAnimationRepeat(Animation animation) {
+						// TODO Auto-generated method stub
+					}
+					@Override
+					public void onAnimationEnd(Animation animation) {
+						// TODO Auto-generated method stub
+						mTitle.clearAnimation();
+						mTitle.startAnimation(ani1);
+					}
+				});
+				
+				mTitle.startAnimation(ani2);
+				return false;
+			}
+		});
+        
+/*
+        mTitle.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+		        Animation ani2 = AnimationUtils.loadAnimation(CanvasNetActivity.this, R.anim.title_canvasnet_anim_onclick);
+				mTitle.clearAnimation();
+				ani2.setAnimationListener(new AnimationListener() {
+					@Override
+					public void onAnimationStart(Animation animation) {
+						// TODO Auto-generated method stub
+					}
+					@Override
+					public void onAnimationRepeat(Animation animation) {
+						// TODO Auto-generated method stub
+					}
+					@Override
+					public void onAnimationEnd(Animation animation) {
+						// TODO Auto-generated method stub
+						mTitle.clearAnimation();
+						mTitle.startAnimation(ani1);
+					}
+				});
+				
+				mTitle.startAnimation(ani2);
+			}
+		});
+  */      
+
         
         
         //ChengYan: QR code button
         mQRcodeBtn = (ImageButton)findViewById(R.id.QRcodeBtn);
-        mQRcodeBtn.setAlpha(180);
+        mQRcodeBtn.setAlpha(35);
         mQRcodeBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				 openQRCodeDialog();

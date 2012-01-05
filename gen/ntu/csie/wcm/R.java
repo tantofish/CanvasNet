@@ -10,7 +10,8 @@ package ntu.csie.wcm;
 public final class R {
     public static final class anim {
         public static final int cover_fadeout=0x7f040000;
-        public static final int title_canvasnet_animation=0x7f040001;
+        public static final int title_canvasnet_anim_onclick=0x7f040001;
+        public static final int title_canvasnet_animation=0x7f040002;
     }
     public static final class attr {
     }
