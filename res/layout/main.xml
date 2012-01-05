@@ -5,12 +5,15 @@
     android:layout_height="fill_parent"
     android:background="@drawable/background_800_480" android:clickable="true" android:weightSum="1">
     <RelativeLayout android:id="@+id/relativeLayout1" android:layout_height="fill_parent" android:layout_width="fill_parent">
+
     <ImageButton android:src="@drawable/bt_host"   android:scaleType="fitCenter" android:id="@+id/hostBtn" android:background="@android:color/transparent" android:layout_alignParentBottom="true" android:layout_alignParentLeft="true" android:layout_width="140dp" android:layout_height="160dp" android:layout_marginLeft="13dp" android:layout_marginBottom="130dp"></ImageButton>
     <ImageButton android:src="@drawable/bt_client" android:scaleType="fitCenter" android:id="@+id/clientBtn" android:background="@android:color/transparent" android:layout_above="@+id/hostBtn" android:layout_alignParentRight="true" android:layout_width="100dp" android:layout_height="100dp" android:layout_marginBottom="-140dp" android:layout_marginRight="40dp"></ImageButton>
     <ImageButton android:id="@+id/QRcodeBtn" android:src="@drawable/qrcode" android:layout_alignParentBottom="true" android:background="@android:color/transparent" android:layout_alignParentLeft="true" android:layout_marginLeft="16dp" android:layout_height="30dp" android:layout_width="30dp" android:scaleType="fitXY" android:layout_marginBottom="16dp"></ImageButton>
     <ImageView android:src="@drawable/cover" android:clickable="true" android:layout_height="fill_parent" android:scaleType="fitXY" android:id="@+id/cover" android:layout_width="wrap_content"></ImageView>
+
         
     </RelativeLayout>
+    <ImageView android:scaleType="fitXY" android:clickable="true" android:layout_height="fill_parent" android:id="@+id/cover" android:src="@drawable/cover" android:layout_width="wrap_content"></ImageView>
 
 
 </LinearLayout>

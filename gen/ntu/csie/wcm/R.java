@@ -10,6 +10,7 @@ package ntu.csie.wcm;
 public final class R {
     public static final class anim {
         public static final int cover_fadeout=0x7f040000;
+        public static final int title_canvasnet_animation=0x7f040001;
     }
     public static final class attr {
     }
@@ -44,6 +45,7 @@ public final class R {
         public static final int folder=0x7f02001b;
         public static final int icon=0x7f02001c;
         public static final int qrcode=0x7f02001d;
+        public static final int title_canvasnet=0x7f02001e;
     }
     public static final class id {
         public static final int ChangeColorBt=0x7f060003;
