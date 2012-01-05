@@ -65,6 +65,14 @@ public class CanvasNetActivity extends Activity {
 		});
         
         
+        
+        //ChengYan: title animation
+        
+        ImageView title = (ImageView) findViewById(R.id.title);
+        Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(this, R.anim.title_canvasnet_animation);
+        title.startAnimation(hyperspaceJumpAnimation);
+        
+        
         //ChengYan: QR code button
         mQRcodeBtn = (ImageButton)findViewById(R.id.QRcodeBtn);
         mQRcodeBtn.setAlpha(180);

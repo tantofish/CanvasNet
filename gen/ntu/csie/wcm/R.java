@@ -55,22 +55,23 @@ public final class R {
         public static final int bt_imgEdit_OK=0x7f06000a;
         public static final int clearBt=0x7f060007;
         public static final int clientBtn=0x7f060012;
-        public static final int cover=0x7f060014;
+        public static final int cover=0x7f060015;
         public static final int gallery1=0x7f06000f;
         public static final int gallery_folder=0x7f06000e;
         public static final int hostBtn=0x7f060011;
-        public static final int image=0x7f060017;
+        public static final int image=0x7f060018;
         public static final int imageView1=0x7f060010;
         public static final int ipTextView=0x7f06000c;
-        public static final int layout_root=0x7f060015;
+        public static final int layout_root=0x7f060016;
         public static final int linearLayout1=0x7f060002;
         public static final int loadedImage=0x7f060009;
         public static final int myImgEditView=0x7f060001;
         public static final int mySurfaceView1=0x7f060000;
         public static final int redoBt=0x7f060006;
         public static final int relativeLayout1=0x7f060008;
-        public static final int text=0x7f060016;
+        public static final int text=0x7f060017;
         public static final int textView1=0x7f06000d;
+        public static final int title=0x7f060014;
         public static final int undoBt=0x7f060005;
     }
     public static final class layout {
