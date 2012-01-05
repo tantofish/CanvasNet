@@ -435,7 +435,7 @@ public class MyCanvas extends Activity{
         
         ipTextView.setText(ip);
         final ProgressDialog.Builder dialog = new ProgressDialog.Builder(MyCanvas.this); 
-        dialog.setCancelable(false);  
+     //   dialog.setCancelable(false);  
         dialog.setTitle("Your MAGIC NUMBER is:");  
         
         dialog.setView(textEntryView);
