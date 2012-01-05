@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,7 +27,11 @@ public class CanvasNetActivity extends Activity {
 	/** Called when the activity is first created. */
 
 
-	ImageButton HostStartBtn,ClientStartBtn,mQRcodeBtn; 
+	ImageButton HostStartBtn;
+	ImageButton ClientStartBtn;
+	ImageButton mQRcodeBtn; 
+	ImageButton mAboutBtn;
+	
 	ImageView mCover;
 	TransitionDrawable transition;
 	
@@ -74,11 +79,38 @@ public class CanvasNetActivity extends Activity {
 			}
 		});
         
+        //Tantpfish: about us button (image is a tag)
+        mAboutBtn = (ImageButton)findViewById(R.id.aboutBtn);
         
+        mAboutBtn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				 gotoAboutUsActivity();
+				 
+			}
+		});
+        mAboutBtn.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if(event.getAction() == MotionEvent.ACTION_DOWN){
+					
+				}else if(event.getAction() == MotionEvent.ACTION_UP){
+					
+				}else if(event.getAction() == MotionEvent.ACTION_MOVE){
+					/*float x = event.getX();
+					float y = event.getY();
+					Log.e("tantofish", "event touch(x,y):" + "("+ x +", " + y + ")");
+					int t = mAboutBtn.getTop() + 1;
+					int l = mAboutBtn.getLeft();
+					int r = mAboutBtn.getRight();
+					int b = mAboutBtn.getBottom()+1;
+					 
+					mAboutBtn.layout(l, t, r, b);*/
+				}
+				return false;
+			}
+		});
         
-        
-        
-        
+
 
 		HostStartBtn = (ImageButton) findViewById(R.id.hostBtn);
 		
@@ -89,6 +121,7 @@ public class CanvasNetActivity extends Activity {
 				onClickHost();
 			}
 		});
+		
 		// tantofish : chenge button image when click
 		HostStartBtn.setOnTouchListener(new View.OnTouchListener() {
 			@Override
@@ -273,7 +306,7 @@ public class CanvasNetActivity extends Activity {
         });   
          
        
-       AlertDialog alert = builder.create();
+        AlertDialog alert = builder.create();
      
         alert.show();
 		
@@ -292,8 +325,8 @@ public class CanvasNetActivity extends Activity {
 		
 	}
 	
+	private void gotoAboutUsActivity(){
+		
+	}
 	
 }
-
-
-
