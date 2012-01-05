@@ -42,6 +42,7 @@ public final class R {
         public static final int folder=0x7f020019;
         public static final int icon=0x7f02001a;
         public static final int qrcode=0x7f02001b;
+        public static final int title_canvasnet=0x7f02001c;
     }
     public static final class id {
         public static final int ChangeColorBt=0x7f060003;
