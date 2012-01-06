@@ -12,9 +12,9 @@
     <ImageButton android:id="@+id/hostBtn"   android:src="@drawable/bt_host"   android:scaleType="fitCenter" 			android:background="@android:color/transparent" android:layout_width="140dp" android:layout_height="160dp" android:layout_above="@+id/QRcodeBtn" android:layout_alignLeft="@+id/QRcodeBtn" android:layout_marginBottom="80dp"></ImageButton>
     <ImageButton android:id="@+id/aboutBtn"  android:src="@drawable/bt_about"  android:scaleType="fitCenter" 			android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="150dp" android:layout_alignParentTop="true" android:layout_alignParentRight="true" android:layout_marginTop="30dp"></ImageButton>
  	<ImageView android:id="@+id/title" android:layout_width="250dp" android:scaleType="fitXY" android:layout_height="150dp" android:src="@drawable/title_canvasnet" android:layout_alignParentTop="true" android:layout_alignLeft="@+id/hostBtn" android:layout_marginTop="17dp"></ImageView>
+ 	<ImageView android:id="@+id/cover" android:layout_height="fill_parent" android:clickable="true" android:layout_width="wrap_content" android:scaleType="fitXY" android:src="@drawable/cover"></ImageView>
 
     </RelativeLayout>
-    <ImageView android:scaleType="fitXY" android:id="@+id/cover" android:src="@drawable/cover" android:layout_height="fill_parent" android:layout_width="wrap_content" android:clickable="true"></ImageView>
 
 
 </LinearLayout>

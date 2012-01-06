@@ -34,7 +34,7 @@ public class ImgLoaderActivity extends Activity {
 	Vector<Vector<Bitmap>> bmFiles;
 	
 	
-	
+	ViewGroup folder;
 	int folderIndex = -1;
 	int imageIndex = -1;
 	int w, h;
@@ -164,9 +164,12 @@ public class ImgLoaderActivity extends Activity {
 
 		
 		public View getView(final int position, View convertView, ViewGroup parent) {
-			Log.d("tantofish","Folder Index: "+folderIndex+"Position"+position);
+			Log.d("tantofish","Folder Index: "+folderIndex+"Position"+position + "parent" + parent);
 			final ImageView i = new ImageView(mContext);
 			if (imageIndex == -1)
+				folder = parent;
+			
+			if (folder == parent)
 				i.setImageResource(folderImageId);
 			else{
 				i.setImageBitmap(null);
@@ -231,7 +234,20 @@ public class ImgLoaderActivity extends Activity {
 		
 		/* Two filters that can tell if the file is a directory or a file */
 		FileFilter fileFilter = new FileFilter() {
-		    public boolean accept(File file) {	return file.isFile();	}
+		    public boolean accept(File file) {
+		    	String str = file.toString();
+		    	//int len = str.length();
+		    	//String sub = file.toString().substring(len-4, len-1);
+		    	if((str.endsWith(".jpg")  ||
+		    	    str.endsWith(".jpeg") ||
+		    	    str.endsWith(".png")  ||
+		    	    str.startsWith("CanvasNET") ||
+		    	    
+		    	    str.endsWith(".bmp")) && file.isFile())
+		    		return true;
+		    	else
+		    		return false;
+		    }
 		};
 		FileFilter dirFilter = new FileFilter() {
 		    public boolean accept(File file) {	return file.isDirectory();	}

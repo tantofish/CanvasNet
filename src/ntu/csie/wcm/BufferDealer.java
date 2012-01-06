@@ -139,13 +139,13 @@ public class BufferDealer {
 		// you can create a new file name "test.jpg" in sdcard folder.
 		File f = new File(Environment.getExternalStorageDirectory()
 				+ File.separator + "pictures" + File.separator + "CanvasNET"
-				+ File.separator +fileName);
+				+ File.separator +fileName + ".jpg");
 		while(f.exists())
 		{
 			fileName = fileNameBase + Integer.toString(counter);
 			 f = new File(Environment.getExternalStorageDirectory()
 					+ File.separator + "pictures" + File.separator + "CanvasNET"
-					+ File.separator +fileName);
+					+ File.separator +fileName + ".jpg");
 			 counter++;
 		}
 		

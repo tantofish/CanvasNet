@@ -407,7 +407,7 @@ public class MyCanvas extends Activity{
 		case 4:
 	        String fileName = mView.mBufferDealer.saveBitmapToMemory(mView.getBitmap());
 	        
-	        mView.errorToast("Save picture to "+ fileName);
+	        mView.errorToast("Save picture to "+ fileName + ".jpg");
 			
 			break;
 		default:
