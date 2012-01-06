@@ -9,9 +9,11 @@ package ntu.csie.wcm;
 
 public final class R {
     public static final class anim {
-        public static final int cover_fadeout=0x7f040000;
-        public static final int title_canvasnet_anim_onclick=0x7f040001;
-        public static final int title_canvasnet_animation=0x7f040002;
+        public static final int about_animation=0x7f040000;
+        public static final int click_btn_animation=0x7f040001;
+        public static final int cover_fadeout=0x7f040002;
+        public static final int title_canvasnet_anim_onclick=0x7f040003;
+        public static final int title_canvasnet_animation=0x7f040004;
     }
     public static final class attr {
     }
@@ -51,35 +53,40 @@ public final class R {
         public static final int title_canvasnet=0x7f020020;
     }
     public static final class id {
-        public static final int ChangeColorBt=0x7f060012;
-        public static final int EraserBt=0x7f060013;
-        public static final int QRcodeBtn=0x7f060020;
-        public static final int aboutBtn=0x7f060021;
+        public static final int ChangeColorBt=0x7f060017;
+        public static final int EraserBt=0x7f060018;
+        public static final int QRcodeBtn=0x7f060025;
+        public static final int aboutBtn=0x7f060026;
         public static final int aboutusview=0x7f060000;
-        public static final int bt_imgEdit_Cancel=0x7f060019;
-        public static final int bt_imgEdit_OK=0x7f060018;
-        public static final int clearBt=0x7f060016;
-        public static final int clientBtn=0x7f06001e;
-        public static final int cover=0x7f060023;
-        public static final int gallery1=0x7f06001c;
-        public static final int gallery_folder=0x7f06001b;
-        public static final int hostBtn=0x7f06001f;
-        public static final int image=0x7f060026;
-        public static final int imageView1=0x7f06001d;
-        public static final int ipTextView=0x7f06001a;
+        public static final int bt_imgEdit_Cancel=0x7f06001e;
+        public static final int bt_imgEdit_OK=0x7f06001d;
+        public static final int clearBt=0x7f06001b;
+        public static final int clientBtn=0x7f060023;
+        public static final int cover=0x7f060028;
+        public static final int gallery1=0x7f060021;
+        public static final int gallery_folder=0x7f060020;
+        public static final int hostBtn=0x7f060024;
+        public static final int image=0x7f06002b;
+        public static final int imageView1=0x7f060022;
+        public static final int ipTextView=0x7f06001f;
         public static final int lLayout1=0x7f060001;
-        public static final int layout_root=0x7f060024;
-        public static final int linearLayout1=0x7f060011;
-        public static final int loadedImage=0x7f060017;
-        public static final int myImgEditView=0x7f060010;
-        public static final int mySurfaceView1=0x7f06000f;
-        public static final int redoBt=0x7f060015;
+        public static final int layout_root=0x7f060029;
+        public static final int linearLayout1=0x7f060016;
+        public static final int loadedImage=0x7f06001c;
+        public static final int myImgEditView=0x7f060015;
+        public static final int mySurfaceView1=0x7f060014;
+        public static final int redoBt=0x7f06001a;
         public static final int relativeLayout1=0x7f060002;
-        public static final int text=0x7f060025;
+        public static final int text=0x7f06002a;
         public static final int textView1=0x7f060003;
         public static final int textView10=0x7f06000c;
         public static final int textView11=0x7f06000d;
         public static final int textView12=0x7f06000e;
+        public static final int textView13=0x7f06000f;
+        public static final int textView14=0x7f060010;
+        public static final int textView15=0x7f060011;
+        public static final int textView16=0x7f060012;
+        public static final int textView17=0x7f060013;
         public static final int textView2=0x7f060004;
         public static final int textView3=0x7f060005;
         public static final int textView4=0x7f060006;
@@ -88,8 +95,8 @@ public final class R {
         public static final int textView7=0x7f060009;
         public static final int textView8=0x7f06000a;
         public static final int textView9=0x7f06000b;
-        public static final int title=0x7f060022;
-        public static final int undoBt=0x7f060014;
+        public static final int title=0x7f060027;
+        public static final int undoBt=0x7f060019;
     }
     public static final class layout {
         public static final int aboutus=0x7f030000;

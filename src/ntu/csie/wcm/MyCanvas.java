@@ -374,11 +374,11 @@ public class MyCanvas extends Activity{
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// 把计1:竤舱id, 把计2:itemId, 把计3:item抖, 把计4:item嘿
-		menu.add(0, 0, 0, "Next Page");
-		menu.add(0, 1, 1, "Frame Select");
+		//menu.add(0, 0, 0, "Next Page");
+		//menu.add(0, 1, 1, "Frame Select");
 		menu.add(0, 2, 2, "Load Image");
 		menu.add(0, 3, 3, "Check IP");
-		menu.add(0, 4, 4, "Disconnect");
+		//menu.add(0, 4, 4, "Disconnect");
 		return super.onCreateOptionsMenu(menu);
 	}
 	

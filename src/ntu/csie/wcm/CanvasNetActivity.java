@@ -6,6 +6,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.TransitionDrawable;
@@ -15,21 +17,15 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-
 import android.view.View.OnTouchListener;
-
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.TextView;
-
 import android.widget.Toast;
 
 public class CanvasNetActivity extends Activity {
@@ -46,7 +42,7 @@ public class CanvasNetActivity extends Activity {
 	TransitionDrawable transition;
 	ScrollView sview;
 	LinearLayout llayout;
-	Thread tmp;
+	Thread tmp,mAboutThread;
 	int counter;
 	int bottom;
 	//Button imgLoaderActivityJumper; // tantofish:temporary use.
@@ -119,41 +115,10 @@ public class CanvasNetActivity extends Activity {
 			}
 		});
         
-/*
-        mTitle.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-		        Animation ani2 = AnimationUtils.loadAnimation(CanvasNetActivity.this, R.anim.title_canvasnet_anim_onclick);
-				mTitle.clearAnimation();
-				ani2.setAnimationListener(new AnimationListener() {
-					@Override
-					public void onAnimationStart(Animation animation) {
-						// TODO Auto-generated method stub
-					}
-					@Override
-					public void onAnimationRepeat(Animation animation) {
-						// TODO Auto-generated method stub
-					}
-					@Override
-					public void onAnimationEnd(Animation animation) {
-						// TODO Auto-generated method stub
-						mTitle.clearAnimation();
-						mTitle.startAnimation(ani1);
-					}
-				});
-				
-				mTitle.startAnimation(ani2);
-			}
-		});
-  */      
-
-        
         
         //ChengYan: QR code button
         mQRcodeBtn = (ImageButton)findViewById(R.id.QRcodeBtn);
-        mQRcodeBtn.setAlpha(35);
+        mQRcodeBtn.setAlpha(50);
         mQRcodeBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				 openQRCodeDialog();
@@ -162,6 +127,10 @@ public class CanvasNetActivity extends Activity {
         
         //Tantpfish: about us button (image is a tag)
         mAboutBtn = (ImageButton)findViewById(R.id.aboutBtn);
+        
+        //ChengYan: apply animation to about button
+        final Animation aboutAni = AnimationUtils.loadAnimation(this, R.anim.about_animation);
+        mAboutBtn.startAnimation(aboutAni);
         
         mAboutBtn.setOnTouchListener(new View.OnTouchListener() {
 			@Override
@@ -190,6 +159,30 @@ public class CanvasNetActivity extends Activity {
 				AlertDialog.Builder builder = new AlertDialog.Builder(CanvasNetActivity.this);
 				builder.setView(login_view);
 				AlertDialog dialog = builder.create();
+				
+				dialog.setOnDismissListener(new OnDismissListener() {
+					
+					@Override
+					public void onDismiss(DialogInterface dialog) {
+						// TODO Auto-generated method stub
+						mAboutThread.interrupt();
+						Log.e("CYY", Boolean.toString(mAboutThread.isInterrupted()));
+						
+					}
+				});
+				
+				dialog.setOnCancelListener(new OnCancelListener() {
+					
+					@Override
+					public void onCancel(DialogInterface dialog) {
+						// TODO Auto-generated method stub
+						mAboutThread.interrupt();
+						Log.e("CYY", "onCancel");
+					}
+				});
+				
+				
+				
 				dialog.show();
 		
 				
@@ -197,11 +190,14 @@ public class CanvasNetActivity extends Activity {
 				if(sview == null) Log.d("proj", "null!!!");
 				llayout = (LinearLayout)login_view.findViewById(R.id.lLayout1);
 				
-				tmp = new Thread(){
+				mAboutThread = new Thread(){
 					public void run(){
 						while(!interrupted()){
 							try {								
 								sleep(100);
+								
+								Log.e("CYY", "scrolling");
+								
 								runOnUiThread(new Runnable() {
 									
 									@Override
@@ -220,14 +216,22 @@ public class CanvasNetActivity extends Activity {
 							} catch (InterruptedException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
+								Thread.currentThread().interrupt();
 							}
 						}						
 					}
 				};
-				tmp.start();
+				mAboutThread.start();
+				
+
 			}
 		});
         /////////////////////////
+        
+        //ChengYan: animation for on click button
+        final Animation onclickBtnAnimation = AnimationUtils.loadAnimation(this, R.anim.click_btn_animation);
+        
+        
         
 		HostStartBtn = (ImageButton) findViewById(R.id.hostBtn);
 		
@@ -245,6 +249,7 @@ public class CanvasNetActivity extends Activity {
 			public boolean onTouch(View v, MotionEvent event) {
 				if(event.getAction() == MotionEvent.ACTION_DOWN){
 					HostStartBtn.setImageResource(R.drawable.bt_host_down);
+					HostStartBtn.startAnimation(onclickBtnAnimation);
 				}else if(event.getAction() == MotionEvent.ACTION_UP){
 					HostStartBtn.setImageResource(R.drawable.bt_host);
 					//HostStartBtn.setImageDrawable(null);
@@ -266,6 +271,7 @@ public class CanvasNetActivity extends Activity {
 				// TODO Auto-generated method stub
 				if(event.getAction() == MotionEvent.ACTION_DOWN){
 					ClientStartBtn.setImageResource(R.drawable.bt_client_down);
+					ClientStartBtn.startAnimation(onclickBtnAnimation);
 				}else if(event.getAction() == MotionEvent.ACTION_UP){
 					ClientStartBtn.setImageResource(R.drawable.bt_client);
 					//ClientStartBtn.setImageDrawable(null);
