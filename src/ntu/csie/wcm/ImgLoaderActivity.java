@@ -50,7 +50,7 @@ public class ImgLoaderActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.gallery);
-		
+		setRequestedOrientation(1);	//lock rotate
 		context  = ImgLoaderActivity.this;
 		g_folder = (Gallery)   findViewById(R.id.gallery_folder);
 		g_photo  = (Gallery)   findViewById(R.id.gallery1);

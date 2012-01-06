@@ -76,8 +76,8 @@ public class MyImgEditView extends View {
 	public MyImgEditView(Context c, AttributeSet attrs) {
 		super(c, attrs);
 		mContext = c;	
-		//mBitmapPaint = new Paint(Paint.DITHER_FLAG);
-		mBitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+		//mBitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 	}
 
 	@Override

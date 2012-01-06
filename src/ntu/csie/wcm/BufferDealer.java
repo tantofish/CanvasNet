@@ -4,10 +4,17 @@
 
 package ntu.csie.wcm;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.os.Environment;
 import android.util.Log;
 
 
@@ -103,6 +110,62 @@ public class BufferDealer {
 	// return true if I can perform redo
 	public boolean isRedoValid(){
 		return (undoCounter > 0);
+	}
+	
+	public String saveBitmapToMemory(Bitmap bmp)
+	{
+		
+	//	Log.e("CYY", Environment.getExternalStorageDirectory().toString());
+		String root = Environment.getExternalStorageDirectory().toString();
+		new File(root + "/pictures/CanvasNET").mkdirs();
+		// String root = Environment.getExternalStorageDirectory().toString();
+		// new File(root + "/CanvasNET").mkdirs();
+		Bitmap bg = bmp.copy(Bitmap.Config.ARGB_8888, true);
+		Canvas tempcanvasCanvas = new Canvas(bg);
+		tempcanvasCanvas.drawColor(Color.WHITE);
+		tempcanvasCanvas.drawBitmap(bmp, 0, 0, new Paint(Paint.DITHER_FLAG));
+		
+		
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+		
+		bg.compress(Bitmap.CompressFormat.JPEG, 80, bytes);
+		
+		bg.recycle();
+		tempcanvasCanvas = null;
+   
+		String fileName,fileNameBase = "CanvasNetPic" ;
+		int counter =1;
+		fileName = "CanvasNetPic0";
+		// you can create a new file name "test.jpg" in sdcard folder.
+		File f = new File(Environment.getExternalStorageDirectory()
+				+ File.separator + "pictures" + File.separator + "CanvasNET"
+				+ File.separator +fileName);
+		while(f.exists())
+		{
+			fileName = fileNameBase + Integer.toString(counter);
+			 f = new File(Environment.getExternalStorageDirectory()
+					+ File.separator + "pictures" + File.separator + "CanvasNET"
+					+ File.separator +fileName);
+			 counter++;
+		}
+		
+		
+		
+		try {
+			f.createNewFile();
+
+			// write the bytes in file
+			FileOutputStream fo = new FileOutputStream(f);
+			fo.write(bytes.toByteArray());
+			bytes.close();
+			fo.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return fileName;
+		
 	}
 
 }

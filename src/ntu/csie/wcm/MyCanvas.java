@@ -2,6 +2,7 @@ package ntu.csie.wcm;
 
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -18,6 +19,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -378,7 +380,7 @@ public class MyCanvas extends Activity{
 		//menu.add(0, 1, 1, "Frame Select");
 		menu.add(0, 2, 2, "Load Image");
 		menu.add(0, 3, 3, "Check IP");
-		//menu.add(0, 4, 4, "Disconnect");
+		menu.add(0, 4, 4, "Save");
 		return super.onCreateOptionsMenu(menu);
 	}
 	
@@ -403,9 +405,10 @@ public class MyCanvas extends Activity{
 			checkIP();
 			break;
 		case 4:
-			mMySocket.disconnect();
-			this.finish();
-		//	this.finalize();
+	        String fileName = mView.mBufferDealer.saveBitmapToMemory(mView.getBitmap());
+	        
+	        mView.errorToast("Save picture to "+ fileName);
+			
 			break;
 		default:
 		}
