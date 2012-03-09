@@ -4,7 +4,7 @@
  * touched.
  */
 
-package ntu.csie.wcm;
+package ntu.csie.wcmlab;
 
 
 import android.app.Dialog;

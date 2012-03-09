@@ -1,4 +1,4 @@
-package ntu.csie.wcm;
+package ntu.csie.wcmlab;
 
 import java.io.IOException;
 import java.net.InetAddress;

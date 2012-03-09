@@ -5,7 +5,7 @@
  */
 
 
-package ntu.csie.wcm;
+package ntu.csie.wcmlab;
 
 import java.io.ByteArrayOutputStream;
 

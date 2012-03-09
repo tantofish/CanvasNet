@@ -1,4 +1,4 @@
-package ntu.csie.wcm;
+package ntu.csie.wcmlab;
 
 import android.content.Context;
 import android.graphics.Bitmap;

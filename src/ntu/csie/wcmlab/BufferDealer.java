@@ -2,7 +2,7 @@
 
 
 
-package ntu.csie.wcm;
+package ntu.csie.wcmlab;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,7 +19,7 @@ import android.util.Log;
 
 
 public class BufferDealer {
-	private final int BITMAP_CACHE_SIZE = 3;
+	private final int BITMAP_CACHE_SIZE = 2;
 	private ArrayList<Bitmap> mBitmaps;
 	private boolean isUndoing;
 	private int undoCounter;

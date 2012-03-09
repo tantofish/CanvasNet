@@ -9,8 +9,8 @@
        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
    			 android:layout_width="fill_parent"
    	         android:layout_height="fill_parent" android:background="@drawable/background_paper">
-           <ntu.csie.wcm.MySurfaceView android:id="@+id/mySurfaceView1" android:layout_width="wrap_content" android:layout_height="wrap_content"></ntu.csie.wcm.MySurfaceView>
-           <ntu.csie.wcm.MyImgEditView android:id="@+id/myImgEditView" android:layout_width="wrap_content" android:layout_height="wrap_content"></ntu.csie.wcm.MyImgEditView>
+           <ntu.csie.wcmlab.MySurfaceView android:id="@+id/mySurfaceView1" android:layout_width="wrap_content" android:layout_height="wrap_content"></ntu.csie.wcmlab.MySurfaceView>
+           <ntu.csie.wcmlab.MyImgEditView android:id="@+id/myImgEditView" android:layout_width="wrap_content" android:layout_height="wrap_content"></ntu.csie.wcmlab.MyImgEditView>
            <LinearLayout android:id="@+id/linearLayout1" android:layout_width="match_parent" android:layout_height="wrap_content">
                <ImageButton android:src="@drawable/bt_palette_128" android:text="Bt1" android:layout_width="0pt" android:layout_weight="1" android:background="@android:color/transparent" android:id="@+id/ChangeColorBt" android:layout_height="20pt" android:scaleType="centerInside"></ImageButton>
                <ImageButton android:src="@drawable/bt_eraser_128" android:text="bt2" android:id="@+id/EraserBt" android:layout_width="0pt" android:layout_weight="1"   android:background="@android:color/transparent" android:layout_height="20pt" android:scaleType="fitCenter"></ImageButton>

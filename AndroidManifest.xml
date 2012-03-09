@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="ntu.csie.wcm"
+      package="ntu.csie.wcmlab"
       android:versionCode="5"
       android:versionName="1.5.1">
     <uses-sdk android:minSdkVersion="10" />
@@ -16,7 +16,7 @@
         </activity>
         <activity android:name=".MyCanvas" android:theme="@android:style/Theme.NoTitleBar"></activity>
         
-        <activity android:name=".ImgLoaderActivity"></activity>
+        <activity android:name="ntu.csie.wcmlab.ImgLoaderActivity"></activity>
         
     </application>
     
