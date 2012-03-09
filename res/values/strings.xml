@@ -3,4 +3,5 @@
     <string name="hello">Hello World, CanvasNetActivity!</string>
     <string name="app_name">CanvasNet</string>
     <string name="hello_gallery">Hello World, GalleryActivity!</string>
+    <string name="patchnote">currently, we can only link devices which are in the same local network (include android phone AP)</string>
 </resources>

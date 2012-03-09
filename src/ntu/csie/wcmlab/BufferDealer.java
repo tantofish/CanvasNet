@@ -15,7 +15,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Environment;
-import android.util.Log;
+
 
 
 public class BufferDealer {

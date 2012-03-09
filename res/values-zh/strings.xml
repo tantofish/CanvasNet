@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="patchnote">目前僅支援區域網路內的連線(包含自己架設的android ap), 若使用自機架設的ap,則magic number為043001</string>
+    
+</resources>

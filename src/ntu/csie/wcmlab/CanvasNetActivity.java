@@ -16,7 +16,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -44,6 +43,7 @@ public class CanvasNetActivity extends Activity {
 	ImageButton mAboutBtn;
 	ImageView mCover,mTitle;
 
+  
 	TransitionDrawable transition;
 	ScrollView sview;
 	LinearLayout llayout;
@@ -51,7 +51,8 @@ public class CanvasNetActivity extends Activity {
 	int counter;
 	int bottom;
 	//Button imgLoaderActivityJumper; // tantofish:temporary use.
-	
+
+	private AlertDialog mPatchNoteDialog;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -80,6 +81,9 @@ public class CanvasNetActivity extends Activity {
 				
 				mCover.setClickable(false);
 				mCover.setVisibility(View.INVISIBLE);
+				
+				mPatchNoteDialog= buildPatchNoteDialog();
+				mPatchNoteDialog.show();
 			
 			}
 		});
@@ -112,6 +116,8 @@ public class CanvasNetActivity extends Activity {
 						// TODO Auto-generated method stub
 						mTitle.clearAnimation();
 						mTitle.startAnimation(ani1);
+
+						
 					}
 				});
 				
@@ -288,7 +294,7 @@ public class CanvasNetActivity extends Activity {
 		
 		
 		
-		
+
 		
 
 
@@ -323,6 +329,13 @@ public class CanvasNetActivity extends Activity {
 							mCover.startAnimation(fadeout);
 							mCover.setClickable(false);
 							mCover.setVisibility(View.INVISIBLE);
+							
+							//show pathcNote
+							if(mPatchNoteDialog == null)
+							{
+						    mPatchNoteDialog= buildPatchNoteDialog();
+							mPatchNoteDialog.show();
+							}
 							
 							
 							
@@ -460,6 +473,26 @@ public class CanvasNetActivity extends Activity {
 	
 	private void gotoAboutUsActivity(){
 		
+	}
+	
+	private AlertDialog buildPatchNoteDialog()
+	{
+		//chengyan:show patch note dialog
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Note")
+		       .setMessage(R.string.patchnote)
+		       .setCancelable(false)
+		       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		               
+		           }
+		       });
+
+		AlertDialog alert = builder.create();
+		//alert.show();
+		return alert;
+		
+	
 	}
 	
 }
