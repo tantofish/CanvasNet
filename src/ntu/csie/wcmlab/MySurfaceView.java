@@ -457,6 +457,7 @@ public class MySurfaceView extends View {
 			
 			int [] pixels = new int[mWidth * mHeight];
 			/* origin
+			
 			tempBmp.getPixels(pixels, 0, mWidth, 0, 0, tempBmp.getWidth(), tempBmp.getHeight()); 
 			bmp.setPixels(pixels, 0, mWidth, 0, 0, tempBmp.getWidth(), tempBmp.getHeight());
 			*/

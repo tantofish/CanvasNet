@@ -315,11 +315,13 @@ public class MyCanvas extends Activity{
 				        rect.right  = mView.getWidth();
 				        rect.top    = 0;
 				        rect.bottom = mView.getHeight();
-				        
+				      
+				        /*/chengyan: temporary comment out
 				        Bitmap bgpaper = BitmapFactory.decodeResource(res, R.drawable.background_paper);
 						
 						tmpCan.drawBitmap(bgpaper, null, rect, mView.mBitmapPaint);
-						
+						*/
+				        tmpCan.drawColor(Color.WHITE);
 						
 						tmpCan.drawBitmap(bm, 0, 0, mView.mBitmapPaint);
 						
