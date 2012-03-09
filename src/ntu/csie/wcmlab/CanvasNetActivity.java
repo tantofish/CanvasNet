@@ -2,7 +2,6 @@ package ntu.csie.wcmlab;
 
 
 
-import java.io.File;
 
 
 
@@ -471,9 +470,7 @@ public class CanvasNetActivity extends Activity {
 		
 	}
 	
-	private void gotoAboutUsActivity(){
-		
-	}
+
 	
 	private AlertDialog buildPatchNoteDialog()
 	{

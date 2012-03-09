@@ -11,7 +11,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Shader;
@@ -119,7 +118,7 @@ public class ColorPickDialog extends Dialog {
         private static final int CENTER_Y = 120;
         private static final int CENTER_RADIUS = 32;
         private static final int STROKE_WIDTH = 60;
-
+/*
         private int floatToByte(float x) {
             int n = java.lang.Math.round(x);
             return n;
@@ -132,7 +131,7 @@ public class ColorPickDialog extends Dialog {
             }
             return n;
         }
-
+*/
         private int ave(int s, int d, float p) {
             return s + java.lang.Math.round(p * (d - s));
         }
@@ -162,7 +161,7 @@ public class ColorPickDialog extends Dialog {
            
         }
 
-        private int rotateColor(int color, float rad) {
+    /*    private int rotateColor(int color, float rad) {
             float deg = rad * 180 / 3.1415927f;
             int r = Color.red(color);
             int g = Color.green(color);
@@ -185,7 +184,7 @@ public class ColorPickDialog extends Dialog {
 
             return Color.argb(Color.alpha(color), pinToByte(ir),
                               pinToByte(ig), pinToByte(ib));
-        }
+        }*/
 
         private static final float PI = 3.1415926f;
 

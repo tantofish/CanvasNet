@@ -4,13 +4,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -29,8 +26,8 @@ public class MyImgEditView extends View {
 	public Bitmap mBitmap;
 	public Canvas mCanvas;
 	private Paint mBitmapPaint;
-	private Paint mPaint;
-	private Path  mPath;
+	//private Paint mPaint;
+	//private Path  mPath;
 	
 	private int mWidth, mHeight;	// window width and window height
 	private int fWidth, fHeight;	// fitted width and fitted height 

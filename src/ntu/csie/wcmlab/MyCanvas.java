@@ -2,7 +2,6 @@ package ntu.csie.wcmlab;
 
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 
 
 
@@ -10,9 +9,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -21,7 +18,6 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -306,7 +302,7 @@ public class MyCanvas extends Activity{
 						
 						//tmpCan.drawColor(Color.TRANSPARENT);
 					
-						Resources res = getResources();
+					//	Resources res = getResources();
 						
 					
 						

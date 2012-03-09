@@ -7,10 +7,7 @@
 
 package ntu.csie.wcmlab;
 
-import java.io.ByteArrayOutputStream;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 
 public class Commands  implements java.io.Serializable {
