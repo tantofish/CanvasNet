@@ -456,8 +456,15 @@ public class MySurfaceView extends View {
 			Bitmap bmp =  Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
 			
 			int [] pixels = new int[mWidth * mHeight];
-			tempBmp.getPixels(pixels, 0, mWidth, 0, 0, tempBmp.getWidth(), tempBmp.getHeight());
+			/* origin
+			tempBmp.getPixels(pixels, 0, mWidth, 0, 0, tempBmp.getWidth(), tempBmp.getHeight()); 
 			bmp.setPixels(pixels, 0, mWidth, 0, 0, tempBmp.getWidth(), tempBmp.getHeight());
+			*/
+            int tempWidth = mWidth <= tempBmp.getWidth() ?  mWidth : tempBmp.getWidth();
+            int tempHeight = mHeight <= tempBmp.getHeight() ? mHeight : tempBmp.getHeight();
+			tempBmp.getPixels(pixels, 0, mWidth, 0, 0, tempWidth, tempHeight);
+			
+			bmp.setPixels(pixels, 0, mWidth, 0, 0, tempWidth,tempHeight);
 			/*for(int j = 0 ; j < mHeight ; j++)
 				for(int i = 0 ; i < mWidth ; i++){
 					
